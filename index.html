@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>臻伟福利商城 - 原型设计导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+        }
+        .stat-card .number {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .stat-card .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        .consumer-icon { background: linear-gradient(135deg, #52C41A, #73d13d); }
+        .merchant-icon { background: linear-gradient(135deg, #1890FF, #40a9ff); }
+        .platform-icon { background: linear-gradient(135deg, #722ED1, #9254de); }
+        .sales-icon { background: linear-gradient(135deg, #FA8C16, #ffa940); }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+        }
+        .section-count {
+            margin-left: auto;
+            background: #f5f5f5;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .page-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .page-item:hover {
+            background: #f0f0f0;
+            border-color: #1890FF;
+            transform: translateY(-2px);
+        }
+        .page-item .icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        .page-item .name {
+            font-size: 14px;
+            flex: 1;
+        }
+        .page-item .arrow {
+            color: #999;
+            font-size: 12px;
+        }
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .badge-pc { background: #e6f7ff; color: #1890FF; }
+        .badge-mini { background: #f6ffed; color: #52C41A; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 臻伟福利商城</h1>
+            <p>原型设计导航 - 全部页面在线预览</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">52</div>
+                <div class="label">原型页面</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">4</div>
+                <div class="label">客户端</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">100%</div>
+                <div class="label">设计完成</div>
+            </div>
+        </div>
+
+        <!-- 消费者端 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon consumer-icon">🛒</div>
+                <div class="section-title">消费者端</div>
+                <div class="section-count">12 页面</div>
+            </div>
+            <div class="pages-grid">
+                <a href="consumer-home.html" class="page-item">
+                    <span class="icon">🏠</span>
+                    <span class="name">首页</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-category.html" class="page-item">
+                    <span class="icon">📋</span>
+                    <span class="name">分类页</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-product-list.html" class="page-item">
+                    <span class="icon">📦</span>
+                    <span class="name">商品列表</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-product-detail.html" class="page-item">
+                    <span class="icon">📄</span>
+                    <span class="name">商品详情</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-cart.html" class="page-item">
+                    <span class="icon">🛒</span>
+                    <span class="name">购物车</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-order-confirm.html" class="page-item">
+                    <span class="icon">✅</span>
+                    <span class="name">订单确认</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-pay-result.html" class="page-item">
+                    <span class="icon">💳</span>
+                    <span class="name">支付结果</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-order-list.html" class="page-item">
+                    <span class="icon">📋</span>
+                    <span class="name">订单列表</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-order-detail.html" class="page-item">
+                    <span class="icon">📄</span>
+                    <span class="name">订单详情</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-address.html" class="page-item">
+                    <span class="icon">📍</span>
+                    <span class="name">地址管理</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-profile.html" class="page-item">
+                    <span class="icon">👤</span>
+                    <span class="name">个人中心</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="consumer-message.html" class="page-item">
+                    <span class="icon">💬</span>
+                    <span class="name">消息中心</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 商家端 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon merchant-icon">🏪</div>
+                <div class="section-title">商家端</div>
+                <div class="section-count">16 页面</div>
+            </div>
+            <div class="pages-grid">
+                <a href="merchant-home.html" class="page-item">
+                    <span class="icon">🏠</span>
+                    <span class="name">工作台</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-order.html" class="page-item">
+                    <span class="icon">📋</span>
+                    <span class="name">订单管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-order-detail.html" class="page-item">
+                    <span class="icon">📄</span>
+                    <span class="name">订单详情</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-after-sale.html" class="page-item">
+                    <span class="icon">🔄</span>
+                    <span class="name">售后管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-logistics.html" class="page-item">
+                    <span class="icon">🚚</span>
+                    <span class="name">物流查询</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-customer-service.html" class="page-item">
+                    <span class="icon">💬</span>
+                    <span class="name">客服对话</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-exchange.html" class="page-item">
+                    <span class="icon">🎁</span>
+                    <span class="name">兑换记录</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-stats.html" class="page-item">
+                    <span class="icon">📊</span>
+                    <span class="name">数据统计</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-message.html" class="page-item">
+                    <span class="icon">📨</span>
+                    <span class="name">消息中心</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-setting.html" class="page-item">
+                    <span class="icon">⚙️</span>
+                    <span class="name">店铺设置</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-mini-home.html" class="page-item">
+                    <span class="icon">🏠</span>
+                    <span class="name">首页</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-mini-order.html" class="page-item">
+                    <span class="icon">📋</span>
+                    <span class="name">订单管理</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-mini-order-detail.html" class="page-item">
+                    <span class="icon">📄</span>
+                    <span class="name">订单详情</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-mini-stats.html" class="page-item">
+                    <span class="icon">📊</span>
+                    <span class="name">数据统计</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-mini-message.html" class="page-item">
+                    <span class="icon">💬</span>
+                    <span class="name">消息中心</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="merchant-mini-profile.html" class="page-item">
+                    <span class="icon">👤</span>
+                    <span class="name">个人中心</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 平台端 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon platform-icon">🏢</div>
+                <div class="section-title">平台端</div>
+                <div class="section-count">16 页面</div>
+            </div>
+            <div class="pages-grid">
+                <a href="platform-home.html" class="page-item">
+                    <span class="icon">🏠</span>
+                    <span class="name">首页</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-product.html" class="page-item">
+                    <span class="icon">📦</span>
+                    <span class="name">商品管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-product-edit.html" class="page-item">
+                    <span class="icon">✏️</span>
+                    <span class="name">商品编辑</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-exchange.html" class="page-item">
+                    <span class="icon">🎁</span>
+                    <span class="name">兑换中心</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-account.html" class="page-item">
+                    <span class="icon">👥</span>
+                    <span class="name">账号管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-data.html" class="page-item">
+                    <span class="icon">📊</span>
+                    <span class="name">运营数据</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-merchant.html" class="page-item">
+                    <span class="icon">🏪</span>
+                    <span class="name">商家管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-sales.html" class="page-item">
+                    <span class="icon">💼</span>
+                    <span class="name">销售管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-message.html" class="page-item">
+                    <span class="icon">📨</span>
+                    <span class="name">消息管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-settings.html" class="page-item">
+                    <span class="icon">⚙️</span>
+                    <span class="name">系统设置</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-permission.html" class="page-item">
+                    <span class="icon">🔐</span>
+                    <span class="name">权限管理</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-log.html" class="page-item">
+                    <span class="icon">📝</span>
+                    <span class="name">操作日志</span>
+                    <span class="badge badge-pc">PC</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-mini-home.html" class="page-item">
+                    <span class="icon">🏠</span>
+                    <span class="name">首页</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-mini-stats.html" class="page-item">
+                    <span class="icon">📊</span>
+                    <span class="name">数据</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-mini-todo.html" class="page-item">
+                    <span class="icon">📋</span>
+                    <span class="name">待办</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="platform-mini-profile.html" class="page-item">
+                    <span class="icon">👤</span>
+                    <span class="name">我的</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 销售端 -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon sales-icon">💼</div>
+                <div class="section-title">销售端</div>
+                <div class="section-count">8 页面</div>
+            </div>
+            <div class="pages-grid">
+                <a href="sales-home.html" class="page-item">
+                    <span class="icon">🏠</span>
+                    <span class="name">首页</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="sales-customer.html" class="page-item">
+                    <span class="icon">👥</span>
+                    <span class="name">客户管理</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="sales-customer-detail.html" class="page-item">
+                    <span class="icon">📄</span>
+                    <span class="name">客户详情</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="sales-order.html" class="page-item">
+                    <span class="icon">📋</span>
+                    <span class="name">订单管理</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="sales-commission.html" class="page-item">
+                    <span class="icon">💰</span>
+                    <span class="name">佣金统计</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="sales-stats.html" class="page-item">
+                    <span class="icon">📊</span>
+                    <span class="name">业绩统计</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="sales-message.html" class="page-item">
+                    <span class="icon">💬</span>
+                    <span class="name">消息中心</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+                <a href="sales-profile.html" class="page-item">
+                    <span class="icon">👤</span>
+                    <span class="name">个人中心</span>
+                    <span class="badge badge-mini">小程序</span>
+                    <span class="arrow">→</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>臻伟福利商城原型设计 © 2026 | 共 52 个页面</p>
+            <p style="margin-top: 8px;">设计时间：2026年3月19日</p>
+        </div>
+    </div>
+</body>
+</html>
