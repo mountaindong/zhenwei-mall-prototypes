@@ -790,14 +790,14 @@
 
     <!-- 三种兑换卡类型切换 -->
     <div style="background:white;border-radius:8px;padding:12px 20px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,0.04);display:flex;gap:24px;border-bottom:1px solid #f0f0f0">
-      <div class="type-tab active" data-type="physical" onclick="switchCardType('physical')" style="padding:8px 0;border-bottom:2px solid #1890FF;color:#1890FF;cursor:pointer;font-weight:500">
-        <i class="fas fa-box" style="margin-right:6px;"></i>实物兑换卡 <span style="color:#999;font-weight:400">(128)</span>
+      <div class="type-tab active" data-type="fixed" onclick="switchCardType('fixed')" style="padding:8px 0;border-bottom:2px solid #1890FF;color:#1890FF;cursor:pointer;font-weight:500">
+        <i class="fas fa-money-bill-wave" style="margin-right:6px;"></i>固定金额卡 <span style="color:#999;font-weight:400">(1,024)</span>
       </div>
-      <div class="type-tab" data-type="virtual" onclick="switchCardType('virtual')" style="padding:8px 0;border-bottom:2px solid transparent;color:#666;cursor:pointer">
-        <i class="fas fa-qrcode" style="margin-right:6px;"></i>虚拟兑换卡 <span style="color:#999;">(256)</span>
+      <div class="type-tab" data-type="product" onclick="switchCardType('product')" style="padding:8px 0;border-bottom:2px solid transparent;color:#666;cursor:pointer">
+        <i class="fas fa-gift" style="margin-right:6px;"></i>商品选择卡 <span style="color:#999;">(256)</span>
       </div>
-      <div class="type-tab" data-type="service" onclick="switchCardType('service')" style="padding:8px 0;border-bottom:2px solid transparent;color:#666;cursor:pointer">
-        <i class="fas fa-concierge-bell" style="margin-right:6px;"></i>服务兑换卡 <span style="color:#999;">(64)</span>
+      <div class="type-tab" data-type="large" onclick="switchCardType('large')" style="padding:8px 0;border-bottom:2px solid transparent;color:#666;cursor:pointer">
+        <i class="fas fa-crown" style="margin-right:6px;"></i>大额兑换卡 <span style="color:#999;">(64)</span>
       </div>
     </div>
 
