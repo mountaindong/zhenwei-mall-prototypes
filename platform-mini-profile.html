@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 平台端个人中心</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #e5e5e5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    .bottom-nav {
+      width: 390px;
+      margin: 0 auto;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    .nav-items {
+      display: flex;
+      height: 56px;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-item i {
+      font-size: 20px;
+      color: #999;
+    }
+    .nav-item span {
+      font-size: 10px;
+      color: #999;
+    }
+    .nav-item.active i { color: #1890FF; }
+    .nav-item.active span { color: #1890FF; font-weight: 500; }
+    .safe-area {
+      height: 34px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .home-indicator {
+      width: 134px;
+      height: 5px;
+      background: #333;
+      border-radius: 3px;
+    }
+    
+    /* 卡片交互 */
+    .menu-item {
+      transition: transform 0.2s, background 0.2s;
+    }
+    .menu-item:active {
+      transform: scale(0.98);
+      background: #f5f5f5;
+    }
+    
+    .stat-card {
+      transition: transform 0.2s;
+    }
+    .stat-card:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#1890FF,#096DD9)"></div>
+      
+      <!-- 顶部：管理员信息头部 -->
+      <div style="background:linear-gradient(135deg,#1890FF,#096DD9);padding:16px 16px 60px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <!-- 管理员头像 -->
+          <div style="width:64px;height:64px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
+            <i class="fas fa-user-shield" style="color:#1890FF;font-size:28px"></i>
+          </div>
+          <div style="flex:1">
+            <div style="color:white;font-size:20px;font-weight:600">平台管理员</div>
+            <div style="color:rgba(255,255,255,0.85);font-size:13px;margin-top:4px">运营中心 · 超级管理员</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+              <span style="background:rgba(255,255,255,0.2);color:white;font-size:11px;padding:2px 8px;border-radius:10px">全部权限</span>
+              <span style="background:rgba(255,255,255,0.2);color:white;font-size:11px;padding:2px 8px;border-radius:10px">已认证</span>
+            </div>
+          </div>
+          <!-- 设置入口 -->
+          <div style="width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer">
+            <i class="fas fa-cog" style="color:white;font-size:18px"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据概览卡片 -->
+      <div style="margin:-44px 16px 16px">
+        <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,0.08)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+            <i class="fas fa-chart-line" style="color:#1890FF;font-size:14px"></i>
+            <span style="font-size:14px;color:#666">今日概览</span>
+            <span style="font-size:11px;color:#999;margin-left:auto">实时数据</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            <!-- 新增商家 -->
+            <div class="stat-card" style="text-align:center;padding:16px 8px;background:linear-gradient(135deg,#E6F7FF,#bae7ff);border-radius:12px;cursor:pointer">
+              <div style="font-size:28px;font-weight:700;color:#1890FF">12</div>
+              <div style="font-size:12px;color:#666;margin-top:6px">新增商家</div>
+            </div>
+            <!-- 待审核 -->
+            <div class="stat-card" style="text-align:center;padding:16px 8px;background:linear-gradient(135deg,#FFF7E6,#ffe7ba);border-radius:12px;cursor:pointer">
+              <div style="font-size:28px;font-weight:700;color:#FA8C16">8</div>
+              <div style="font-size:12px;color:#666;margin-top:6px">待审核</div>
+            </div>
+            <!-- 处理工单 -->
+            <div class="stat-card" style="text-align:center;padding:16px 8px;background:linear-gradient(135deg,#FFF1F0,#ffccc7);border-radius:12px;cursor:pointer">
+              <div style="font-size:28px;font-weight:700;color:#FF4D4F">5</div>
+              <div style="font-size:12px;color:#666;margin-top:6px">处理工单</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快捷功能 -->
+      <div style="padding:0 16px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">快捷功能</span>
+        </div>
+        <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+            <!-- 商家审核 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#E6F7FF;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-user-check" style="color:#1890FF;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">商家审核</span>
+            </div>
+            <!-- 商品审核 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#FFF7E6;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-box-check" style="color:#FA8C16;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">商品审核</span>
+            </div>
+            <!-- 订单管理 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#F0FDF4;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-clipboard-list" style="color:#52C41A;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">订单管理</span>
+            </div>
+            <!-- 工单处理 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#FFF1F0;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-ticket-alt" style="color:#FF4D4F;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">工单处理</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 管理功能 -->
+      <div style="padding:0 16px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">管理功能</span>
+        </div>
+        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+          <!-- 商家管理 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer;border-bottom:1px solid #f5f5f5">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#1890FF,#096DD9);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px;box-shadow:0 2px 8px rgba(24,144,255,0.25)">
+              <i class="fas fa-store" style="color:white;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">商家管理</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">商家入驻、资质审核</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="background:#FFF7E6;color:#FA8C16;font-size:11px;padding:2px 8px;border-radius:10px">8待审核</span>
+              <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+            </div>
+          </div>
+          
+          <!-- 商品管理 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer;border-bottom:1px solid #f5f5f5">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#FA8C16,#d48806);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px;box-shadow:0 2px 8px rgba(250,140,22,0.25)">
+              <i class="fas fa-boxes" style="color:white;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">商品管理</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">商品审核、上下架管理</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="background:#FF4D4F;color:white;font-size:11px;padding:2px 8px;border-radius:10px;min-width:20px;text-align:center">3</span>
+              <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+            </div>
+          </div>
+          
+          <!-- 用户管理 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer;border-bottom:1px solid #f5f5f5">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#52C41A,#389e0d);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px;box-shadow:0 2px 8px rgba(82,196,26,0.25)">
+              <i class="fas fa-users" style="color:white;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">用户管理</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">用户列表、权限管理</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+          </div>
+          
+          <!-- 运营设置 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#722ED1,#531dab);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px;box-shadow:0 2px 8px rgba(114,46,209,0.25)">
+              <i class="fas fa-sliders-h" style="color:white;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">运营设置</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">平台配置、规则设置</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系统功能 -->
+      <div style="padding:0 16px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">系统功能</span>
+        </div>
+        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+          <!-- 消息通知 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer;border-bottom:1px solid #f5f5f5">
+            <div style="width:44px;height:44px;background:#E6F7FF;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px">
+              <i class="fas fa-bell" style="color:#1890FF;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">消息通知</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">系统消息、通知管理</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="background:#FF4D4F;color:white;font-size:11px;padding:2px 8px;border-radius:10px;min-width:20px;text-align:center">5</span>
+              <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+            </div>
+          </div>
+          
+          <!-- 系统设置 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer">
+            <div style="width:44px;height:44px;background:#F5F5F5;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px">
+              <i class="fas fa-cog" style="color:#8C8C8C;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">系统设置</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">账户安全、系统偏好</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+      <div class="nav-items">
+        <div class="nav-item">
+          <i class="fas fa-home"></i>
+          <span>首页</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>数据</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-clipboard-list"></i>
+          <span>待办</span>
+        </div>
+        <div class="nav-item active">
+          <i class="fas fa-user"></i>
+          <span>我的</span>
+        </div>
+      </div>
+      <div class="safe-area">
+        <div class="home-indicator"></div>
+      </div>
+    </nav>
+  </div>
+</body>
+</html>

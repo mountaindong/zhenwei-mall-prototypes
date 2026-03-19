@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 客户详情原型</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #e5e5e5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    .action-btn {
+      transition: transform 0.2s, background 0.2s;
+    }
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#FF6B00,#ff8533)"></div>
+      
+      <!-- 导航栏 -->
+      <div style="background:linear-gradient(135deg,#FF6B00,#ff8533);padding:8px 16px;display:flex;align-items:center;justify-content:space-between">
+        <i class="fas fa-arrow-left" style="color:white;font-size:18px;cursor:pointer" onclick="history.back()"></i>
+        <span style="color:white;font-size:18px;font-weight:600">客户详情</span>
+        <i class="fas fa-ellipsis-h" style="color:white;font-size:18px;cursor:pointer"></i>
+      </div>
+      
+      <!-- 客户信息卡片 -->
+      <div style="background:linear-gradient(135deg,#FF6B00,#ff8533);padding:0 16px 24px">
+        <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,0.08)">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+            <div style="width:64px;height:64px;border-radius:50%;overflow:hidden;background:#f0f0f0">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=customer1" alt="头像" style="width:100%;height:100%">
+            </div>
+            <div style="flex:1">
+              <div style="font-size:18px;font-weight:600;color:#333;margin-bottom:4px">李明</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="background:#FFF7E6;color:#FF6B00;font-size:11px;padding:2px 8px;border-radius:10px">VIP客户</span>
+                <span style="color:#999;font-size:12px">合作 186 天</span>
+              </div>
+            </div>
+          </div>
+          
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+            <div>
+              <div style="font-size:20px;font-weight:600;color:#FF6B00">¥12,580</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">累计消费</div>
+            </div>
+            <div>
+              <div style="font-size:20px;font-weight:600;color:#333">28</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">订单数</div>
+            </div>
+            <div>
+              <div style="font-size:20px;font-weight:600;color:#52C41A">¥628</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">贡献佣金</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 联系方式 -->
+      <div style="padding:0 16px 16px">
+        <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+          <div style="font-size:15px;font-weight:600;color:#333;margin-bottom:12px">联系方式</div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0">
+              <div style="display:flex;align-items:center;gap:10px">
+                <i class="fas fa-phone" style="color:#1890FF;font-size:16px"></i>
+                <span style="font-size:14px;color:#333">138****8888</span>
+              </div>
+              <div style="display:flex;gap:12px">
+                <div class="action-btn" style="width:36px;height:36px;border-radius:50%;background:#E6F7FF;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <i class="fas fa-phone-alt" style="color:#1890FF;font-size:14px"></i>
+                </div>
+                <div class="action-btn" style="width:36px;height:36px;border-radius:50%;background:#52C41A;display:flex;align-items:center;justify-content:center;cursor:pointer">
+                  <i class="fab fa-weixin" style="color:white;font-size:16px"></i>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <i class="fas fa-map-marker-alt" style="color:#FF6B00;font-size:16px"></i>
+              <span style="font-size:14px;color:#333">北京市朝阳区建国路88号</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 标签 -->
+      <div style="padding:0 16px 16px">
+        <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:15px;font-weight:600;color:#333">客户标签</span>
+            <span style="font-size:13px;color:#1890FF;cursor:pointer"><i class="fas fa-plus" style="margin-right:4px"></i>添加</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span style="background:#FFF7E6;color:#FF6B00;font-size:12px;padding:4px 12px;border-radius:12px">VIP</span>
+            <span style="background:#E6F7FF;color:#1890FF;font-size:12px;padding:4px 12px;border-radius:12px">高频购买</span>
+            <span style="background:#F6FFED;color:#52C41A;font-size:12px;padding:4px 12px;border-radius:12px">高客单价</span>
+            <span style="background:#FFF0F6;color:#EB2F96;font-size:12px;padding:4px 12px;border-radius:12px">喜欢优惠</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 最近订单 -->
+      <div style="padding:0 16px 16px">
+        <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <span style="font-size:15px;font-weight:600;color:#333">最近订单</span>
+            <span style="font-size:13px;color:#1890FF;cursor:pointer">查看全部 <i class="fas fa-chevron-right" style="font-size:12px"></i></span>
+          </div>
+          
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="padding:12px;background:#f9f9f9;border-radius:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:12px;color:#999">订单号: 202403150001</span>
+                <span style="font-size:12px;color:#52C41A">已完成</span>
+              </div>
+              <div style="font-size:14px;color:#333;margin-bottom:4px">臻选有机绿茶礼盒装 250g</div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:14px;color:#FF6B00;font-weight:600">¥128</span>
+                <span style="font-size:12px;color:#999">2024-03-15</span>
+              </div>
+            </div>
+            
+            <div style="padding:12px;background:#f9f9f9;border-radius:12px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:12px;color:#999">订单号: 202403120003</span>
+                <span style="font-size:12px;color:#52C41A">已完成</span>
+              </div>
+              <div style="font-size:14px;color:#333;margin-bottom:4px">智能保温杯 500ml</div>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:14px;color:#FF6B00;font-weight:600">¥89</span>
+                <span style="font-size:12px;color:#999">2024-03-12</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 备注信息 -->
+      <div style="padding:0 16px 16px">
+        <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:15px;font-weight:600;color:#333">备注信息</span>
+            <span style="font-size:13px;color:#1890FF;cursor:pointer"><i class="fas fa-edit" style="margin-right:4px"></i>编辑</span>
+          </div>
+          <div style="font-size:14px;color:#666;line-height:1.6">
+            客户偏好购买高品质生活用品，对价格敏感度中等，喜欢新品尝鲜。建议定期推送优惠活动和新品信息。
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 底部操作栏 -->
+    <div style="width:390px;margin:0 auto;background:white;border-top:1px solid #f0f0f0;padding:12px 16px;display:flex;gap:12px">
+      <div class="action-btn" style="flex:1;height:44px;background:#FFF7E6;color:#FF6B00;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;cursor:pointer">
+        <i class="fas fa-share-alt" style="margin-right:6px"></i>分享商品
+      </div>
+      <div class="action-btn" style="flex:1;height:44px;background:linear-gradient(135deg,#FF6B00,#ff8533);color:white;border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;cursor:pointer">
+        <i class="fas fa-comment-dots" style="margin-right:6px"></i>发消息
+      </div>
+    </div>
+  </div>
+</body>
+</html>

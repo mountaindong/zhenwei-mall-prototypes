@@ -175,15 +175,15 @@
       font-size: 12px;
     }
     .bottom-nav {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 83px;
+      flex-shrink: 0;
       background: white;
       border-top: 1px solid #f0f0f0;
       display: flex;
-      padding-bottom: 20px;
+      flex-direction: column;
+    }
+    .nav-items {
+      display: flex;
+      height: 56px;
     }
     .nav-item {
       flex: 1;
@@ -327,25 +327,27 @@
       </div>
     </div>
     <div class="bottom-nav">
-      <div class="nav-item">
-        <i class="fas fa-home"></i>
-        <span>首页</span>
+      <div class="nav-items">
+        <div class="nav-item">
+          <i class="fas fa-home"></i>
+          <span>首页</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>数据</span>
+        </div>
+        <div class="nav-item active">
+          <i class="fas fa-clipboard-list"></i>
+          <span>待办</span>
+        </div>
+        <div class="nav-item">
+          <i class="fas fa-user"></i>
+          <span>我的</span>
+        </div>
       </div>
-      <div class="nav-item">
-        <i class="fas fa-chart-bar"></i>
-        <span>数据</span>
+      <div class="safe-area">
+        <div class="home-indicator"></div>
       </div>
-      <div class="nav-item active">
-        <i class="fas fa-clipboard-list"></i>
-        <span>待办</span>
-      </div>
-      <div class="nav-item">
-        <i class="fas fa-user"></i>
-        <span>我的</span>
-      </div>
-    </div>
-    <div class="safe-area">
-      <div class="home-indicator"></div>
     </div>
   </div>
 </body>

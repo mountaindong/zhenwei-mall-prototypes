@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>臻伟福利 - 兑换中心</title>
+  <title>兑换中心 - 甄选商城平台端</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
-      background: #f0f2f5;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
       min-height: 100vh;
     }
     
@@ -17,313 +21,440 @@
     .top-nav {
       background: white;
       height: 56px;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid #e8e8e8;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 24px;
-      position: sticky;
+      position: fixed;
       top: 0;
+      left: 0;
+      right: 0;
       z-index: 100;
     }
     
     /* 侧边栏 */
     .sidebar {
-      width: 210px;
-      background: white;
+      width: 200px;
+      background: #001529;
       height: calc(100vh - 56px);
       position: fixed;
       left: 0;
       top: 56px;
-      border-right: 1px solid #f0f0f0;
-      padding: 20px 0;
       overflow-y: auto;
+      padding: 16px 0;
     }
-    .menu-item {
-      padding: 14px 24px;
-      margin: 4px 12px;
+    .sidebar-header {
+      padding: 0 16px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 16px;
+    }
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
       border-radius: 8px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      color: #666;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .logo i {
+      color: white;
+      font-size: 20px;
+    }
+    .logo-text {
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .platform-tag {
+      display: inline-block;
+      background: rgba(24,144,255,0.2);
+      color: #1890FF;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+    .menu-item {
+      color: rgba(255,255,255,0.65);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       cursor: pointer;
       transition: all 0.2s;
+      font-size: 14px;
     }
     .menu-item:hover {
-      background: #f5f5f5;
-      color: #1890FF;
+      background: rgba(255,255,255,0.05);
+      color: white;
     }
     .menu-item.active {
-      background: #e6f7ff;
-      color: #1890FF;
+      background: #1890FF;
+      color: white;
     }
     .menu-item i {
-      width: 18px;
+      width: 16px;
       text-align: center;
+    }
+    .menu-item.has-submenu {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0;
+    }
+    .menu-item-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      cursor: pointer;
+    }
+    .menu-item-header i:first-child {
+      width: 16px;
+      text-align: center;
+    }
+    .submenu-arrow {
+      margin-left: auto;
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+    .menu-item.has-submenu.open .submenu-arrow {
+      transform: rotate(180deg);
+    }
+    .submenu {
+      display: none;
+      background: rgba(0,0,0,0.2);
+    }
+    .menu-item.has-submenu.open .submenu {
+      display: block;
+    }
+    .submenu-item {
+      display: block;
+      padding: 10px 20px 10px 46px;
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .submenu-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: white;
+    }
+    .submenu-item.active {
+      color: #1890FF;
+      background: rgba(24,144,255,0.1);
     }
     
     /* 主内容区 */
     .main-content {
-      margin-left: 210px;
+      margin-left: 200px;
+      margin-top: 56px;
       padding: 24px;
       min-height: calc(100vh - 56px);
     }
     
-    /* 数据卡片 */
+    /* Tab切换 */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      background: white;
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .tab-item {
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #666;
+      background: transparent;
+      border: none;
+    }
+    .tab-item:hover {
+      background: #f5f5f5;
+    }
+    .tab-item.active {
+      background: #1890FF;
+      color: white;
+    }
+    
+    /* 统计卡片 */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
     .stat-card {
       background: white;
-      border-radius: 8px;
       padding: 20px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    }
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #333;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .stat-label {
       font-size: 13px;
       color: #999;
       margin-bottom: 8px;
     }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #333;
+    }
+    .stat-trend {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .stat-trend.up {
+      color: #52C41A;
+    }
+    .stat-trend.down {
+      color: #FF4D4F;
+    }
     
     /* 筛选栏 */
     .filter-bar {
       background: white;
-      border-radius: 8px;
       padding: 16px 20px;
+      border-radius: 8px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
       display: flex;
-      align-items: center;
-      gap: 16px;
       flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     .filter-group {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-direction: column;
+      gap: 6px;
     }
     .filter-label {
-      font-size: 13px;
+      font-size: 12px;
       color: #666;
     }
-    .filter-input {
+    .filter-input, .filter-select {
       height: 32px;
-      padding: 0 12px;
       border: 1px solid #d9d9d9;
-      border-radius: 6px;
+      border-radius: 4px;
+      padding: 0 10px;
       font-size: 13px;
       outline: none;
       transition: border-color 0.2s;
     }
-    .filter-input:focus {
-      border-color: #1890FF;
-    }
-    .filter-select {
-      height: 32px;
-      padding: 0 28px 0 12px;
-      border: 1px solid #d9d9d9;
-      border-radius: 6px;
-      font-size: 13px;
-      outline: none;
-      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
-      cursor: pointer;
-      appearance: none;
-    }
-    .filter-select:focus {
+    .filter-input:focus, .filter-select:focus {
       border-color: #1890FF;
     }
     .filter-btn {
       height: 32px;
       padding: 0 16px;
-      border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       font-size: 13px;
       cursor: pointer;
       transition: all 0.2s;
+      border: 1px solid #d9d9d9;
+      background: white;
     }
     .filter-btn.primary {
       background: #1890FF;
+      border-color: #1890FF;
       color: white;
     }
     .filter-btn.primary:hover {
       background: #40a9ff;
-    }
-    .filter-btn.default {
-      background: white;
-      border: 1px solid #d9d9d9;
-      color: #666;
     }
     .filter-btn.default:hover {
       border-color: #1890FF;
       color: #1890FF;
     }
     
-    /* 表格容器 */
+    /* 数据表格 */
     .table-container {
       background: white;
       border-radius: 8px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       overflow: hidden;
     }
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .table-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+    }
+    .table-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #1890FF;
+      border: 1px solid #1890FF;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    .btn-default {
+      background: white;
+      border: 1px solid #d9d9d9;
+      color: #666;
+    }
+    .btn-default:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .btn-success {
+      background: #52C41A;
+      border: 1px solid #52C41A;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #73d13d;
+    }
+    .btn-danger {
+      background: #FF4D4F;
+      border: 1px solid #FF4D4F;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #ff7875;
+    }
     
-    /* 表格 */
     .data-table {
       width: 100%;
       border-collapse: collapse;
     }
-    .data-table th {
+    .data-table th, .data-table td {
+      padding: 12px 16px;
       text-align: left;
-      padding: 14px 16px;
-      background: #fafafa;
-      font-weight: 500;
-      color: #666;
-      font-size: 13px;
       border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
     }
-    .data-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 13px;
-      color: #333;
+    .data-table th {
+      background: #fafafa;
+      color: #666;
+      font-weight: 500;
     }
     .data-table tr:hover {
       background: #fafafa;
     }
-    .data-table tr:last-child td {
-      border-bottom: none;
+    .data-table td {
+      color: #333;
     }
     
     /* 状态标签 */
     .status-tag {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .status-tag.unused {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .status-tag.used {
+      background: #f0f0f0;
+      color: #999;
+    }
+    .status-tag.expired {
+      background: #fff1f0;
+      color: #FF4D4F;
+    }
+    .status-tag.disabled {
+      background: #f5f5f5;
+      color: #bfbfbf;
+    }
+    
+    /* 卡类型标签 */
+    .card-type-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
       border-radius: 4px;
       font-size: 12px;
       font-weight: 500;
     }
-    .status-tag.success {
-      background: #f6ffed;
-      color: #52C41A;
-      border: 1px solid #b7eb8f;
-    }
-    .status-tag.warning {
-      background: #fffbe6;
-      color: #FAAD14;
-      border: 1px solid #fff1b8;
-    }
-    .status-tag.processing {
-      background: #e6f7ff;
-      color: #1890FF;
-      border: 1px solid #91d5ff;
-    }
-    .status-tag.error {
-      background: #fff2f0;
-      color: #FF4D4F;
-      border: 1px solid #ffccc7;
-    }
-    
-    /* 分页 */
-    .pagination {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 16px 20px;
-      border-top: 1px solid #f0f0f0;
-      gap: 8px;
-    }
-    .pagination-info {
-      font-size: 13px;
-      color: #666;
-      margin-right: 16px;
-    }
-    .pagination-btn {
-      min-width: 32px;
-      height: 32px;
-      padding: 0 8px;
-      border: 1px solid #d9d9d9;
-      border-radius: 6px;
-      background: white;
-      font-size: 13px;
-      color: #333;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .pagination-btn:hover:not(:disabled) {
-      border-color: #1890FF;
-      color: #1890FF;
-    }
-    .pagination-btn.active {
-      background: #1890FF;
-      border-color: #1890FF;
+    .card-type-tag.physical {
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
     }
-    .pagination-btn:disabled {
-      color: #d9d9d9;
-      cursor: not-allowed;
+    .card-type-tag.virtual {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
     }
-    .pagination-ellipsis {
-      width: 32px;
-      text-align: center;
-      color: #999;
+    .card-type-tag.coupon {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: white;
+    }
+    .card-type-tag.gift {
+      background: linear-gradient(135deg, #fa709a, #fee140);
+      color: white;
     }
     
-    /* 商品信息 */
-    .product-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    /* 卡密信息 */
+    .card-info {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
     }
-    .product-img {
-      width: 48px;
-      height: 48px;
-      border-radius: 6px;
-      background: #f5f5f5;
-      object-fit: cover;
-    }
-    .product-name {
-      font-size: 13px;
-      color: #333;
+    .card-number {
+      color: #1890FF;
       font-weight: 500;
     }
-    .product-sku {
-      font-size: 12px;
-      color: #999;
+    .card-password {
+      color: #52C41A;
       margin-top: 2px;
     }
-    
-    /* 用户信息 */
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .card-masked {
+      color: #999;
     }
-    .user-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #e6f7ff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    
+    /* 有效期 */
+    .expiry-info {
       font-size: 12px;
-      color: #1890FF;
     }
-    
-    /* 积分数值 */
-    .points-value {
+    .expiry-date {
+      color: #666;
+    }
+    .expiry-warning {
+      color: #FAAD14;
+    }
+    .expiry-danger {
       color: #FF4D4F;
-      font-weight: 600;
+    }
+    .expiry-ok {
+      color: #52C41A;
     }
     
     /* 操作按钮 */
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
     .action-btn {
-      padding: 4px 12px;
+      padding: 4px 10px;
       border: none;
       border-radius: 4px;
       font-size: 12px;
@@ -335,6 +466,236 @@
     .action-btn:hover {
       background: #e6f7ff;
     }
+    .action-btn.danger {
+      color: #FF4D4F;
+    }
+    .action-btn.danger:hover {
+      background: #fff1f0;
+    }
+    .action-btn.success {
+      color: #52C41A;
+    }
+    .action-btn.success:hover {
+      background: #f6ffed;
+    }
+    .action-btn.warning {
+      color: #FAAD14;
+    }
+    .action-btn.warning:hover {
+      background: #fffbe6;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 16px 20px;
+      gap: 8px;
+    }
+    .pagination-info {
+      font-size: 13px;
+      color: #666;
+      margin-right: auto;
+    }
+    .pagination-btn {
+      min-width: 32px;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .pagination-btn:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .pagination-btn.active {
+      background: #1890FF;
+      border-color: #1890FF;
+      color: white;
+    }
+    .pagination-btn:disabled {
+      background: #f5f5f5;
+      border-color: #d9d9d9;
+      color: #d9d9d9;
+      cursor: not-allowed;
+    }
+    
+    /* 弹窗 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      border-radius: 8px;
+      width: 650px;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: #999;
+      border-radius: 4px;
+    }
+    .modal-close:hover {
+      background: #f5f5f5;
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    /* 表单 */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    .form-label.required::before {
+      content: '*';
+      color: #FF4D4F;
+      margin-right: 4px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      height: 36px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-textarea {
+      height: 80px;
+      padding: 8px 12px;
+      resize: vertical;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #1890FF;
+    }
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+    .form-hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    /* 卡密生成设置 */
+    .card-generate-settings {
+      background: #fafafa;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .card-generate-settings h4 {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .generate-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .generate-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .generate-option input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+    }
+    .generate-option label {
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+    }
+    
+    /* 批量操作栏 */
+    .batch-actions {
+      display: none;
+      background: #e6f7ff;
+      padding: 12px 20px;
+      border-bottom: 1px solid #91d5ff;
+    }
+    .batch-actions.show {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .batch-info {
+      font-size: 13px;
+      color: #1890FF;
+    }
+    .batch-btns {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+    
+    /* 导入导出提示 */
+    .import-export-tips {
+      background: #fffbe6;
+      border: 1px solid #ffe58f;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #ad8b00;
+    }
+    .import-export-tips i {
+      margin-right: 8px;
+    }
   </style>
 </head>
 <body>
@@ -343,9 +704,9 @@
     <div style="display:flex;align-items:center;gap:16px">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
-          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+          <i class="fas fa-building" style="color:white;font-size:14px"></i>
         </div>
-        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+        <span style="font-size:16px;font-weight:600;color:#333">甄选商城</span>
       </div>
       <span style="color:#d9d9d9">|</span>
       <span style="font-size:14px;color:#666">平台管理后台</span>
@@ -368,20 +729,33 @@
       <i class="fas fa-home"></i>
       <span>首页</span>
     </div>
-    <div class="menu-item">
-      <i class="fas fa-shopping-bag"></i>
-      <span>商品管理</span>
+    <div class="menu-item has-submenu">
+      <div class="menu-item-header" onclick="toggleSubmenu(this)">
+        <i class="fas fa-box"></i>
+        <span>商品管理</span>
+        <i class="fas fa-chevron-down submenu-arrow"></i>
+      </div>
+      <div class="submenu">
+        <a href="platform-product.html?status=online" class="submenu-item">已上架</a>
+        <a href="platform-product.html?status=pending" class="submenu-item">待上架</a>
+        <a href="platform-product.html?status=offline" class="submenu-item">已下架</a>
+        <a href="platform-product.html?view=stock" class="submenu-item">库存查看</a>
+      </div>
+    </div>
+    <div class="menu-item" onclick="location.href='platform-category.html'">
+      <i class="fas fa-tags"></i>
+      <span>分类管理</span>
     </div>
     <div class="menu-item active">
-      <i class="fas fa-gift"></i>
+      <i class="fas fa-exchange-alt"></i>
       <span>兑换中心</span>
     </div>
-    <div class="menu-item">
+    <div class="menu-item" onclick="location.href='platform-account.html'">
       <i class="fas fa-users"></i>
       <span>账号管理</span>
     </div>
     <div class="menu-item">
-      <i class="fas fa-chart-bar"></i>
+      <i class="fas fa-chart-line"></i>
       <span>运营数据</span>
     </div>
     <div class="menu-item">
@@ -410,368 +784,714 @@
   <main class="main-content">
     <!-- 页面标题 -->
     <div style="margin-bottom:20px">
-      <h1 style="font-size:20px;font-weight:600;color:#333">兑换中心</h1>
-      <div style="font-size:13px;color:#999;margin-top:4px">管理所有积分兑换订单</div>
+      <h1 style="font-size:20px;font-weight:600;color:#333">兑换卡管理</h1>
+      <div style="font-size:13px;color:#999;margin-top:4px">管理平台兑换卡、优惠券、礼品卡等</div>
     </div>
 
-    <!-- 兑换统计 -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+    <!-- Tab切换 -->
+    <div class="tab-nav">
+      <button class="tab-item active" onclick="switchTab('all')">全部兑换卡</button>
+      <button class="tab-item" onclick="switchTab('unused')">未使用</button>
+      <button class="tab-item" onclick="switchTab('used')">已使用</button>
+      <button class="tab-item" onclick="switchTab('expired')">已过期</button>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stat-cards">
       <div class="stat-card">
-        <div class="stat-label">今日兑换订单</div>
-        <div class="stat-value" style="color:#1890FF">156</div>
-        <div style="font-size:12px;color:#52C41A;margin-top:4px"><i class="fas fa-arrow-up"></i> 12.5% 较昨日</div>
+        <div class="stat-label">兑换卡总数</div>
+        <div class="stat-value">12,586</div>
+        <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 8.5% 较上月</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">今日消耗积分</div>
-        <div class="stat-value" style="color:#FF4D4F">28,500</div>
-        <div style="font-size:12px;color:#52C41A;margin-top:4px"><i class="fas fa-arrow-up"></i> 8.3% 较昨日</div>
+        <div class="stat-label">未使用</div>
+        <div class="stat-value" style="color:#52C41A">8,432</div>
+        <div class="stat-trend">占比 67%</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">待发货</div>
-        <div class="stat-value" style="color:#FAAD14">32</div>
-        <div style="font-size:12px;color:#999;margin-top:4px">需要及时处理</div>
+        <div class="stat-label">已使用</div>
+        <div class="stat-value" style="color:#1890FF">3,856</div>
+        <div class="stat-trend">占比 31%</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">已完成订单</div>
-        <div class="stat-value" style="color:#52C41A">1,256</div>
-        <div style="font-size:12px;color:#52C41A;margin-top:4px">本月累计</div>
+        <div class="stat-label">已过期</div>
+        <div class="stat-value" style="color:#FF4D4F">298</div>
+        <div class="stat-trend">需及时清理</div>
       </div>
+    </div>
+
+    <!-- 导入导出提示 -->
+    <div class="import-export-tips">
+      <i class="fas fa-info-circle"></i>
+      支持批量导入导出兑换卡，请使用系统标准模板。导出时将按当前筛选条件导出数据。
     </div>
 
     <!-- 筛选栏 -->
     <div class="filter-bar">
       <div class="filter-group">
-        <label class="filter-label">商品名称</label>
-        <input type="text" class="filter-input" placeholder="请输入商品名称" style="width:180px">
+        <label class="filter-label">卡号/卡密</label>
+        <input type="text" class="filter-input" placeholder="输入卡号或卡密" style="width:140px">
       </div>
       <div class="filter-group">
-        <label class="filter-label">订单状态</label>
-        <select class="filter-select" style="width:120px">
-          <option value="">全部状态</option>
-          <option value="pending">待发货</option>
-          <option value="shipped">已发货</option>
-          <option value="completed">已完成</option>
-          <option value="cancelled">已取消</option>
+        <label class="filter-label">兑换卡类型</label>
+        <select class="filter-select" style="width:130px">
+          <option value="">全部类型</option>
+          <option value="physical">实物卡</option>
+          <option value="virtual">虚拟卡</option>
+          <option value="coupon">优惠券</option>
+          <option value="gift">礼品卡</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">时间范围</label>
-        <input type="date" class="filter-input" style="width:140px">
-        <span style="color:#999;font-size:13px">至</span>
-        <input type="date" class="filter-input" style="width:140px">
+        <label class="filter-label">关联商品</label>
+        <select class="filter-select" style="width:140px">
+          <option value="">全部商品</option>
+          <option value="p1">华为FreeBuds Pro 3</option>
+          <option value="p2">iPhone 15 Pro 手机壳</option>
+          <option value="p3">小米无线充电器</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">状态</label>
+        <select class="filter-select" style="width:100px">
+          <option value="">全部状态</option>
+          <option value="unused">未使用</option>
+          <option value="used">已使用</option>
+          <option value="expired">已过期</option>
+          <option value="disabled">已禁用</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">有效期</label>
+        <input type="date" class="filter-input" style="width:130px">
+        <span style="line-height:32px;color:#d9d9d9">~</span>
+        <input type="date" class="filter-input" style="width:130px">
       </div>
       <div class="filter-group" style="margin-left:auto">
-        <button class="filter-btn primary"><i class="fas fa-search" style="margin-right:6px"></i>查询</button>
-        <button class="filter-btn default"><i class="fas fa-redo" style="margin-right:6px"></i>重置</button>
-        <button class="filter-btn default"><i class="fas fa-download" style="margin-right:6px"></i>导出</button>
+        <button class="filter-btn primary"><i class="fas fa-search"></i> 查询</button>
+        <button class="filter-btn default"><i class="fas fa-redo"></i> 重置</button>
       </div>
     </div>
 
-    <!-- 表格 -->
+    <!-- 数据表格 -->
     <div class="table-container">
+      <div class="table-header">
+        <div class="table-title">兑换卡列表</div>
+        <div class="table-actions">
+          <button class="btn btn-primary" onclick="showAddModal()"><i class="fas fa-plus"></i> 新增兑换卡</button>
+          <button class="btn btn-success" onclick="showImportModal()"><i class="fas fa-file-import"></i> 批量导入</button>
+          <button class="btn btn-default" onclick="exportCards()"><i class="fas fa-file-export"></i> 导出</button>
+          <button class="btn btn-default"><i class="fas fa-download"></i> 下载模板</button>
+        </div>
+      </div>
+      
+      <!-- 批量操作栏 -->
+      <div class="batch-actions" id="batchActions">
+        <span class="batch-info"><i class="fas fa-check-square"></i> 已选择 <span id="selectedCount">0</span> 项</span>
+        <div class="batch-btns">
+          <button class="btn btn-success"><i class="fas fa-check"></i> 批量启用</button>
+          <button class="btn btn-default"><i class="fas fa-ban"></i> 批量禁用</button>
+          <button class="btn btn-default" onclick="showBatchDeleteModal()"><i class="fas fa-trash"></i> 批量删除</button>
+          <button class="btn btn-default"><i class="fas fa-file-export"></i> 批量导出</button>
+        </div>
+      </div>
+      
       <table class="data-table">
         <thead>
           <tr>
-            <th style="width:180px">订单号</th>
-            <th style="width:220px">商品信息</th>
-            <th style="width:100px">积分</th>
-            <th style="width:140px">用户</th>
-            <th style="width:100px">状态</th>
-            <th style="width:160px">兑换时间</th>
-            <th style="width:80px">操作</th>
+            <th style="width:40px"><input type="checkbox" onchange="toggleSelectAll(this)"></th>
+            <th style="width:100px">卡类型</th>
+            <th style="width:180px">卡号/卡密</th>
+            <th style="width:140px">关联商品</th>
+            <th style="width:100px">面值/积分</th>
+            <th style="width:140px">有效期</th>
+            <th style="width:80px">状态</th>
+            <th style="width:120px">使用信息</th>
+            <th style="width:140px">创建时间</th>
+            <th style="width:140px">操作</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900001</td>
+            <td><input type="checkbox" class="row-checkbox" onchange="updateBatchActions()"></td>
+            <td><span class="card-type-tag physical"><i class="fas fa-credit-card"></i> 实物卡</span></td>
             <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-headphones" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">蓝牙耳机Pro版</div>
-                  <div class="product-sku">SKU: BT-001</div>
-                </div>
+              <div class="card-info">
+                <div class="card-number">CARD-20260319001</div>
+                <div class="card-password">密: ABC123XYZ</div>
               </div>
             </td>
-            <td><span class="points-value">2,800</span></td>
+            <td>华为FreeBuds Pro 3</td>
+            <td style="color:#FF4D4F;font-weight:600">2,800积分</td>
             <td>
-              <div class="user-info">
-                <div class="user-avatar">张</div>
-                <div>
-                  <div style="font-size:13px;color:#333">张三</div>
-                  <div style="font-size:12px;color:#999">ID: 10001</div>
-                </div>
+              <div class="expiry-info">
+                <div class="expiry-ok"><i class="fas fa-calendar-check"></i> 2026-12-31</div>
+                <div style="color:#999;font-size:11px">剩余 287 天</div>
               </div>
             </td>
-            <td><span class="status-tag processing">待发货</span></td>
-            <td>2026-03-19 10:28:35</td>
-            <td><button class="action-btn">详情</button></td>
+            <td><span class="status-tag unused">未使用</span></td>
+            <td>-</td>
+            <td>2026-03-15 10:28</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" onclick="showViewModal()">查看</button>
+                <button class="action-btn" onclick="showEditModal()">编辑</button>
+                <button class="action-btn danger" onclick="showDeleteModal()">删除</button>
+              </div>
+            </td>
           </tr>
           <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900002</td>
+            <td><input type="checkbox" class="row-checkbox" onchange="updateBatchActions()"></td>
+            <td><span class="card-type-tag virtual"><i class="fas fa-mobile-alt"></i> 虚拟卡</span></td>
             <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#f093fb,#f5576c);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-mobile-alt" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">iPhone手机壳</div>
-                  <div class="product-sku">SKU: CS-015</div>
-                </div>
+              <div class="card-info">
+                <div class="card-number">VC-20260318002</div>
+                <div class="card-password">密: XYZ789ABC</div>
               </div>
             </td>
-            <td><span class="points-value">580</span></td>
+            <td>小米无线充电器</td>
+            <td style="color:#FF4D4F;font-weight:600">1,500积分</td>
             <td>
-              <div class="user-info">
-                <div class="user-avatar">李</div>
-                <div>
-                  <div style="font-size:13px;color:#333">李四</div>
-                  <div style="font-size:12px;color:#999">ID: 10002</div>
-                </div>
+              <div class="expiry-info">
+                <div class="expiry-warning"><i class="fas fa-calendar-alt"></i> 2026-04-15</div>
+                <div style="color:#FAAD14;font-size:11px">剩余 27 天</div>
               </div>
             </td>
-            <td><span class="status-tag success">已完成</span></td>
-            <td>2026-03-19 09:15:22</td>
-            <td><button class="action-btn">详情</button></td>
+            <td><span class="status-tag unused">未使用</span></td>
+            <td>-</td>
+            <td>2026-03-14 15:42</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" onclick="showViewModal()">查看</button>
+                <button class="action-btn" onclick="showEditModal()">编辑</button>
+                <button class="action-btn danger" onclick="showDeleteModal()">删除</button>
+              </div>
+            </td>
           </tr>
           <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900003</td>
+            <td><input type="checkbox" class="row-checkbox" onchange="updateBatchActions()"></td>
+            <td><span class="card-type-tag coupon"><i class="fas fa-ticket-alt"></i> 优惠券</span></td>
             <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#4facfe,#00f2fe);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-charging-station" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">无线充电器</div>
-                  <div class="product-sku">SKU: WC-008</div>
-                </div>
+              <div class="card-info">
+                <div class="card-number">COP-20260313003</div>
+                <div class="card-masked">密: ****已使用</div>
               </div>
             </td>
-            <td><span class="points-value">1,500</span></td>
+            <td>iPhone 15 Pro 手机壳</td>
+            <td style="color:#FF4D4F;font-weight:600">580积分</td>
             <td>
-              <div class="user-info">
-                <div class="user-avatar">王</div>
-                <div>
-                  <div style="font-size:13px;color:#333">王五</div>
-                  <div style="font-size:12px;color:#999">ID: 10003</div>
-                </div>
+              <div class="expiry-info">
+                <div class="expiry-ok"><i class="fas fa-calendar-check"></i> 2026-06-30</div>
+                <div style="color:#999;font-size:11px">剩余 103 天</div>
               </div>
             </td>
-            <td><span class="status-tag success">已完成</span></td>
-            <td>2026-03-19 08:42:18</td>
-            <td><button class="action-btn">详情</button></td>
+            <td><span class="status-tag used">已使用</span></td>
+            <td>
+              <div style="font-size:12px">
+                <div>用户: 张三</div>
+                <div style="color:#999">2026-03-16 09:15</div>
+              </div>
+            </td>
+            <td>2026-03-13 09:18</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" onclick="showViewModal()">查看</button>
+                <button class="action-btn danger" onclick="showDeleteModal()">删除</button>
+              </div>
+            </td>
           </tr>
           <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900004</td>
+            <td><input type="checkbox" class="row-checkbox" onchange="updateBatchActions()"></td>
+            <td><span class="card-type-tag gift"><i class="fas fa-gift"></i> 礼品卡</span></td>
             <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#fa709a,#fee140);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-umbrella-beach" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">便携遮阳伞</div>
-                  <div class="product-sku">SKU: UB-022</div>
-                </div>
+              <div class="card-info">
+                <div class="card-number">GIFT-20260310004</div>
+                <div class="card-password">密: GIFT2026XYZ</div>
               </div>
             </td>
-            <td><span class="points-value">320</span></td>
+            <td>全品类通用</td>
+            <td style="color:#FF4D4F;font-weight:600">500积分</td>
             <td>
-              <div class="user-info">
-                <div class="user-avatar">赵</div>
-                <div>
-                  <div style="font-size:13px;color:#333">赵六</div>
-                  <div style="font-size:12px;color:#999">ID: 10004</div>
-                </div>
+              <div class="expiry-info">
+                <div class="expiry-danger"><i class="fas fa-calendar-times"></i> 2026-03-01</div>
+                <div style="color:#FF4D4F;font-size:11px">已过期 18 天</div>
               </div>
             </td>
-            <td><span class="status-tag warning">已发货</span></td>
-            <td>2026-03-18 16:30:45</td>
-            <td><button class="action-btn">详情</button></td>
+            <td><span class="status-tag expired">已过期</span></td>
+            <td>-</td>
+            <td>2026-03-10 11:22</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" onclick="showViewModal()">查看</button>
+                <button class="action-btn warning" onclick="renewCard()">续期</button>
+                <button class="action-btn danger" onclick="showDeleteModal()">删除</button>
+              </div>
+            </td>
           </tr>
           <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900005</td>
+            <td><input type="checkbox" class="row-checkbox" onchange="updateBatchActions()"></td>
+            <td><span class="card-type-tag virtual"><i class="fas fa-mobile-alt"></i> 虚拟卡</span></td>
             <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#a8edea,#fed6e3);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-mug-hot" style="color:#666;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">保温杯500ml</div>
-                  <div class="product-sku">SKU: CP-009</div>
-                </div>
+              <div class="card-info">
+                <div class="card-number">VC-20260308005</div>
+                <div class="card-password">密: DISABLED</div>
               </div>
             </td>
-            <td><span class="points-value">680</span></td>
+            <td>智能保温杯</td>
+            <td style="color:#FF4D4F;font-weight:600">680积分</td>
             <td>
-              <div class="user-info">
-                <div class="user-avatar">孙</div>
-                <div>
-                  <div style="font-size:13px;color:#333">孙七</div>
-                  <div style="font-size:12px;color:#999">ID: 10005</div>
-                </div>
+              <div class="expiry-info">
+                <div class="expiry-ok"><i class="fas fa-calendar-check"></i> 2026-08-31</div>
+                <div style="color:#999;font-size:11px">剩余 165 天</div>
               </div>
             </td>
-            <td><span class="status-tag processing">待发货</span></td>
-            <td>2026-03-18 14:22:10</td>
-            <td><button class="action-btn">详情</button></td>
+            <td><span class="status-tag disabled">已禁用</span></td>
+            <td>
+              <div style="font-size:12px;color:#999">
+                <div>原因: 异常操作</div>
+              </div>
+            </td>
+            <td>2026-03-08 16:45</td>
+            <td>
+              <div class="action-btns">
+                <button class="action-btn" onclick="showViewModal()">查看</button>
+                <button class="action-btn success" onclick="enableCard()">启用</button>
+                <button class="action-btn danger" onclick="showDeleteModal()">删除</button>
+              </div>
+            </td>
           </tr>
           <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900006</td>
+            <td><input type="checkbox" class="row-checkbox" onchange="updateBatchActions()"></td>
+            <td><span class="card-type-tag physical"><i class="fas fa-credit-card"></i> 实物卡</span></td>
             <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#ff9a9e,#fecfef);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-tshirt" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">定制T恤</div>
-                  <div class="product-sku">SKU: TS-003</div>
-                </div>
+              <div class="card-info">
+                <div class="card-number">CARD-20260305006</div>
+                <div class="card-password">密: PHYSICAL789</div>
               </div>
             </td>
-            <td><span class="points-value">1,200</span></td>
+            <td>定制企业文化T恤</td>
+            <td style="color:#FF4D4F;font-weight:600">1,200积分</td>
             <td>
-              <div class="user-info">
-                <div class="user-avatar">周</div>
-                <div>
-                  <div style="font-size:13px;color:#333">周八</div>
-                  <div style="font-size:12px;color:#999">ID: 10006</div>
-                </div>
+              <div class="expiry-info">
+                <div class="expiry-ok"><i class="fas fa-calendar-check"></i> 2026-12-31</div>
+                <div style="color:#999;font-size:11px">剩余 287 天</div>
               </div>
             </td>
-            <td><span class="status-tag error">已取消</span></td>
-            <td>2026-03-18 11:05:33</td>
-            <td><button class="action-btn">详情</button></td>
-          </tr>
-          <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900007</td>
+            <td><span class="status-tag unused">未使用</span></td>
+            <td>-</td>
+            <td>2026-03-05 14:30</td>
             <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-keyboard" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">机械键盘</div>
-                  <div class="product-sku">SKU: KB-012</div>
-                </div>
+              <div class="action-btns">
+                <button class="action-btn" onclick="showViewModal()">查看</button>
+                <button class="action-btn" onclick="showEditModal()">编辑</button>
+                <button class="action-btn danger" onclick="showDeleteModal()">删除</button>
               </div>
             </td>
-            <td><span class="points-value">3,500</span></td>
-            <td>
-              <div class="user-info">
-                <div class="user-avatar">吴</div>
-                <div>
-                  <div style="font-size:13px;color:#333">吴九</div>
-                  <div style="font-size:12px;color:#999">ID: 10007</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="status-tag success">已完成</span></td>
-            <td>2026-03-17 17:48:56</td>
-            <td><button class="action-btn">详情</button></td>
-          </tr>
-          <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900008</td>
-            <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#ffecd2,#fcb69f);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-book" style="color:#666;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">精美笔记本</div>
-                  <div class="product-sku">SKU: NB-007</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="points-value">450</span></td>
-            <td>
-              <div class="user-info">
-                <div class="user-avatar">郑</div>
-                <div>
-                  <div style="font-size:13px;color:#333">郑十</div>
-                  <div style="font-size:12px;color:#999">ID: 10008</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="status-tag warning">已发货</span></td>
-            <td>2026-03-17 15:30:12</td>
-            <td><button class="action-btn">详情</button></td>
-          </tr>
-          <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900009</td>
-            <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#a1c4fd,#c2e9fb);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-mouse" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">无线鼠标</div>
-                  <div class="product-sku">SKU: MS-004</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="points-value">880</span></td>
-            <td>
-              <div class="user-info">
-                <div class="user-avatar">钱</div>
-                <div>
-                  <div style="font-size:13px;color:#333">钱十一</div>
-                  <div style="font-size:12px;color:#999">ID: 10009</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="status-tag success">已完成</span></td>
-            <td>2026-03-17 10:15:44</td>
-            <td><button class="action-btn">详情</button></td>
-          </tr>
-          <tr>
-            <td style="font-family:monospace;color:#666">DH2026031900010</td>
-            <td>
-              <div class="product-info">
-                <div style="width:48px;height:48px;background:linear-gradient(135deg,#f5af19,#f12711);border-radius:6px;display:flex;align-items:center;justify-content:center">
-                  <i class="fas fa-backpack" style="color:white;font-size:18px"></i>
-                </div>
-                <div>
-                  <div class="product-name">商务背包</div>
-                  <div class="product-sku">SKU: BP-011</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="points-value">2,200</span></td>
-            <td>
-              <div class="user-info">
-                <div class="user-avatar">陈</div>
-                <div>
-                  <div style="font-size:13px;color:#333">陈十二</div>
-                  <div style="font-size:12px;color:#999">ID: 10010</div>
-                </div>
-              </div>
-            </td>
-            <td><span class="status-tag processing">待发货</span></td>
-            <td>2026-03-16 18:22:30</td>
-            <td><button class="action-btn">详情</button></td>
           </tr>
         </tbody>
       </table>
       
       <!-- 分页 -->
       <div class="pagination">
-        <span class="pagination-info">共 256 条记录</span>
-        <button class="pagination-btn" disabled><i class="fas fa-angle-left"></i></button>
+        <span class="pagination-info">共 12,586 条记录</span>
+        <button class="pagination-btn" disabled><i class="fas fa-chevron-left"></i></button>
         <button class="pagination-btn active">1</button>
         <button class="pagination-btn">2</button>
         <button class="pagination-btn">3</button>
-        <span class="pagination-ellipsis">...</span>
-        <button class="pagination-btn">26</button>
-        <button class="pagination-btn"><i class="fas fa-angle-right"></i></button>
-        <div style="display:flex;align-items:center;gap:8px;margin-left:16px">
-          <span style="font-size:13px;color:#666">跳至</span>
-          <input type="number" class="filter-input" style="width:50px;text-align:center" value="1">
-          <span style="font-size:13px;color:#666">页</span>
-        </div>
+        <button class="pagination-btn">...</button>
+        <button class="pagination-btn">1259</button>
+        <button class="pagination-btn"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
   </main>
+
+  <!-- 新增/编辑兑换卡弹窗 -->
+  <div class="modal-overlay" id="cardModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">新增兑换卡</h3>
+        <button class="modal-close" onclick="closeModal('cardModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label required">兑换卡类型</label>
+            <select class="form-select" id="cardType" onchange="toggleCardSettings()">
+              <option value="">请选择类型</option>
+              <option value="physical">实物卡</option>
+              <option value="virtual">虚拟卡</option>
+              <option value="coupon">优惠券</option>
+              <option value="gift">礼品卡</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label required">关联商品</label>
+            <select class="form-select">
+              <option value="">请选择商品</option>
+              <option value="p1">华为FreeBuds Pro 3</option>
+              <option value="p2">iPhone 15 Pro 手机壳</option>
+              <option value="p3">小米无线充电器</option>
+              <option value="p4">全自动折叠遮阳伞</option>
+              <option value="p5">智能保温杯 500ml</option>
+              <option value="universal">全品类通用</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label required">面值/积分</label>
+            <input type="number" class="form-input" placeholder="请输入积分面值">
+          </div>
+          <div class="form-group">
+            <label class="form-label required">生成数量</label>
+            <input type="number" class="form-input" placeholder="批量生成数量" value="1">
+          </div>
+        </div>
+        
+        <!-- 卡号卡密设置 -->
+        <div class="card-generate-settings">
+          <h4><i class="fas fa-cog"></i> 卡号卡密设置</h4>
+          <div class="form-row" style="margin-top:12px">
+            <div class="form-group">
+              <label class="form-label">卡号规则</label>
+              <select class="form-select">
+                <option value="auto">自动生成</option>
+                <option value="custom">自定义前缀</option>
+                <option value="import">批量导入</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">卡号前缀</label>
+              <input type="text" class="form-input" placeholder="如: CARD-" value="CARD-">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">卡密规则</label>
+              <select class="form-select">
+                <option value="random">随机生成</option>
+                <option value="custom">自定义</option>
+                <option value="import">批量导入</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">卡密长度</label>
+              <select class="form-select">
+                <option value="8">8位</option>
+                <option value="12" selected>12位</option>
+                <option value="16">16位</option>
+              </select>
+            </div>
+          </div>
+          <div class="generate-options">
+            <div class="generate-option">
+              <input type="checkbox" id="uppercase" checked>
+              <label for="uppercase">包含大写字母</label>
+            </div>
+            <div class="generate-option">
+              <input type="checkbox" id="lowercase">
+              <label for="lowercase">包含小写字母</label>
+            </div>
+            <div class="generate-option">
+              <input type="checkbox" id="numbers" checked>
+              <label for="numbers">包含数字</label>
+            </div>
+            <div class="generate-option">
+              <input type="checkbox" id="specialchars">
+              <label for="specialchars">包含特殊字符</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 有效期设置 -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label required">有效期类型</label>
+            <select class="form-select" onchange="toggleExpiryType(this)">
+              <option value="fixed">固定日期</option>
+              <option value="relative">相对天数</option>
+            </select>
+          </div>
+          <div class="form-group" id="fixedExpiry">
+            <label class="form-label required">有效期至</label>
+            <input type="date" class="form-input">
+          </div>
+          <div class="form-group" id="relativeExpiry" style="display:none">
+            <label class="form-label required">有效天数</label>
+            <input type="number" class="form-input" placeholder="自激活起有效天数">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">备注</label>
+          <textarea class="form-textarea" placeholder="请输入备注信息"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('cardModal')">取消</button>
+        <button class="btn btn-primary">确定添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 查看详情弹窗 -->
+  <div class="modal-overlay" id="viewModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">兑换卡详情</h3>
+        <button class="modal-close" onclick="closeModal('viewModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px">兑换卡类型</div>
+            <span class="card-type-tag physical"><i class="fas fa-credit-card"></i> 实物卡</span>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px">状态</div>
+            <span class="status-tag unused">未使用</span>
+          </div>
+        </div>
+        <div style="margin-top:20px;padding:16px;background:#fafafa;border-radius:6px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <div style="font-size:12px;color:#999;margin-bottom:4px">卡号</div>
+              <div style="font-family:monospace;font-size:16px;color:#1890FF;font-weight:600">CARD-20260319001</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#999;margin-bottom:4px">卡密</div>
+              <div style="font-family:monospace;font-size:16px;color:#52C41A;font-weight:600">ABC123XYZ</div>
+            </div>
+          </div>
+          <div style="margin-top:16px">
+            <div style="font-size:12px;color:#999;margin-bottom:4px">关联商品</div>
+            <div style="font-size:14px">华为FreeBuds Pro 3</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px">面值/积分</div>
+            <div style="font-size:16px;font-weight:600;color:#FF4D4F">2,800 积分</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px">有效期至</div>
+            <div style="font-size:14px;color:#52C41A"><i class="fas fa-calendar-check"></i> 2026-12-31</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px">创建时间</div>
+            <div style="font-size:14px">2026-03-15 10:28:36</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#999;margin-bottom:4px">创建人</div>
+            <div style="font-size:14px">管理员</div>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <div style="font-size:12px;color:#999;margin-bottom:4px">使用信息</div>
+          <div style="padding:12px;background:#f5f5f5;border-radius:4px;font-size:13px;color:#999">
+            暂无使用记录
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('viewModal')">关闭</button>
+        <button class="btn btn-primary">编辑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 批量导入弹窗 -->
+  <div class="modal-overlay" id="importModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">批量导入兑换卡</h3>
+        <button class="modal-close" onclick="closeModal('importModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:16px;padding:12px;background:#e6f7ff;border-radius:6px;font-size:13px;color:#1890FF">
+          <i class="fas fa-info-circle"></i> 请先下载导入模板，按模板格式填写后上传
+        </div>
+        <div class="form-group">
+          <label class="form-label required">兑换卡类型</label>
+          <select class="form-select">
+            <option value="">请选择类型</option>
+            <option value="physical">实物卡</option>
+            <option value="virtual">虚拟卡</option>
+            <option value="coupon">优惠券</option>
+            <option value="gift">礼品卡</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">关联商品</label>
+          <select class="form-select">
+            <option value="">请选择商品</option>
+            <option value="p1">华为FreeBuds Pro 3</option>
+            <option value="p2">iPhone 15 Pro 手机壳</option>
+            <option value="p3">小米无线充电器</option>
+            <option value="universal">全品类通用</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label required">上传文件</label>
+          <div style="border:2px dashed #d9d9d9;border-radius:6px;padding:30px;text-align:center;cursor:pointer" onclick="document.getElementById('importFile').click()">
+            <i class="fas fa-file-excel" style="font-size:48px;color:#52C41A;margin-bottom:12px"></i>
+            <div style="font-size:14px;color:#666">点击或拖拽上传 Excel 文件</div>
+            <div style="font-size:12px;color:#ccc;margin-top:8px">支持 .xlsx, .xls 格式，单次最多导入 1000 条</div>
+            <input type="file" id="importFile" style="display:none" accept=".xlsx,.xls">
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:#fafafa;border-radius:6px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:8px">导入说明</div>
+          <ul style="font-size:12px;color:#666;padding-left:16px;margin:0">
+            <li>卡号、卡密为必填项</li>
+            <li>有效期格式：YYYY-MM-DD</li>
+            <li>重复卡号将自动跳过</li>
+            <li>导入结果将在处理完成后通知</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal('importModal')">取消</button>
+        <button class="btn btn-default"><i class="fas fa-download"></i> 下载模板</button>
+        <button class="btn btn-primary"><i class="fas fa-upload"></i> 开始导入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认弹窗 -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="width:400px">
+      <div class="modal-header">
+        <h3 class="modal-title">确认删除</h3>
+        <button class="modal-close" onclick="closeModal('deleteModal')">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align:center;padding:30px 20px">
+        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:#FAAD14;margin-bottom:16px"></i>
+        <div style="font-size:16px;color:#333;margin-bottom:8px">确定要删除此兑换卡吗？</div>
+        <div style="font-size:13px;color:#999">删除后数据将无法恢复，请谨慎操作</div>
+      </div>
+      <div class="modal-footer" style="justify-content:center">
+        <button class="btn btn-default" onclick="closeModal('deleteModal')">取消</button>
+        <button class="btn btn-danger">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 批量删除确认弹窗 -->
+  <div class="modal-overlay" id="batchDeleteModal">
+    <div class="modal" style="width:400px">
+      <div class="modal-header">
+        <h3 class="modal-title">批量删除确认</h3>
+        <button class="modal-close" onclick="closeModal('batchDeleteModal')">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align:center;padding:30px 20px">
+        <i class="fas fa-exclamation-triangle" style="font-size:48px;color:#FF4D4F;margin-bottom:16px"></i>
+        <div style="font-size:16px;color:#333;margin-bottom:8px">确定要删除已选中的 <span style="color:#FF4D4F;font-weight:600" id="batchDeleteCount">0</span> 张兑换卡吗？</div>
+        <div style="font-size:13px;color:#999">此操作不可恢复，请谨慎操作</div>
+      </div>
+      <div class="modal-footer" style="justify-content:center">
+        <button class="btn btn-default" onclick="closeModal('batchDeleteModal')">取消</button>
+        <button class="btn btn-danger">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 切换子菜单
+    function toggleSubmenu(el) {
+      const menuItem = el.closest('.menu-item');
+      menuItem.classList.toggle('open');
+    }
+    
+    // 切换Tab
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-item').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+    
+    // 全选
+    function toggleSelectAll(el) {
+      document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = el.checked);
+      updateBatchActions();
+    }
+    
+    // 更新批量操作栏
+    function updateBatchActions() {
+      const checked = document.querySelectorAll('.row-checkbox:checked').length;
+      document.getElementById('selectedCount').textContent = checked;
+      document.getElementById('batchActions').classList.toggle('show', checked > 0);
+    }
+    
+    // 显示新增弹窗
+    function showAddModal() {
+      document.getElementById('cardModal').classList.add('show');
+    }
+    
+    // 显示编辑弹窗
+    function showEditModal() {
+      document.querySelector('#cardModal .modal-title').textContent = '编辑兑换卡';
+      document.getElementById('cardModal').classList.add('show');
+    }
+    
+    // 显示查看弹窗
+    function showViewModal() {
+      document.getElementById('viewModal').classList.add('show');
+    }
+    
+    // 显示导入弹窗
+    function showImportModal() {
+      document.getElementById('importModal').classList.add('show');
+    }
+    
+    // 显示删除弹窗
+    function showDeleteModal() {
+      document.getElementById('deleteModal').classList.add('show');
+    }
+    
+    // 显示批量删除弹窗
+    function showBatchDeleteModal() {
+      const count = document.querySelectorAll('.row-checkbox:checked').length;
+      document.getElementById('batchDeleteCount').textContent = count;
+      document.getElementById('batchDeleteModal').classList.add('show');
+    }
+    
+    // 关闭弹窗
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+    
+    // 切换有效期类型
+    function toggleExpiryType(el) {
+      const fixed = document.getElementById('fixedExpiry');
+      const relative = document.getElementById('relativeExpiry');
+      if (el.value === 'fixed') {
+        fixed.style.display = 'block';
+        relative.style.display = 'none';
+      } else {
+        fixed.style.display = 'none';
+        relative.style.display = 'block';
+      }
+    }
+    
+    // 切换卡类型设置
+    function toggleCardSettings() {
+      // 根据卡类型显示不同设置
+    }
+    
+    // 导出兑换卡
+    function exportCards() {
+      alert('正在导出兑换卡数据...');
+    }
+    
+    // 续期
+    function renewCard() {
+      alert('请选择新的有效期');
+    }
+    
+    // 启用
+    function enableCard() {
+      alert('确定要启用此兑换卡吗？');
+    }
+  </script>
 </body>
 </html>

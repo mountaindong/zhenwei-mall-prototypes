@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分类管理 - 甄选商城平台端</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 200px;
+      background: #001529;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      overflow-y: auto;
+      padding: 16px 0;
+    }
+    .sidebar-header {
+      padding: 0 16px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 16px;
+    }
+    .logo {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    .logo i {
+      color: white;
+      font-size: 20px;
+    }
+    .logo-text {
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .platform-tag {
+      display: inline-block;
+      background: rgba(24,144,255,0.2);
+      color: #1890FF;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+    .menu-item {
+      color: rgba(255,255,255,0.65);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    .menu-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: white;
+    }
+    .menu-item.active {
+      background: #1890FF;
+      color: white;
+    }
+    .menu-item i {
+      width: 16px;
+      text-align: center;
+    }
+    .menu-item.has-submenu {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0;
+    }
+    .menu-item-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      cursor: pointer;
+    }
+    .menu-item-header i:first-child {
+      width: 16px;
+      text-align: center;
+    }
+    .submenu-arrow {
+      margin-left: auto;
+      font-size: 10px;
+      transition: transform 0.2s;
+    }
+    .menu-item.has-submenu.open .submenu-arrow {
+      transform: rotate(180deg);
+    }
+    .submenu {
+      display: none;
+      background: rgba(0,0,0,0.2);
+    }
+    .menu-item.has-submenu.open .submenu {
+      display: block;
+    }
+    .submenu-item {
+      display: block;
+      padding: 10px 20px 10px 46px;
+      color: rgba(255,255,255,0.65);
+      font-size: 13px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .submenu-item:hover {
+      background: rgba(255,255,255,0.05);
+      color: white;
+    }
+    .submenu-item.active {
+      color: #1890FF;
+      background: rgba(24,144,255,0.1);
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 200px;
+      margin-top: 56px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 统计卡片 */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    /* 页面布局 */
+    .page-layout {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+    
+    /* 分类树 */
+    .category-tree {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .tree-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .tree-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+    }
+    .tree-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .tree-body {
+      padding: 12px;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    /* 树节点 */
+    .tree-node {
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .tree-node:hover {
+      background: #f5f5f5;
+    }
+    .tree-node.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .tree-node i {
+      font-size: 12px;
+    }
+    .tree-node .node-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: white;
+    }
+    .tree-node .node-name {
+      flex: 1;
+      font-size: 13px;
+    }
+    .tree-node .node-count {
+      font-size: 11px;
+      color: #999;
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 10px;
+    }
+    .tree-children {
+      margin-left: 28px;
+      display: none;
+    }
+    .tree-node.expanded + .tree-children {
+      display: block;
+    }
+    
+    /* 分类详情 */
+    .category-detail {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .detail-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+    }
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* 按钮 */
+    .btn {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 4px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #1890FF;
+      border: 1px solid #1890FF;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    .btn-default {
+      background: white;
+      border: 1px solid #d9d9d9;
+      color: #666;
+    }
+    .btn-default:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .btn-success {
+      background: #52C41A;
+      border: 1px solid #52C41A;
+      color: white;
+    }
+    .btn-danger {
+      background: #FF4D4F;
+      border: 1px solid #FF4D4F;
+      color: white;
+    }
+    .btn-sm {
+      height: 26px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+    
+    /* 表单 */
+    .detail-body {
+      padding: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .form-label.required::before {
+      content: '*';
+      color: #FF4D4F;
+      margin-right: 4px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      height: 36px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-textarea {
+      height: 80px;
+      padding: 8px 12px;
+      resize: vertical;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #1890FF;
+    }
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+    .form-hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    /* 图标选择 */
+    .icon-selector {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .icon-option {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #f0f0f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .icon-option:hover {
+      border-color: #1890FF;
+    }
+    .icon-option.selected {
+      border-color: #1890FF;
+      background: #e6f7ff;
+    }
+    .icon-option i {
+      font-size: 18px;
+      color: #666;
+    }
+    .icon-option.selected i {
+      color: #1890FF;
+    }
+    
+    /* 颜色选择 */
+    .color-selector {
+      display: flex;
+      gap: 8px;
+    }
+    .color-option {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .color-option:hover {
+      transform: scale(1.1);
+    }
+    .color-option.selected {
+      border-color: #333;
+    }
+    
+    /* 状态开关 */
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .switch-toggle {
+      width: 44px;
+      height: 22px;
+      background: #d9d9d9;
+      border-radius: 11px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .switch-toggle::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: left 0.2s;
+    }
+    .switch-toggle.active {
+      background: #52C41A;
+    }
+    .switch-toggle.active::after {
+      left: 24px;
+    }
+    
+    /* 商品列表 */
+    .product-list {
+      border: 1px solid #f0f0f0;
+      border-radius: 6px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .product-item {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid #f0f0f0;
+      gap: 12px;
+    }
+    .product-item:last-child {
+      border-bottom: none;
+    }
+    .product-item:hover {
+      background: #fafafa;
+    }
+    .product-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .product-img i {
+      color: white;
+      font-size: 18px;
+    }
+    .product-info {
+      flex: 1;
+    }
+    .product-name {
+      font-size: 13px;
+      color: #333;
+      font-weight: 500;
+    }
+    .product-sku {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    .product-status {
+      font-size: 12px;
+    }
+    .product-status.online {
+      color: #52C41A;
+    }
+    .product-status.offline {
+      color: #999;
+    }
+    
+    /* 弹窗 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal {
+      background: white;
+      border-radius: 8px;
+      width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      color: #999;
+      border-radius: 4px;
+    }
+    .modal-close:hover {
+      background: #f5f5f5;
+    }
+    .modal-body {
+      padding: 20px;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    /* 排序拖拽 */
+    .drag-handle {
+      cursor: move;
+      color: #d9d9d9;
+    }
+    .drag-handle:hover {
+      color: #1890FF;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-building" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">甄选商城</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item has-submenu">
+      <div class="menu-item-header" onclick="toggleSubmenu(this)">
+        <i class="fas fa-box"></i>
+        <span>商品管理</span>
+        <i class="fas fa-chevron-down submenu-arrow"></i>
+      </div>
+      <div class="submenu">
+        <a href="platform-product.html?status=online" class="submenu-item">已上架</a>
+        <a href="platform-product.html?status=pending" class="submenu-item">待上架</a>
+        <a href="platform-product.html?status=offline" class="submenu-item">已下架</a>
+        <a href="platform-product.html?view=stock" class="submenu-item">库存查看</a>
+      </div>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-tags"></i>
+      <span>分类管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-exchange-alt"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item" onclick="location.href='platform-account.html'">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-line"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面标题 -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:20px;font-weight:600;color:#333">分类管理</h1>
+      <div style="font-size:13px;color:#999;margin-top:4px">管理平台商品分类，支持多级分类</div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stat-cards">
+      <div class="stat-card">
+        <div class="stat-label">分类总数</div>
+        <div class="stat-value">24</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">一级分类</div>
+        <div class="stat-value" style="color:#1890FF">7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">二级分类</div>
+        <div class="stat-value" style="color:#52C41A">17</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">已启用</div>
+        <div class="stat-value" style="color:#52C41A">22</div>
+      </div>
+    </div>
+
+    <!-- 页面布局 -->
+    <div class="page-layout">
+      <!-- 分类树 -->
+      <div class="category-tree">
+        <div class="tree-header">
+          <span class="tree-title">分类结构</span>
+          <div class="tree-actions">
+            <button class="btn btn-primary btn-sm" onclick="showAddModal()">
+              <i class="fas fa-plus"></i> 新增
+            </button>
+          </div>
+        </div>
+        <div class="tree-body">
+          <!-- 数码电子 -->
+          <div class="tree-node expanded active" onclick="selectCategory(this, 'electronics')">
+            <i class="fas fa-chevron-down"></i>
+            <div class="node-icon" style="background:#667eea"><i class="fas fa-laptop"></i></div>
+            <span class="node-name">数码电子</span>
+            <span class="node-count">156</span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-node" onclick="selectCategory(this, 'phone')">
+              <i class="fas fa-chevron-right" style="visibility:hidden"></i>
+              <div class="node-icon" style="background:#f093fb"><i class="fas fa-mobile-alt"></i></div>
+              <span class="node-name">手机通讯</span>
+              <span class="node-count">45</span>
+            </div>
+            <div class="tree-node" onclick="selectCategory(this, 'computer')">
+              <i class="fas fa-chevron-right" style="visibility:hidden"></i>
+              <div class="node-icon" style="background:#4facfe"><i class="fas fa-desktop"></i></div>
+              <span class="node-name">电脑配件</span>
+              <span class="node-count">38</span>
+            </div>
+            <div class="tree-node" onclick="selectCategory(this, 'audio')">
+              <i class="fas fa-chevron-right" style="visibility:hidden"></i>
+              <div class="node-icon" style="background:#fa709a"><i class="fas fa-headphones"></i></div>
+              <span class="node-name">影音设备</span>
+              <span class="node-count">28</span>
+            </div>
+            <div class="tree-node" onclick="selectCategory(this, 'accessories')">
+              <i class="fas fa-chevron-right" style="visibility:hidden"></i>
+              <div class="node-icon" style="background:#a8edea"><i class="fas fa-plug"></i></div>
+              <span class="node-name">数码配件</span>
+              <span class="node-count">45</span>
+            </div>
+          </div>
+
+          <!-- 生活用品 -->
+          <div class="tree-node" onclick="selectCategory(this, 'lifestyle')">
+            <i class="fas fa-chevron-right"></i>
+            <div class="node-icon" style="background:#52C41A"><i class="fas fa-home"></i></div>
+            <span class="node-name">生活用品</span>
+            <span class="node-count">89</span>
+          </div>
+
+          <!-- 食品饮料 -->
+          <div class="tree-node" onclick="selectCategory(this, 'food')">
+            <i class="fas fa-chevron-right"></i>
+            <div class="node-icon" style="background:#FF4D4F"><i class="fas fa-utensils"></i></div>
+            <span class="node-name">食品饮料</span>
+            <span class="node-count">67</span>
+          </div>
+
+          <!-- 服饰箱包 -->
+          <div class="tree-node" onclick="selectCategory(this, 'clothing')">
+            <i class="fas fa-chevron-right"></i>
+            <div class="node-icon" style="background:#faad14"><i class="fas fa-tshirt"></i></div>
+            <span class="node-name">服饰箱包</span>
+            <span class="node-count">134</span>
+          </div>
+
+          <!-- 美妆护肤 -->
+          <div class="tree-node" onclick="selectCategory(this, 'beauty')">
+            <i class="fas fa-chevron-right"></i>
+            <div class="node-icon" style="background:#f5576c"><i class="fas fa-spa"></i></div>
+            <span class="node-name">美妆护肤</span>
+            <span class="node-count">78</span>
+          </div>
+
+          <!-- 运动户外 -->
+          <div class="tree-node" onclick="selectCategory(this, 'sports')">
+            <i class="fas fa-chevron-right"></i>
+            <div class="node-icon" style="background:#00f2fe"><i class="fas fa-running"></i></div>
+            <span class="node-name">运动户外</span>
+            <span class="node-count">56</span>
+          </div>
+
+          <!-- 家居家装 -->
+          <div class="tree-node" onclick="selectCategory(this, 'home')">
+            <i class="fas fa-chevron-right"></i>
+            <div class="node-icon" style="background:#fee140"><i class="fas fa-couch"></i></div>
+            <span class="node-name">家居家装</span>
+            <span class="node-count">43</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分类详情 -->
+      <div class="category-detail">
+        <div class="detail-header">
+          <span class="detail-title">分类详情 - 数码电子</span>
+          <div class="detail-actions">
+            <button class="btn btn-default"><i class="fas fa-plus"></i> 添加子分类</button>
+            <button class="btn btn-primary"><i class="fas fa-save"></i> 保存修改</button>
+            <button class="btn btn-danger"><i class="fas fa-trash"></i> 删除</button>
+          </div>
+        </div>
+        <div class="detail-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label required">分类名称</label>
+              <input type="text" class="form-input" value="数码电子" placeholder="请输入分类名称">
+            </div>
+            <div class="form-group">
+              <label class="form-label">上级分类</label>
+              <select class="form-select">
+                <option value="">无（顶级分类）</option>
+                <option value="electronics">数码电子</option>
+                <option value="lifestyle">生活用品</option>
+                <option value="food">食品饮料</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">分类图标</label>
+              <div class="icon-selector">
+                <div class="icon-option selected"><i class="fas fa-laptop"></i></div>
+                <div class="icon-option"><i class="fas fa-mobile-alt"></i></div>
+                <div class="icon-option"><i class="fas fa-desktop"></i></div>
+                <div class="icon-option"><i class="fas fa-headphones"></i></div>
+                <div class="icon-option"><i class="fas fa-camera"></i></div>
+                <div class="icon-option"><i class="fas fa-gamepad"></i></div>
+                <div class="icon-option"><i class="fas fa-tv"></i></div>
+                <div class="icon-option"><i class="fas fa-tablet-alt"></i></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">分类颜色</label>
+              <div class="color-selector">
+                <div class="color-option selected" style="background:#667eea"></div>
+                <div class="color-option" style="background:#f093fb"></div>
+                <div class="color-option" style="background:#4facfe"></div>
+                <div class="color-option" style="background:#fa709a"></div>
+                <div class="color-option" style="background:#52C41A"></div>
+                <div class="color-option" style="background:#FAAD14"></div>
+                <div class="color-option" style="background:#FF4D4F"></div>
+                <div class="color-option" style="background:#1890FF"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">排序权重</label>
+              <input type="number" class="form-input" value="100" placeholder="数值越大越靠前">
+              <div class="form-hint">数值越大，分类显示越靠前</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">状态</label>
+              <div class="switch" style="margin-top:8px">
+                <div class="switch-toggle active" onclick="this.classList.toggle('active')"></div>
+                <span style="font-size:13px;color:#666">启用</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">分类描述</label>
+            <textarea class="form-textarea" placeholder="请输入分类描述">数码电子产品分类，包含手机、电脑、影音设备、数码配件等</textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">分类下商品（156件）</label>
+            <div class="product-list">
+              <div class="product-item">
+                <div class="product-img">
+                  <i class="fas fa-headphones"></i>
+                </div>
+                <div class="product-info">
+                  <div class="product-name">华为FreeBuds Pro 3</div>
+                  <div class="product-sku">SKU: HW-FB-003</div>
+                </div>
+                <span class="product-status online">已上架</span>
+              </div>
+              <div class="product-item">
+                <div class="product-img" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="product-info">
+                  <div class="product-name">iPhone 15 Pro 手机壳</div>
+                  <div class="product-sku">SKU: AP-CS-015</div>
+                </div>
+                <span class="product-status online">已上架</span>
+              </div>
+              <div class="product-item">
+                <div class="product-img" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
+                  <i class="fas fa-charging-station"></i>
+                </div>
+                <div class="product-info">
+                  <div class="product-name">小米无线充电器</div>
+                  <div class="product-sku">SKU: MI-WC-008</div>
+                </div>
+                <span class="product-status online">已上架</span>
+              </div>
+              <div class="product-item">
+                <div class="product-img" style="background:linear-gradient(135deg,#fa709a,#fee140)">
+                  <i class="fas fa-umbrella-beach"></i>
+                </div>
+                <div class="product-info">
+                  <div class="product-name">全自动折叠遮阳伞</div>
+                  <div class="product-sku">SKU: UB-022</div>
+                </div>
+                <span class="product-status offline">已下架</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 新增分类弹窗 -->
+  <div class="modal-overlay" id="categoryModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">新增分类</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label required">分类名称</label>
+          <input type="text" class="form-input" placeholder="请输入分类名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">上级分类</label>
+          <select class="form-select">
+            <option value="">无（顶级分类）</option>
+            <option value="electronics">数码电子</option>
+            <option value="lifestyle">生活用品</option>
+            <option value="food">食品饮料</option>
+            <option value="clothing">服饰箱包</option>
+            <option value="beauty">美妆护肤</option>
+            <option value="sports">运动户外</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">分类图标</label>
+          <div class="icon-selector">
+            <div class="icon-option"><i class="fas fa-laptop"></i></div>
+            <div class="icon-option"><i class="fas fa-mobile-alt"></i></div>
+            <div class="icon-option"><i class="fas fa-desktop"></i></div>
+            <div class="icon-option"><i class="fas fa-headphones"></i></div>
+            <div class="icon-option"><i class="fas fa-camera"></i></div>
+            <div class="icon-option"><i class="fas fa-gamepad"></i></div>
+            <div class="icon-option"><i class="fas fa-home"></i></div>
+            <div class="icon-option"><i class="fas fa-utensils"></i></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">分类颜色</label>
+          <div class="color-selector">
+            <div class="color-option" style="background:#667eea"></div>
+            <div class="color-option" style="background:#f093fb"></div>
+            <div class="color-option" style="background:#4facfe"></div>
+            <div class="color-option" style="background:#fa709a"></div>
+            <div class="color-option" style="background:#52C41A"></div>
+            <div class="color-option" style="background:#FAAD14"></div>
+            <div class="color-option" style="background:#FF4D4F"></div>
+            <div class="color-option" style="background:#1890FF"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">排序权重</label>
+          <input type="number" class="form-input" value="0" placeholder="数值越大越靠前">
+        </div>
+        <div class="form-group">
+          <label class="form-label">分类描述</label>
+          <textarea class="form-textarea" placeholder="请输入分类描述"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" onclick="closeModal()">取消</button>
+        <button class="btn btn-primary">确定添加</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 切换子菜单
+    function toggleSubmenu(el) {
+      const menuItem = el.closest('.menu-item');
+      menuItem.classList.toggle('open');
+    }
+    
+    // 选择分类
+    function selectCategory(el, id) {
+      document.querySelectorAll('.tree-node').forEach(node => node.classList.remove('active'));
+      el.classList.add('active');
+      
+      // 切换展开
+      if (el.querySelector('.fa-chevron-right, .fa-chevron-down')) {
+        el.classList.toggle('expanded');
+        const icon = el.querySelector('.fa-chevron-right, .fa-chevron-down');
+        if (el.classList.contains('expanded')) {
+          icon.classList.remove('fa-chevron-right');
+          icon.classList.add('fa-chevron-down');
+        } else {
+          icon.classList.remove('fa-chevron-down');
+          icon.classList.add('fa-chevron-right');
+        }
+      }
+    }
+    
+    // 显示添加弹窗
+    function showAddModal() {
+      document.getElementById('categoryModal').classList.add('show');
+    }
+    
+    // 关闭弹窗
+    function closeModal() {
+      document.getElementById('categoryModal').classList.remove('show');
+    }
+    
+    // 图标选择
+    document.querySelectorAll('.icon-option').forEach(option => {
+      option.addEventListener('click', function() {
+        this.closest('.icon-selector').querySelectorAll('.icon-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+    
+    // 颜色选择
+    document.querySelectorAll('.color-option').forEach(option => {
+      option.addEventListener('click', function() {
+        this.closest('.color-selector').querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+  </script>
+</body>
+</html>

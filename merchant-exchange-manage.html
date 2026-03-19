@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 兑换管理（PC端）</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      height: 100%;
+      background: #f0f2f5; 
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    /* 整体布局 */
+    .app-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* 侧边导航 */
+    .sidebar {
+      width: 220px;
+      background: #001529;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .sidebar-logo i {
+      font-size: 24px;
+      color: #52C41A;
+    }
+    
+    .sidebar-logo span {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    .sidebar-menu {
+      flex: 1;
+      padding: 12px 0;
+      overflow-y: auto;
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    
+    .menu-item:hover {
+      background: rgba(255,255,255,0.08);
+      color: white;
+    }
+    
+    .menu-item.active {
+      background: #52C41A;
+      color: white;
+    }
+    
+    .menu-item i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+    
+    .menu-item span {
+      font-size: 14px;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* 顶部栏 */
+    .topbar {
+      height: 60px;
+      background: white;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .notification-btn {
+      position: relative;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    
+    .notification-btn:hover {
+      background: #f5f5f5;
+    }
+    
+    .notification-btn i {
+      font-size: 18px;
+      color: #666;
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+    
+    .user-info:hover {
+      background: #f5f5f5;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+    }
+    
+    .user-name {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    /* 内容区 */
+    .content-area {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    
+    /* 数据统计卡片 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    
+    .stat-card-title {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .stat-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .stat-card-icon i {
+      font-size: 18px;
+    }
+    
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: #333;
+    }
+    
+    .stat-card.green .stat-card-icon {
+      background: rgba(82, 196, 26, 0.1);
+    }
+    .stat-card.green .stat-card-icon i {
+      color: #52C41A;
+    }
+    .stat-card.green .stat-value {
+      color: #52C41A;
+    }
+    
+    .stat-card.blue .stat-card-icon {
+      background: rgba(24, 144, 255, 0.1);
+    }
+    .stat-card.blue .stat-card-icon i {
+      color: #1890FF;
+    }
+    .stat-card.blue .stat-value {
+      color: #1890FF;
+    }
+    
+    .stat-card.orange .stat-card-icon {
+      background: rgba(250, 173, 20, 0.1);
+    }
+    .stat-card.orange .stat-card-icon i {
+      color: #FAAD14;
+    }
+    .stat-card.orange .stat-value {
+      color: #FAAD14;
+    }
+    
+    .stat-card.red .stat-card-icon {
+      background: rgba(255, 77, 79, 0.1);
+    }
+    .stat-card.red .stat-card-icon i {
+      color: #FF4D4F;
+    }
+    .stat-card.red .stat-value {
+      color: #FF4D4F;
+    }
+    
+    /* 筛选区域 */
+    .filter-bar {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .filter-label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      font-size: 14px;
+      background: white;
+      min-width: 120px;
+    }
+    
+    .filter-input {
+      padding: 8px 12px;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .filter-date {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .date-separator {
+      color: #999;
+    }
+    
+    .filter-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    
+    .btn-default {
+      background: white;
+      color: #666;
+      border: 1px solid #d9d9d9;
+    }
+    
+    .btn-default:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    
+    .btn-success {
+      background: #52C41A;
+      color: white;
+      border: none;
+    }
+    
+    .btn-success:hover {
+      background: #45a617;
+    }
+    
+    /* 表格区域 */
+    .table-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    
+    .table-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .table-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .table-title-dot {
+      width: 4px;
+      height: 16px;
+      background: #1890FF;
+      border-radius: 2px;
+    }
+    
+    .table-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 14px 16px;
+      text-align: left;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    th {
+      font-size: 13px;
+      color: #999;
+      font-weight: 500;
+      background: #fafafa;
+    }
+    
+    td {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    tr:hover td {
+      background: #fafafa;
+    }
+    
+    .order-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .order-number {
+      font-weight: 500;
+      color: #1890FF;
+    }
+    
+    .order-time {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .product-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .product-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+    }
+    
+    .product-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .product-name {
+      font-weight: 500;
+    }
+    
+    .product-spec {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .amount {
+      font-weight: 600;
+      color: #FF4D4F;
+    }
+    
+    .status-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    
+    .status-tag.success {
+      background: #f6ffed;
+      color: #52c41a;
+    }
+    
+    .status-tag.pending {
+      background: #fff7e6;
+      color: #fa8c16;
+    }
+    
+    .status-tag.failed {
+      background: #fff1f0;
+      color: #ff4d4f;
+    }
+    
+    .status-tag.processing {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .action-btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s;
+    }
+    
+    .action-btn.primary {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    
+    .action-btn.primary:hover {
+      background: #1890FF;
+      color: white;
+    }
+    
+    .action-btn.default {
+      background: #f5f5f5;
+      color: #666;
+    }
+    
+    .action-btn.default:hover {
+      background: #e6e6e6;
+    }
+    
+    /* 分页 */
+    .pagination {
+      padding: 16px 20px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .pagination-info {
+      font-size: 13px;
+      color: #999;
+    }
+    
+    .pagination-btns {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid #d9d9d9;
+      background: white;
+      color: #666;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 8px;
+      transition: all 0.3s;
+    }
+    
+    .page-btn:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    
+    .page-btn.active {
+      background: #1890FF;
+      border-color: #1890FF;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 侧边导航 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-store"></i>
+          <span>商家工作台</span>
+        </div>
+      </div>
+      <nav class="sidebar-menu">
+        <a href="merchant-home.html" class="menu-item">
+          <i class="fas fa-home"></i>
+          <span>工作台</span>
+        </a>
+        <a href="merchant-exchange.html" class="menu-item">
+          <i class="fas fa-exchange-alt"></i>
+          <span>订单兑换</span>
+        </a>
+        <a href="merchant-exchange-manage.html" class="menu-item active">
+          <i class="fas fa-gift"></i>
+          <span>兑换管理</span>
+        </a>
+        <a href="merchant-stats.html" class="menu-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>数据统计</span>
+        </a>
+        <a href="merchant-organization.html" class="menu-item">
+          <i class="fas fa-sitemap"></i>
+          <span>组织架构</span>
+        </a>
+        <a href="merchant-permission.html" class="menu-item">
+          <i class="fas fa-shield-alt"></i>
+          <span>权限管理</span>
+        </a>
+        <a href="merchant-mini-profile.html" class="menu-item">
+          <i class="fas fa-user-circle"></i>
+          <span>账户设置</span>
+        </a>
+      </nav>
+    </aside>
+    
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 顶部栏 -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="topbar-title">兑换管理</h1>
+        </div>
+        <div class="topbar-right">
+          <div class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge">3</span>
+          </div>
+          <div class="user-info">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="user-name">张三店铺</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- 内容区 -->
+      <div class="content-area">
+        <!-- 数据统计 -->
+        <div class="stats-grid">
+          <div class="stat-card green">
+            <div class="stat-card-header">
+              <span class="stat-card-title">已兑换订单</span>
+              <div class="stat-card-icon">
+                <i class="fas fa-check-circle"></i>
+              </div>
+            </div>
+            <div class="stat-value">328</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-card-header">
+              <span class="stat-card-title">待兑换订单</span>
+              <div class="stat-card-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+            </div>
+            <div class="stat-value">56</div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-card-header">
+              <span class="stat-card-title">兑换总金额</span>
+              <div class="stat-card-icon">
+                <i class="fas fa-yen-sign"></i>
+              </div>
+            </div>
+            <div class="stat-value">¥98,560</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-card-header">
+              <span class="stat-card-title">兑换失败</span>
+              <div class="stat-card-icon">
+                <i class="fas fa-times-circle"></i>
+              </div>
+            </div>
+            <div class="stat-value">12</div>
+          </div>
+        </div>
+        
+        <!-- 筛选区域 -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <span class="filter-label">兑换状态：</span>
+            <select class="filter-select">
+              <option value="">全部状态</option>
+              <option value="success">已兑换</option>
+              <option value="pending">待兑换</option>
+              <option value="failed">兑换失败</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">订单号：</span>
+            <input type="text" class="filter-input" placeholder="请输入订单号">
+          </div>
+          <div class="filter-group filter-date">
+            <span class="filter-label">兑换时间：</span>
+            <input type="date" class="filter-input" value="2026-03-13">
+            <span class="date-separator">至</span>
+            <input type="date" class="filter-input" value="2026-03-19">
+          </div>
+          <div class="filter-actions">
+            <button class="btn btn-default">
+              <i class="fas fa-redo"></i>
+              重置
+            </button>
+            <button class="btn btn-primary">
+              <i class="fas fa-search"></i>
+              查询
+            </button>
+          </div>
+        </div>
+        
+        <!-- 表格区域 -->
+        <div class="table-card">
+          <div class="table-header">
+            <div class="table-title">
+              <div class="table-title-dot"></div>
+              兑换记录
+            </div>
+            <div class="table-actions">
+              <button class="btn btn-default">
+                <i class="fas fa-download"></i>
+                导出
+              </button>
+              <button class="btn btn-success">
+                <i class="fas fa-file-export"></i>
+                批量兑换
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th><input type="checkbox"></th>
+                  <th>订单信息</th>
+                  <th>商品信息</th>
+                  <th>兑换金额</th>
+                  <th>用户信息</th>
+                  <th>兑换状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>
+                    <div class="order-info">
+                      <span class="order-number">20260319001</span>
+                      <span class="order-time">2026-03-19 14:30</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="product-info">
+                      <div class="product-img">
+                        <i class="fas fa-mobile-alt"></i>
+                      </div>
+                      <div class="product-detail">
+                        <span class="product-name">iPhone手机壳</span>
+                        <span class="product-spec">黑色 / 透明</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="amount">¥299.00</span></td>
+                  <td>张** 138****1234</td>
+                  <td><span class="status-tag success">已兑换</span></td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="action-btn primary">详情</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>
+                    <div class="order-info">
+                      <span class="order-number">20260319002</span>
+                      <span class="order-time">2026-03-19 13:45</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="product-info">
+                      <div class="product-img">
+                        <i class="fas fa-bolt"></i>
+                      </div>
+                      <div class="product-detail">
+                        <span class="product-name">无线充电器</span>
+                        <span class="product-spec">白色</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="amount">¥199.00</span></td>
+                  <td>李** 139****5678</td>
+                  <td><span class="status-tag pending">待兑换</span></td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="action-btn primary">兑换</button>
+                      <button class="action-btn default">详情</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>
+                    <div class="order-info">
+                      <span class="order-number">20260318056</span>
+                      <span class="order-time">2026-03-18 16:20</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="product-info">
+                      <div class="product-img">
+                        <i class="fas fa-headphones"></i>
+                      </div>
+                      <div class="product-detail">
+                        <span class="product-name">蓝牙耳机</span>
+                        <span class="product-spec">黑色</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="amount">¥459.00</span></td>
+                  <td>王** 137****9012</td>
+                  <td><span class="status-tag success">已兑换</span></td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="action-btn primary">详情</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>
+                    <div class="order-info">
+                      <span class="order-number">20260318032</span>
+                      <span class="order-time">2026-03-18 11:05</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="product-info">
+                      <div class="product-img">
+                        <i class="fas fa-plug"></i>
+                      </div>
+                      <div class="product-detail">
+                        <span class="product-name">数据线套装</span>
+                        <span class="product-spec">1米 / 2米</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="amount">¥89.00</span></td>
+                  <td>赵** 136****3456</td>
+                  <td><span class="status-tag processing">处理中</span></td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="action-btn primary">详情</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox"></td>
+                  <td>
+                    <div class="order-info">
+                      <span class="order-number">20260317088</span>
+                      <span class="order-time">2026-03-17 15:30</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="product-info">
+                      <div class="product-img">
+                        <i class="fas fa-mobile-alt"></i>
+                      </div>
+                      <div class="product-detail">
+                        <span class="product-name">手机支架</span>
+                        <span class="product-spec">银色</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="amount">¥129.00</span></td>
+                  <td>孙** 135****7890</td>
+                  <td><span class="status-tag failed">兑换失败</span></td>
+                  <td>
+                    <div class="action-btns">
+                      <button class="action-btn primary">重试</button>
+                      <button class="action-btn default">详情</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="pagination">
+            <span class="pagination-info">共 156 条记录，每页 10 条</span>
+            <div class="pagination-btns">
+              <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">...</button>
+              <button class="page-btn">16</button>
+              <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
