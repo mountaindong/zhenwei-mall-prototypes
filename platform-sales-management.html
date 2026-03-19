@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>销售管理 - 振威商城平台端</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 220px;
+      background: linear-gradient(180deg, #001529, #002140);
+      color: white;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+    
+    .logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .logo p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      margin-top: 4px;
+    }
+    
+    .menu-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.65);
+      transition: all 0.3s;
+    }
+    
+    .menu-item:hover, .menu-item.active {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    
+    .menu-item i {
+      width: 16px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    
+    /* 卡片 */
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    /* 按钮 */
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    
+    .btn-success {
+      background: #52C41A;
+      color: white;
+    }
+    
+    .btn-warning {
+      background: #FA8C16;
+      color: white;
+    }
+    
+    /* 统计卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .stat-label {
+      font-size: 13px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .stat-change {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    
+    .stat-change.positive {
+      color: #52C41A;
+    }
+    
+    .stat-change.negative {
+      color: #FF4D4F;
+    }
+    
+    /* 图表容器 */
+    .chart-container {
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fafafa;
+      border-radius: 8px;
+      position: relative;
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th {
+      text-align: left;
+      padding: 12px 8px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .data-table td {
+      padding: 12px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+    
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    
+    /* 进度条 */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #1890FF, #40a9ff);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-good {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    
+    .status-warning {
+      background: #fff7e6;
+      color: #FA8C16;
+      border: 1px solid #ffd591;
+    }
+    
+    .status-danger {
+      background: #fff1f0;
+      color: #FF4D4F;
+      border: 1px solid #ffa39e;
+    }
+    
+    /* 排名列表 */
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .rank-number {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      background: #f0f0f0;
+      color: #666;
+    }
+    
+    .rank-number.top-1 {
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: white;
+    }
+    
+    .rank-number.top-2 {
+      background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+      color: white;
+    }
+    
+    .rank-number.top-3 {
+      background: linear-gradient(135deg, #CD7F32, #B87333);
+      color: white;
+    }
+    
+    /* 筛选栏 */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .filter-btn {
+      padding: 6px 16px;
+      border: 1px solid #d9d9d9;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.3s;
+    }
+    
+    .filter-btn:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    
+    .filter-btn.active {
+      background: #1890FF;
+      color: white;
+      border-color: #1890FF;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="logo">
+        <h1>振威商城</h1>
+        <p>平台管理后台</p>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-dashboard.html'">
+        <i class="fas fa-home"></i>
+        <span>首页概览</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-user.html'">
+        <i class="fas fa-users"></i>
+        <span>用户管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-merchant.html'">
+        <i class="fas fa-store"></i>
+        <span>商家管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-exchange.html'">
+        <i class="fas fa-exchange-alt"></i>
+        <span>兑换管理</span>
+      </div>
+      
+      <div class="menu-item active">
+        <i class="fas fa-chart-line"></i>
+        <span>销售管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-finance.html'">
+        <i class="fas fa-wallet"></i>
+        <span>财务管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-settings.html'">
+        <i class="fas fa-cog"></i>
+        <span>系统设置</span>
+      </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="main-content">
+      <!-- 页面标题 -->
+      <div style="margin-bottom:20px">
+        <h1 style="font-size:20px;font-weight:600;color:#333">销售管理</h1>
+        <div style="font-size:13px;color:#999;margin-top:4px">监控平台销售数据与业绩表现</div>
+      </div>
+
+      <!-- 筛选栏 -->
+      <div class="filter-bar">
+        <button class="filter-btn active">今日</button>
+        <button class="filter-btn">昨日</button>
+        <button class="filter-btn">本周</button>
+        <button class="filter-btn">本月</button>
+        <button class="filter-btn">本季度</button>
+        <button class="filter-btn">自定义</button>
+      </div>
+
+      <!-- 核心指标卡片 -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-shopping-cart" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div class="stat-label">今日销售额</div>
+              <div class="stat-value">¥128,456</div>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 12.5% 较昨日
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#52C41A,#73d13d);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-box" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div class="stat-label">今日订单数</div>
+              <div class="stat-value">1,842</div>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 8.3% 较昨日
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#FA8C16,#ffa940);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-users" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div class="stat-label">新增用户</div>
+              <div class="stat-value">326</div>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 15.2% 较昨日
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#722ED1,#9254DE);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-redo" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div class="stat-label">复购率</div>
+              <div class="stat-value">68.5%</div>
+            </div>
+          </div>
+          <div class="stat-change negative">
+            <i class="fas fa-arrow-down"></i> 2.1% 较昨日
+          </div>
+        </div>
+      </div>
+
+      <!-- 图表区域 -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px">
+        <!-- 销售趋势图 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">销售趋势</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-primary" style="padding:4px 12px;font-size:12px">日</button>
+              <button class="btn" style="padding:4px 12px;font-size:12px;background:#f0f0f0">周</button>
+              <button class="btn" style="padding:4px 12px;font-size:12px;background:#f0f0f0">月</button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div style="text-align:center;color:#999">
+              <i class="fas fa-chart-area" style="font-size:48px;margin-bottom:12px;color:#1890FF"></i>
+              <div>销售趋势图表区域</div>
+              <div style="font-size:12px;margin-top:4px">可集成 ECharts 或其他图表库</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 商品分类销售占比 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">分类销售占比</div>
+          </div>
+          <div class="chart-container" style="height:260px">
+            <div style="text-align:center;color:#999">
+              <i class="fas fa-chart-pie" style="font-size:48px;margin-bottom:12px;color:#FA8C16"></i>
+              <div>分类占比图表</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商家销售排名 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">商家销售排行榜</div>
+            <button class="btn btn-primary" style="padding:4px 12px;font-size:12px">查看全部</button>
+          </div>
+          <div>
+            <div class="rank-item">
+              <div class="rank-number top-1">1</div>
+              <div style="flex:1">
+                <div style="font-weight:500">苹果旗舰店</div>
+                <div style="font-size:12px;color:#999">销售额: ¥458,230</div>
+              </div>
+              <div class="status-tag status-good">优秀</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number top-2">2</div>
+              <div style="flex:1">
+                <div style="font-weight:500">华为官方店</div>
+                <div style="font-size:12px;color:#999">销售额: ¥386,450</div>
+              </div>
+              <div class="status-tag status-good">优秀</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number top-3">3</div>
+              <div style="flex:1">
+                <div style="font-weight:500">小米官方旗舰店</div>
+                <div style="font-size:12px;color:#999">销售额: ¥298,120</div>
+              </div>
+              <div class="status-tag status-good">优秀</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number">4</div>
+              <div style="flex:1">
+                <div style="font-weight:500">OPPO官方店</div>
+                <div style="font-size:12px;color:#999">销售额: ¥245,680</div>
+              </div>
+              <div class="status-tag status-good">良好</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number">5</div>
+              <div style="flex:1">
+                <div style="font-weight:500">vivo体验店</div>
+                <div style="font-size:12px;color:#999">销售额: ¥198,450</div>
+              </div>
+              <div class="status-tag status-warning">一般</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 热销商品排行 -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">热销商品排行榜</div>
+            <button class="btn btn-primary" style="padding:4px 12px;font-size:12px">查看全部</button>
+          </div>
+          <div>
+            <div class="rank-item">
+              <div class="rank-number top-1">1</div>
+              <div style="flex:1">
+                <div style="font-weight:500">iPhone 15 Pro Max</div>
+                <div style="font-size:12px;color:#999">销量: 1,256件</div>
+              </div>
+              <div style="color:#FF4D4F;font-weight:600">¥458,230</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number top-2">2</div>
+              <div style="flex:1">
+                <div style="font-weight:500">华为Mate 60 Pro</div>
+                <div style="font-size:12px;color:#999">销量: 986件</div>
+              </div>
+              <div style="color:#FF4D4F;font-weight:600">¥386,450</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number top-3">3</div>
+              <div style="flex:1">
+                <div style="font-weight:500">小米14 Ultra</div>
+                <div style="font-size:12px;color:#999">销量: 823件</div>
+              </div>
+              <div style="color:#FF4D4F;font-weight:600">¥298,120</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number">4</div>
+              <div style="flex:1">
+                <div style="font-weight:500">AirPods Pro 2</div>
+                <div style="font-size:12px;color:#999">销量: 745件</div>
+              </div>
+              <div style="color:#FF4D4F;font-weight:600">¥245,680</div>
+            </div>
+            <div class="rank-item">
+              <div class="rank-number">5</div>
+              <div style="flex:1">
+                <div style="font-weight:500">Apple Watch S9</div>
+                <div style="font-size:12px;color:#999">销量: 698件</div>
+              </div>
+              <div style="color:#FF4D4F;font-weight:600">¥198,450</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 订单转化漏斗 -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">订单转化漏斗</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px">
+          <div style="text-align:center">
+            <div style="font-size:32px;font-weight:600;color:#1890FF">12,456</div>
+            <div style="font-size:13px;color:#999;margin-top:4px">访问用户</div>
+            <div style="margin-top:8px">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:100%"></div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:32px;font-weight:600;color:#52C41A">3,842</div>
+            <div style="font-size:13px;color:#999;margin-top:4px">浏览商品</div>
+            <div style="margin-top:8px">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:75%"></div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:32px;font-weight:600;color:#FA8C16">2,156</div>
+            <div style="font-size:13px;color:#999;margin-top:4px">加入购物车</div>
+            <div style="margin-top:8px">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:56%"></div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:32px;font-weight:600;color:#722ED1">1,428</div>
+            <div style="font-size:13px;color:#999;margin-top:4px">提交订单</div>
+            <div style="margin-top:8px">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:37%"></div>
+              </div>
+            </div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:32px;font-weight:600;color:#FF4D4F">1,125</div>
+            <div style="font-size:13px;color:#999;margin-top:4px">完成支付</div>
+            <div style="margin-top:8px">
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:29%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:16px;font-size:12px;color:#999">
+          转化率: 浏览→购物车 30.8% | 购物车→订单 66.2% | 订单→支付 78.8% | 整体转化率 9.0%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 筛选按钮点击事件
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
