@@ -231,7 +231,6 @@
       color: #666;
     }
     
-    /* 配送方式、优惠券、备注 */
     .option-row {
       display: flex;
       justify-content: space-between;
@@ -268,7 +267,6 @@
       color: #1890FF;
     }
     
-    /* 优惠券标签 */
     .coupon-tag {
       display: inline-block;
       background: linear-gradient(135deg, #fff1f0, #ffccc7);
@@ -455,31 +453,6 @@
         </div>
       </div>
 
-      <!-- 优惠券 -->
-      <div class="card">
-        <div class="option-row">
-          <div class="option-label">
-            <i class="fas fa-ticket-alt" style="color:#FF4D4F"></i>
-            优惠券
-          </div>
-          <div class="option-value highlight">
-            <span class="coupon-tag">新人立减</span>
-            -¥20
-            <i class="fas fa-chevron-right" style="font-size:12px;color:#ccc"></i>
-          </div>
-        </div>
-        <div class="option-row">
-          <div class="option-label">
-            <i class="fas fa-coins" style="color:#FAAD14"></i>
-            积分抵扣
-          </div>
-          <div class="option-value">
-            <span style="color:#999">可用 1200 积分抵扣 ¥12</span>
-            <i class="fas fa-toggle-off" style="font-size:16px;color:#ccc"></i>
-          </div>
-        </div>
-      </div>
-
       <!-- 订单备注 -->
       <div class="card">
         <div class="option-row" style="border:none">
@@ -506,17 +479,9 @@
           <div class="price-label">运费</div>
           <div class="price-value">¥0.00</div>
         </div>
-        <div class="price-row">
-          <div class="price-label">优惠券</div>
-          <div class="price-value discount">-¥20.00</div>
-        </div>
-        <div class="price-row">
-          <div class="price-label">积分抵扣</div>
-          <div class="price-value discount">-¥12.00</div>
-        </div>
         <div class="price-row price-total">
           <div class="price-label">合计</div>
-          <div class="price-value">¥106.00</div>
+          <div class="price-value">¥138.00</div>
         </div>
       </div>
 
@@ -543,7 +508,7 @@
     <div class="submit-bar">
       <div class="total">
         <span class="total-label">合计:</span>
-        <span class="total-amount">¥106.00</span>
+        <span class="total-amount">¥138.00</span>
       </div>
       <button class="submit-btn">提交订单</button>
     </div>
@@ -559,7 +524,6 @@
       }, 200);
     });
 
-    // 积分抵扣开关
     const toggle = document.querySelector('.fa-toggle-off');
     toggle.addEventListener('click', function() {
       if (this.classList.contains('fa-toggle-off')) {

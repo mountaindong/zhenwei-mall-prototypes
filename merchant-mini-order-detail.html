@@ -71,6 +71,46 @@
       box-shadow: 0 4px 12px rgba(82,196,26,0.3);
     }
     
+    /* 底部导航 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 390px;
+      background: white;
+      box-shadow: 0 -2px 16px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+      z-index: 99;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #999;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .nav-item i {
+      font-size: 20px;
+    }
+    
+    .nav-item.active {
+      color: #52C41A;
+    }
+    
+    .nav-item:active {
+      transform: scale(0.95);
+    }
+    
     /* 订单状态时间线 */
     .timeline {
       display: flex;
@@ -233,6 +273,30 @@
             </div>
           </div>
           
+          <!-- 兑换卡密信息 -->
+          <div style="margin-top:14px;padding:12px;background:#FFF7E6;border-radius:8px;border:1px solid #FFD591">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+              <i class="fas fa-key" style="color:#FA8C16;font-size:14px"></i>
+              <span style="font-size:13px;color:#FA8C16;font-weight:600">兑换卡密</span>
+            </div>
+            <div style="background:white;padding:10px;border-radius:6px;font-family:monospace;font-size:13px;color:#333;line-height:1.8">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                <span style="color:#666">卡号：</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="color:#333">CARD-2026-0319-XYZ789</span>
+                  <span style="font-size:11px;color:#1890FF;cursor:pointer" onclick="copyText('CARD-2026-0319-XYZ789')">复制</span>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="color:#666">密码：</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="color:#333">PASS-ABC-123-456</span>
+                  <span style="font-size:11px;color:#1890FF;cursor:pointer" onclick="copyText('PASS-ABC-123-456')">复制</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <!-- 商品小计 -->
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f5f5f5;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:13px;color:#666">商品小计</span>
@@ -343,5 +407,13 @@
       </nav>
     </div>
   </div>
+  
+  <script>
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('已复制：' + text);
+      });
+    }
+  </script>
 </body>
 </html>

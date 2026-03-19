@@ -351,19 +351,28 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
           <div style="display:flex;align-items:center;gap:8px">
             <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+            <span style="color:#999;font-size:12px">(2,368条)</span>
           </div>
           <span style="font-size:13px;color:#999;display:flex;align-items:center;gap:4px;cursor:pointer">
+            查看全部 <i class="fas fa-chevron-right" style="font-size:10px"></i>
           </span>
         </div>
 
         <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
+          <span style="background:#e6f4ff;color:#1890FF;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">全部(2368)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">有图(568)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">质量好(892)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">手感好(756)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">磁吸强(534)</span>
         </div>
 
+        <div class="review-card" style="background:#f9fafb">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
             <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#bae6fd);display:flex;align-items:center;justify-content:center">
               <i class="fas fa-user" style="color:#1890FF;font-size:14px"></i>
             </div>
             <div style="flex:1">
+              <div style="font-size:13px;color:#333">用户***123</div>
               <div style="font-size:11px;color:#999">2024-03-15</div>
             </div>
             <div style="display:flex;gap:2px">
@@ -375,6 +384,7 @@
             </div>
           </div>
           <div style="font-size:13px;color:#333;line-height:1.6;margin-bottom:10px">
+            质量非常好，手感很棒，磁吸力度也够强，手机放支架上很稳，强烈推荐购买！
           </div>
           <div style="display:flex;gap:8px">
             <div style="width:60px;height:60px;border-radius:8px;background:linear-gradient(135deg,#f3f4f6,#e5e7eb);display:flex;align-items:center;justify-content:center">
@@ -385,14 +395,17 @@
             </div>
           </div>
           <div style="margin-top:8px;font-size:11px;color:#999">
+            规格：深空黑 / iPhone 15 Pro Max
           </div>
         </div>
 
+        <div class="review-card" style="background:#f9fafb">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
             <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg:#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center">
               <i class="fas fa-user" style="color:#ec4899;font-size:14px"></i>
             </div>
             <div style="flex:1">
+              <div style="font-size:13px;color:#333">小**花</div>
               <div style="font-size:11px;color:#999">2024-03-14</div>
             </div>
             <div style="display:flex;gap:2px">
@@ -404,8 +417,10 @@
             </div>
           </div>
           <div style="font-size:13px;color:#333;line-height:1.6">
+            买了两个颜色，都很漂亮，透明度很好，支架设计很方便，性价比超高！
           </div>
           <div style="margin-top:8px;font-size:11px;color:#999">
+            规格：星光白 / iPhone 15 Pro Max
           </div>
         </div>
 

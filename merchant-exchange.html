@@ -645,6 +645,16 @@
                   <span class="info-label">联系电话</span>
                   <span class="info-value">138****1234</span>
                 </div>
+                <div class="info-item" style="grid-column: 1 / -1;">
+                  <span class="info-label">兑换卡密</span>
+                  <span class="info-value" style="font-family: monospace; background: #fffbe6; padding: 8px 12px; border-radius: 4px; display: inline-block; border: 1px dashed #ffd666;">
+                    <i class="fas fa-key" style="color: #fa8c16; margin-right: 6px;"></i>
+                    CARD-KEY-2026-0319-ABC123XYZ
+                    <button onclick="copyCardKey()" style="margin-left: 8px; padding: 4px 8px; background: #fa8c16; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">
+                      <i class="fas fa-copy"></i> 复制
+                    </button>
+                  </span>
+                </div>
               </div>
               
               <div class="exchange-action">
@@ -683,5 +693,17 @@
       </div>
     </div>
   </div>
+  
+  <script>
+    // 复制卡密功能
+    function copyCardKey() {
+      const cardKey = 'CARD-KEY-2026-0319-ABC123XYZ';
+      navigator.clipboard.writeText(cardKey).then(() => {
+        alert('卡密已复制到剪贴板！');
+      }).catch(err => {
+        console.error('复制失败:', err);
+      });
+    }
+  </script>
 </body>
 </html>
