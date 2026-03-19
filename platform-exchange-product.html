@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兑换商品管理 - 振威商城平台端</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 220px;
+      background: linear-gradient(180deg, #001529, #002140);
+      color: white;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+    
+    .logo {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #fff;
+    }
+    
+    .logo p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.65);
+      margin-top: 4px;
+    }
+    
+    .menu-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.65);
+      transition: all 0.3s;
+    }
+    
+    .menu-item:hover, .menu-item.active {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    
+    .menu-item i {
+      width: 16px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+    
+    /* 卡片 */
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    /* 按钮 */
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    
+    .btn-success {
+      background: #52C41A;
+      color: white;
+    }
+    
+    .btn-danger {
+      background: #FF4D4F;
+      color: white;
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .data-table th {
+      text-align: left;
+      padding: 12px 8px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .data-table td {
+      padding: 12px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+    
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-active {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    
+    .status-inactive {
+      background: #fff7e6;
+      color: #FA8C16;
+      border: 1px solid #ffd591;
+    }
+    
+    .status-offline {
+      background: #f5f5f5;
+      color: #999;
+      border: 1px solid #d9d9d9;
+    }
+    
+    /* 搜索框 */
+    .search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: #1890FF;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    
+    .page-btn {
+      padding: 6px 12px;
+      border: 1px solid #d9d9d9;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    
+    .page-btn.active {
+      background: #1890FF;
+      color: white;
+      border-color: #1890FF;
+    }
+    
+    /* 商品图标 */
+    .product-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+    
+    /* 操作按钮 */
+    .action-btn {
+      padding: 4px 8px;
+      border: none;
+      background: none;
+      color: #1890FF;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    
+    .action-btn:hover {
+      color: #40a9ff;
+    }
+    
+    .action-btn.danger {
+      color: #FF4D4F;
+    }
+    
+    .action-btn.danger:hover {
+      color: #ff7875;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="logo">
+        <h1>振威商城</h1>
+        <p>平台管理后台</p>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-dashboard.html'">
+        <i class="fas fa-home"></i>
+        <span>首页概览</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-user.html'">
+        <i class="fas fa-users"></i>
+        <span>用户管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-merchant.html'">
+        <i class="fas fa-store"></i>
+        <span>商家管理</span>
+      </div>
+      
+      <div class="menu-item active">
+        <i class="fas fa-exchange-alt"></i>
+        <span>兑换管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-sales-management.html'">
+        <i class="fas fa-chart-line"></i>
+        <span>销售管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-finance.html'">
+        <i class="fas fa-wallet"></i>
+        <span>财务管理</span>
+      </div>
+      
+      <div class="menu-item" onclick="location.href='platform-settings.html'">
+        <i class="fas fa-cog"></i>
+        <span>系统设置</span>
+      </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="main-content">
+      <!-- 页面标题 -->
+      <div style="margin-bottom:20px">
+        <h1 style="font-size:20px;font-weight:600;color:#333">兑换商品管理</h1>
+        <div style="font-size:13px;color:#999;margin-top:4px">管理可兑换的商品信息</div>
+      </div>
+
+      <!-- 统计卡片 -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-box" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:600;color:#333">186</div>
+              <div style="font-size:13px;color:#999">商品总数</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#52C41A,#73d13d);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-check-circle" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:600;color:#333">142</div>
+              <div style="font-size:13px;color:#999">已上架</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#FA8C16,#ffa940);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-clock" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:600;color:#333">38</div>
+              <div style="font-size:13px;color:#999">待审核</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:48px;height:48px;background:linear-gradient(135deg,#FF4D4F,#ff7875);border-radius:12px;display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-times-circle" style="color:white;font-size:20px"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:600;color:#333">6</div>
+              <div style="font-size:13px;color:#999">已下架</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作栏 -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="search-box" style="flex:1;margin-bottom:0">
+            <input type="text" class="search-input" placeholder="搜索商品名称、编码...">
+            <button class="btn btn-primary">
+              <i class="fas fa-search"></i> 搜索
+            </button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="showAddProductModal()">
+              <i class="fas fa-plus"></i> 添加商品
+            </button>
+          </div>
+        </div>
+
+        <!-- 数据表格 -->
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>商品信息</th>
+              <th>商品类型</th>
+              <th>兑换所需积分</th>
+              <th>库存数量</th>
+              <th>已兑换</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="product-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:500">iPhone 15 Pro Max</div>
+                    <div style="font-size:12px;color:#999">编码: IPHONE15PM-001</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-tag status-active">实物商品</span></td>
+              <td style="font-weight:600;color:#FF4D4F">50,000</td>
+              <td>128</td>
+              <td>42</td>
+              <td><span class="status-tag status-active">已上架</span></td>
+              <td>2026-03-15</td>
+              <td>
+                <button class="action-btn" onclick="editProduct(1)">
+                  <i class="fas fa-edit"></i> 编辑
+                </button>
+                <button class="action-btn danger" onclick="deleteProduct(1)">
+                  <i class="fas fa-trash"></i> 删除
+                </button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="product-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:500">京东E卡 100元</div>
+                    <div style="font-size:12px;color:#999">编码: JD-E100-002</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-tag" style="background:#e6f7ff;color:#1890FF;border:1px solid #91d5ff">虚拟商品</span></td>
+              <td style="font-weight:600;color:#FF4D4F">8,000</td>
+              <td>500</td>
+              <td>256</td>
+              <td><span class="status-tag status-active">已上架</span></td>
+              <td>2026-03-14</td>
+              <td>
+                <button class="action-btn" onclick="editProduct(2)">
+                  <i class="fas fa-edit"></i> 编辑
+                </button>
+                <button class="action-btn danger" onclick="deleteProduct(2)">
+                  <i class="fas fa-trash"></i> 删除
+                </button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="product-icon">
+                    <i class="fas fa-spa"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:500">高端SPA护理套餐</div>
+                    <div style="font-size:12px;color:#999">编码: SPA-001-003</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-tag" style="background:#fff0f6;color:#EB2F96;border:1px solid #ffadd2">服务商品</span></td>
+              <td style="font-weight:600;color:#FF4D4F">15,000</td>
+              <td>30</td>
+              <td>18</td>
+              <td><span class="status-tag status-inactive">待审核</span></td>
+              <td>2026-03-13</td>
+              <td>
+                <button class="action-btn" onclick="editProduct(3)">
+                  <i class="fas fa-edit"></i> 编辑
+                </button>
+                <button class="action-btn danger" onclick="deleteProduct(3)">
+                  <i class="fas fa-trash"></i> 删除
+                </button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="product-icon">
+                    <i class="fas fa-coffee"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:500">星巴克咖啡券 中杯</div>
+                    <div style="font-size:12px;color:#999">编码: SBUX-004</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-tag" style="background:#e6f7ff;color:#1890FF;border:1px solid #91d5ff">虚拟商品</span></td>
+              <td style="font-weight:600;color:#FF4D4F">500</td>
+              <td>1000</td>
+              <td>892</td>
+              <td><span class="status-tag status-active">已上架</span></td>
+              <td>2026-03-12</td>
+              <td>
+                <button class="action-btn" onclick="editProduct(4)">
+                  <i class="fas fa-edit"></i> 编辑
+                </button>
+                <button class="action-btn danger" onclick="deleteProduct(4)">
+                  <i class="fas fa-trash"></i> 删除
+                </button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="product-icon">
+                    <i class="fas fa-headphones"></i>
+                  </div>
+                  <div>
+                    <div style="font-weight:500">AirPods Pro 2</div>
+                    <div style="font-size:12px;color:#999">编码: AIRPODS-005</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="status-tag status-active">实物商品</span></td>
+              <td style="font-weight:600;color:#FF4D4F">18,000</td>
+              <td>45</td>
+              <td>15</td>
+              <td><span class="status-tag status-offline">已下架</span></td>
+              <td>2026-03-10</td>
+              <td>
+                <button class="action-btn" onclick="editProduct(5)">
+                  <i class="fas fa-edit"></i> 编辑
+                </button>
+                <button class="action-btn danger" onclick="deleteProduct(5)">
+                  <i class="fas fa-trash"></i> 删除
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">5</button>
+          <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 添加商品弹窗
+    function showAddProductModal() {
+      alert('添加商品功能开发中...');
+    }
+    
+    // 编辑商品
+    function editProduct(id) {
+      alert('编辑商品 ID: ' + id);
+    }
+    
+    // 删除商品
+    function deleteProduct(id) {
+      if (confirm('确定要删除这个商品吗？')) {
+        alert('删除商品 ID: ' + id);
+      }
+    }
+  </script>
+</body>
+</html>
