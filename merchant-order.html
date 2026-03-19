@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 商家端订单管理</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #52C41A;
+    }
+    .menu-item.active {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .menu-item i { width: 18px; text-align: center; }
+    
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-table tr:hover { background: #fafafa; }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#52C41A,#22c55e);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-store" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利商家端</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#f6ffed;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#52C41A;font-weight:500">店</span>
+        </div>
+        <span style="font-size:13px;color:#333">店铺员工</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <a href="merchant-home.html" class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>工作台</span>
+    </a>
+    <a href="merchant-order.html" class="menu-item active">
+      <i class="fas fa-box"></i>
+      <span>订单管理</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-undo"></i>
+      <span>售后管理</span>
+    </a>
+    <a href="merchant-logistics.html" class="menu-item">
+      <i class="fas fa-truck"></i>
+      <span>物流查询</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-headset"></i>
+      <span>客服对话</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换记录</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>数据统计</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-comment-dots"></i>
+      <span>消息中心</span>
+    </a>
+    <a href="merchant-setting.html" class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>店铺设置</span>
+    </a>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 数据统计 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999">卖出数量</div>
+        <div style="font-size:24px;font-weight:700;color:#52C41A;margin-top:4px">156</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999">发货数量</div>
+        <div style="font-size:24px;font-weight:700;color:#1890FF;margin-top:4px">128</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999">兑换数量</div>
+        <div style="font-size:24px;font-weight:700;color:#FAAD14;margin-top:4px">42</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999">非兑换数量</div>
+        <div style="font-size:24px;font-weight:700;color:#666;margin-top:4px">114</div>
+      </div>
+    </div>
+
+    <!-- 筛选区 -->
+    <div style="background:white;border-radius:8px;padding:16px;margin-bottom:16px;box-shadow:0 1px 2px rgba(0,0,0,0.04)">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <select style="padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;color:#666">
+          <option>订单状态</option>
+          <option>待发货</option>
+          <option>已发货</option>
+          <option>已完成</option>
+          <option>售后中</option>
+        </select>
+        <select style="padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;color:#666">
+          <option>订单类型</option>
+          <option>兑换订单</option>
+          <option>非兑换订单</option>
+        </select>
+        <input type="date" style="padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;color:#666">
+        <input type="text" placeholder="订单号/收件人" style="padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;width:180px">
+        <button style="background:#52C41A;color:white;border:none;border-radius:6px;padding:8px 20px;font-size:13px;cursor:pointer">
+          <i class="fas fa-search" style="margin-right:6px"></i>查询
+        </button>
+      </div>
+    </div>
+
+    <!-- 订单表格 -->
+    <div style="background:white;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,0.04);overflow:hidden">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>订单号</th>
+            <th>商品</th>
+            <th>类型</th>
+            <th>金额</th>
+            <th>收件人</th>
+            <th>状态</th>
+            <th>时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#52C41A;cursor:pointer">20260319001</td>
+            <td>iPhone手机壳 x1</td>
+            <td><span style="background:#fff7e6;color:#FAAD14;padding:2px 8px;border-radius:4px;font-size:12px">兑换</span></td>
+            <td style="font-weight:500">¥0</td>
+            <td>张** 138****1234</td>
+            <td><span style="background:#fff1f0;color:#FF4D4F;padding:2px 8px;border-radius:4px;font-size:12px">待发货</span></td>
+            <td style="color:#999">10:05</td>
+            <td>
+              <button style="background:#52C41A;color:white;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer;margin-right:6px">发货</button>
+              <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer">详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="color:#52C41A;cursor:pointer">20260319002</td>
+            <td>无线充电器 x2</td>
+            <td><span style="background:#f5f5f5;color:#666;padding:2px 8px;border-radius:4px;font-size:12px">非兑换</span></td>
+            <td style="font-weight:500">¥158</td>
+            <td>李** 139****5678</td>
+            <td><span style="background:#fff1f0;color:#FF4D4F;padding:2px 8px;border-radius:4px;font-size:12px">待发货</span></td>
+            <td style="color:#999">09:58</td>
+            <td>
+              <button style="background:#52C41A;color:white;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer;margin-right:6px">发货</button>
+              <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer">详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="color:#52C41A;cursor:pointer">20260319003</td>
+            <td>蓝牙耳机 x1</td>
+            <td><span style="background:#f5f5f5;color:#666;padding:2px 8px;border-radius:4px;font-size:12px">非兑换</span></td>
+            <td style="font-weight:500">¥299</td>
+            <td>王** 137****9012</td>
+            <td><span style="background:#e6f7ff;color:#1890FF;padding:2px 8px;border-radius:4px;font-size:12px">已发货</span></td>
+            <td style="color:#999">09:45</td>
+            <td>
+              <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer">详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td style="color:#52C41A;cursor:pointer">20260319004</td>
+            <td>数据线套装 x3</td>
+            <td><span style="background:#fff7e6;color:#FAAD14;padding:2px 8px;border-radius:4px;font-size:12px">兑换</span></td>
+            <td style="font-weight:500">¥0</td>
+            <td>赵** 136****3456</td>
+            <td><span style="background:#f6ffed;color:#52C41A;padding:2px 8px;border-radius:4px;font-size:12px">已完成</span></td>
+            <td style="color:#999">09:32</td>
+            <td>
+              <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:4px 12px;font-size:12px;cursor:pointer">详情</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- 分页 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;border-top:1px solid #f0f0f0">
+        <span style="font-size:13px;color:#999">共 156 条记录</span>
+        <div style="display:flex;gap:8px">
+          <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:6px 12px;font-size:12px;cursor:pointer">上一页</button>
+          <button style="background:#52C41A;color:white;border:none;border-radius:4px;padding:6px 12px;font-size:12px;cursor:pointer">1</button>
+          <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:6px 12px;font-size:12px;cursor:pointer">2</button>
+          <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:6px 12px;font-size:12px;cursor:pointer">3</button>
+          <button style="background:#f5f5f5;color:#666;border:none;border-radius:4px;padding:6px 12px;font-size:12px;cursor:pointer">下一页</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

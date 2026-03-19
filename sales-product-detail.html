@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 商品详情</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #e5e5e5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    :root {
+      --primary: #FF6B00;
+      --primary-light: #ff8533;
+      --primary-dark: #e65c00;
+      --primary-bg: #fff7ed;
+    }
+    
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 80px;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      position: absolute;
+      top: 44px;
+      left: 0;
+      right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 10;
+      background: transparent;
+      transition: background 0.3s;
+    }
+    .top-nav.scrolled {
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .nav-back {
+      width: 32px;
+      height: 32px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .top-nav.scrolled .nav-back {
+      background: #f5f5f5;
+      color: #333;
+    }
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .nav-action {
+      width: 32px;
+      height: 32px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    .top-nav.scrolled .nav-action {
+      background: #f5f5f5;
+      color: #333;
+    }
+    
+    /* 轮播图 */
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 390px;
+      background: #f0f0f0;
+      overflow: hidden;
+    }
+    .carousel-inner {
+      display: flex;
+      width: 400%;
+      height: 100%;
+      transition: transform 0.4s ease;
+    }
+    .carousel-item {
+      width: 25%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ffe4cc, #ffd4b3);
+    }
+    .carousel-item:nth-child(2) { background: linear-gradient(135deg, #fff0e0, #ffe4cc); }
+    .carousel-item:nth-child(3) { background: linear-gradient(135deg, #ffd4b3, #ffc299); }
+    .carousel-item:nth-child(4) { background: linear-gradient(135deg, #ffe8d6, #ffd9bf); }
+    .carousel-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--primary);
+    }
+    .carousel-placeholder i { font-size: 64px; }
+    .carousel-placeholder span { font-size: 14px; color: #999; }
+    
+    .carousel-dots {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+    .carousel-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.6);
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .carousel-dot.active {
+      width: 18px;
+      background: white;
+    }
+    
+    /* 商品信息 */
+    .product-info {
+      background: white;
+      padding: 16px;
+      margin-bottom: 10px;
+    }
+    .product-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .product-price {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .product-price::before {
+      content: '¥';
+      font-size: 16px;
+    }
+    .product-original-price {
+      font-size: 14px;
+      color: #999;
+      text-decoration: line-through;
+    }
+    
+    .product-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    
+    .product-tags {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .product-tag {
+      padding: 4px 10px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      font-size: 12px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    
+    .product-commission {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: linear-gradient(135deg, #fff7ed, #ffedd5);
+      border-radius: 10px;
+    }
+    .commission-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+    .commission-info {
+      flex: 1;
+    }
+    .commission-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 2px;
+    }
+    .commission-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .commission-value span {
+      font-size: 12px;
+      font-weight: 400;
+      color: #999;
+      margin-left: 4px;
+    }
+    
+    /* 推广收益 */
+    .earnings-card {
+      background: white;
+      margin: 0 0 10px 0;
+      padding: 16px;
+    }
+    .earnings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .earnings-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+    }
+    .earnings-title i { color: var(--primary); }
+    .earnings-more {
+      font-size: 13px;
+      color: #999;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    
+    .earnings-tiers {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tier-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #fafafa;
+      border-radius: 10px;
+      border-left: 3px solid var(--primary);
+    }
+    .tier-item.level-2 { border-left-color: #FFB366; }
+    .tier-item.level-3 { border-left-color: #FFD9B3; }
+    .tier-label {
+      font-size: 13px;
+      color: #666;
+    }
+    .tier-label i {
+      margin-right: 6px;
+      color: var(--primary);
+    }
+    .tier-item.level-2 .tier-label i { color: #FFB366; }
+    .tier-item.level-3 .tier-label i { color: #FFD9B3; }
+    .tier-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    /* 商品详情 */
+    .detail-section {
+      background: white;
+      padding: 16px;
+    }
+    .detail-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .detail-line {
+      flex: 1;
+      height: 1px;
+      background: #eee;
+    }
+    .detail-title {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .detail-images {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .detail-img {
+      width: 100%;
+      background: #f8f8f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: #ccc;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .detail-img i { font-size: 48px; }
+    .detail-img span { font-size: 13px; }
+    
+    /* 底部操作栏 */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 390px;
+      height: 64px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      z-index: 100;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .action-icons {
+      display: flex;
+      gap: 20px;
+    }
+    .action-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+    }
+    .action-icon i {
+      font-size: 20px;
+      color: #666;
+    }
+    .action-icon span {
+      font-size: 10px;
+      color: #999;
+    }
+    
+    .btn-group {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      flex: 1;
+      height: 42px;
+      border: none;
+      border-radius: 21px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      color: white;
+    }
+    .btn-outline {
+      background: white;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    
+    /* 弹窗样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal-content {
+      width: 390px;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    .modal-close {
+      width: 28px;
+      height: 28px;
+      background: #f5f5f5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #999;
+    }
+    
+    .share-options {
+      display: flex;
+      justify-content: space-around;
+      padding: 20px 0;
+    }
+    .share-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .share-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .share-icon.wechat { background: #07C160; color: white; }
+    .share-icon.moments { background: #07C160; color: white; }
+    .share-icon.poster { background: var(--primary); color: white; }
+    .share-icon.copy { background: #666; color: white; }
+    .share-label { font-size: 12px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="scroll-area" id="scrollArea">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg, var(--primary), var(--primary-light))"></div>
+      
+      <!-- 顶部导航 -->
+      <div class="top-nav" id="topNav">
+        <div class="nav-back" onclick="history.back()">
+          <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="nav-actions">
+          <div class="nav-action"><i class="fas fa-heart"></i></div>
+          <div class="nav-action"><i class="fas fa-share-alt"></i></div>
+        </div>
+      </div>
+      
+      <!-- 商品轮播 -->
+      <div class="carousel">
+        <div class="carousel-inner" id="carouselInner">
+          <div class="carousel-item">
+            <div class="carousel-placeholder">
+              <i class="fas fa-box-open"></i>
+              <span>商品主图 1</span>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-placeholder">
+              <i class="fas fa-box-open"></i>
+              <span>商品主图 2</span>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-placeholder">
+              <i class="fas fa-box-open"></i>
+              <span>商品主图 3</span>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <div class="carousel-placeholder">
+              <i class="fas fa-box-open"></i>
+              <span>商品主图 4</span>
+            </div>
+          </div>
+        </div>
+        <div class="carousel-dots" id="carouselDots">
+          <div class="carousel-dot active" data-index="0"></div>
+          <div class="carousel-dot" data-index="1"></div>
+          <div class="carousel-dot" data-index="2"></div>
+          <div class="carousel-dot" data-index="3"></div>
+        </div>
+      </div>
+      
+      <!-- 商品信息 -->
+      <div class="product-info">
+        <div class="product-price-row">
+          <span class="product-price">128.00</span>
+          <span class="product-original-price">¥168.00</span>
+        </div>
+        <div class="product-name">臻伟精选 · 云南高原蓝莓果干 无添加蔗糖 健康零食大礼包装</div>
+        <div class="product-tags">
+          <span class="product-tag">限时特惠</span>
+          <span class="product-tag">高佣金</span>
+          <span class="product-tag">爆款</span>
+        </div>
+        <div class="product-commission">
+          <div class="commission-icon">
+            <i class="fas fa-coins"></i>
+          </div>
+          <div class="commission-info">
+            <div class="commission-label">推广佣金比例</div>
+            <div class="commission-value">15%<span>预估收益 ¥19.20</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 推广收益说明 -->
+      <div class="earnings-card">
+        <div class="earnings-header">
+          <div class="earnings-title">
+            <i class="fas fa-chart-line"></i>
+            推广收益说明
+          </div>
+          <div class="earnings-more">
+            查看详情 <i class="fas fa-chevron-right" style="font-size:10px"></i>
+          </div>
+        </div>
+        <div class="earnings-tiers">
+          <div class="tier-item">
+            <div class="tier-label"><i class="fas fa-user"></i>一级推广（直接推荐）</div>
+            <div class="tier-value">¥19.20</div>
+          </div>
+          <div class="tier-item level-2">
+            <div class="tier-label"><i class="fas fa-users"></i>二级推广（间接推荐）</div>
+            <div class="tier-value">¥5.76</div>
+          </div>
+          <div class="tier-item level-3">
+            <div class="tier-label"><i class="fas fa-user-friends"></i>三级推广（再间接）</div>
+            <div class="tier-value">¥1.92</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 商品详情 -->
+      <div class="detail-section">
+        <div class="detail-header">
+          <div class="detail-line"></div>
+          <div class="detail-title">商品详情</div>
+          <div class="detail-line"></div>
+        </div>
+        <div class="detail-images">
+          <div class="detail-img">
+            <i class="fas fa-image"></i>
+            <span>商品详情图 1</span>
+          </div>
+          <div class="detail-img">
+            <i class="fas fa-image"></i>
+            <span>商品详情图 2</span>
+          </div>
+          <div class="detail-img">
+            <i class="fas fa-image"></i>
+            <span>商品详情图 3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 底部操作栏 -->
+    <div class="bottom-bar">
+      <div class="action-icons">
+        <div class="action-icon">
+          <i class="fas fa-store"></i>
+          <span>店铺</span>
+        </div>
+        <div class="action-icon">
+          <i class="fas fa-comment-dots"></i>
+          <span>客服</span>
+        </div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-outline" onclick="showQRModal()">
+          <i class="fas fa-qrcode"></i>
+          推广码
+        </button>
+        <button class="btn btn-primary" onclick="showShareModal()">
+          <i class="fas fa-share-alt"></i>
+          分享商品
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 分享弹窗 -->
+  <div class="modal-overlay" id="shareModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">分享商品</div>
+        <div class="modal-close" onclick="hideShareModal()">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+      <div class="share-options">
+        <div class="share-option">
+          <div class="share-icon wechat">
+            <i class="fab fa-weixin"></i>
+          </div>
+          <span class="share-label">微信好友</span>
+        </div>
+        <div class="share-option">
+          <div class="share-icon moments">
+            <i class="fas fa-circle-notch"></i>
+          </div>
+          <span class="share-label">朋友圈</span>
+        </div>
+        <div class="share-option">
+          <div class="share-icon poster">
+            <i class="fas fa-image"></i>
+          </div>
+          <span class="share-label">生成海报</span>
+        </div>
+        <div class="share-option">
+          <div class="share-icon copy">
+            <i class="fas fa-link"></i>
+          </div>
+          <span class="share-label">复制链接</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 推广码弹窗 -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal-content" style="text-align:center">
+      <div class="modal-header">
+        <div class="modal-title">商品推广码</div>
+        <div class="modal-close" onclick="hideQRModal()">
+          <i class="fas fa-times"></i>
+        </div>
+      </div>
+      <div style="padding:20px 0">
+        <div style="width:180px;height:180px;margin:0 auto 16px;background:white;border:2px solid var(--primary);border-radius:12px;display:flex;align-items:center;justify-content:center">
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:16px">
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:transparent"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+            <div style="width:8px;height:8px;background:var(--primary);border-radius:1px"></div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#999;margin-bottom:20px">扫码购买，自动绑定推广关系</div>
+        <div style="display:flex;gap:12px">
+          <button style="flex:1;background:var(--primary);color:white;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <i class="fas fa-share-alt"></i>分享
+          </button>
+          <button style="flex:1;background:#f5f5f5;color:#666;border:none;border-radius:10px;padding:12px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <i class="fas fa-download"></i>保存
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 轮播功能
+    let currentSlide = 0;
+    const carouselInner = document.getElementById('carouselInner');
+    const dots = document.querySelectorAll('.carousel-dot');
+    
+    function goToSlide(index) {
+      currentSlide = index;
+      carouselInner.style.transform = `translateX(-${index * 25}%)`;
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+    
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        goToSlide(parseInt(dot.dataset.index));
+      });
+    });
+    
+    // 自动轮播
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % 4;
+      goToSlide(currentSlide);
+    }, 4000);
+    
+    // 滚动时改变导航栏样式
+    const scrollArea = document.getElementById('scrollArea');
+    const topNav = document.getElementById('topNav');
+    
+    scrollArea.addEventListener('scroll', () => {
+      if (scrollArea.scrollTop > 50) {
+        topNav.classList.add('scrolled');
+      } else {
+        topNav.classList.remove('scrolled');
+      }
+    });
+    
+    // 弹窗控制
+    function showShareModal() {
+      document.getElementById('shareModal').classList.add('show');
+    }
+    
+    function hideShareModal() {
+      document.getElementById('shareModal').classList.remove('show');
+    }
+    
+    function showQRModal() {
+      document.getElementById('qrModal').classList.add('show');
+    }
+    
+    function hideQRModal() {
+      document.getElementById('qrModal').classList.remove('show');
+    }
+    
+    // 点击遮罩关闭弹窗
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

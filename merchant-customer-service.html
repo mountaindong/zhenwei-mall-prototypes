@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 商家端客服对话</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      height: 100%; 
+      background: #f0f2f5; 
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+    }
+    
+    /* 整体布局 */
+    .app-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    
+    /* 侧边栏 - 210px */
+    .sidebar {
+      width: 210px;
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .sidebar-logo {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .sidebar-logo .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #52C41A;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+    }
+    
+    .sidebar-logo .logo-text {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .sidebar-menu {
+      flex: 1;
+      padding: 12px 0;
+      overflow-y: auto;
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 20px;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .menu-item:hover {
+      color: white;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .menu-item.active {
+      color: white;
+      background: rgba(82, 196, 26, 0.2);
+    }
+    
+    .menu-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: #52C41A;
+      border-radius: 0 3px 3px 0;
+    }
+    
+    .menu-item i {
+      width: 20px;
+      font-size: 16px;
+      margin-right: 12px;
+      text-align: center;
+    }
+    
+    .menu-item span {
+      font-size: 14px;
+    }
+    
+    .menu-item .badge {
+      margin-left: auto;
+      background: #FF4D4F;
+      color: white;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* 顶部栏 - 56px */
+    .topbar {
+      height: 56px;
+      background: white;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    
+    .topbar-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .topbar-title i {
+      color: #52C41A;
+    }
+    
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .topbar-actions .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .topbar-actions .notification-btn {
+      position: relative;
+      cursor: pointer;
+      color: #666;
+      font-size: 18px;
+    }
+    
+    .topbar-actions .notification-btn .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* 聊天区域 */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* 左侧会话列表 */
+    .conversation-list {
+      width: 280px;
+      background: white;
+      border-right: 1px solid #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+    
+    .conversation-header {
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .conversation-header .search-box {
+      display: flex;
+      align-items: center;
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+    
+    .conversation-header .search-box i {
+      color: #999;
+      font-size: 14px;
+      margin-right: 8px;
+    }
+    
+    .conversation-header .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      flex: 1;
+      font-size: 13px;
+      color: #333;
+    }
+    
+    .conversation-header .search-box input::placeholder {
+      color: #999;
+    }
+    
+    .conversation-tabs {
+      display: flex;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .conversation-tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .conversation-tab.active {
+      color: #52C41A;
+      font-weight: 500;
+    }
+    
+    .conversation-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 2px;
+      background: #52C41A;
+      border-radius: 1px;
+    }
+    
+    .conversation-tab .tab-badge {
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 8px;
+      margin-left: 4px;
+    }
+    
+    .conversations {
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .conversation-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .conversation-item:hover {
+      background: #f9f9f9;
+    }
+    
+    .conversation-item.active {
+      background: #f0fdf4;
+      border-left: 3px solid #52C41A;
+    }
+    
+    .conversation-item .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      margin-right: 12px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+    }
+    
+    .conversation-item .info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .conversation-item .info .name {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .conversation-item .info .time {
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .conversation-item .info .last-msg {
+      font-size: 13px;
+      color: #999;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .conversation-item .unread-badge {
+      background: #FF4D4F;
+      color: white;
+      font-size: 11px;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      margin-left: 8px;
+    }
+    
+    /* 右侧聊天区域 */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f5;
+    }
+    
+    .chat-header {
+      background: white;
+      padding: 12px 24px;
+      border-bottom: 1px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .chat-header .user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .chat-header .user-info .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: white;
+    }
+    
+    .chat-header .user-info .details .name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .chat-header .user-info .details .status {
+      font-size: 12px;
+      color: #52C41A;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .chat-header .user-info .details .status.offline {
+      color: #999;
+    }
+    
+    .chat-header .actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .chat-header .action-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid #e8e8e8;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.2s;
+    }
+    
+    .chat-header .action-btn:hover {
+      border-color: #52C41A;
+      color: #52C41A;
+    }
+    
+    /* 消息列表 */
+    .message-list {
+      flex: 1;
+      padding: 16px 24px;
+      overflow-y: auto;
+    }
+    
+    .message-group {
+      margin-bottom: 20px;
+    }
+    
+    .message-date {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    
+    .message-date span {
+      font-size: 12px;
+      color: #999;
+      background: #f5f5f5;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+    
+    .message {
+      display: flex;
+      margin-bottom: 12px;
+      align-items: flex-end;
+    }
+    
+    .message.sent {
+      flex-direction: row-reverse;
+    }
+    
+    .message .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: white;
+    }
+    
+    .message .content {
+      max-width: 480px;
+      margin: 0 12px;
+    }
+    
+    .message .bubble {
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      position: relative;
+    }
+    
+    .message.received .bubble {
+      background: white;
+      color: #333;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .message.sent .bubble {
+      background: #52C41A;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    
+    .message .time {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+      text-align: right;
+    }
+    
+    .message.sent .time {
+      text-align: left;
+    }
+    
+    /* 订单卡片消息 */
+    .message .order-card {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid #e8e8e8;
+      margin-top: 8px;
+      min-width: 200px;
+    }
+    
+    .message .order-card .order-title {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .message .order-card .order-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .message .order-card .order-img {
+      width: 48px;
+      height: 48px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+    }
+    
+    .message .order-card .order-detail {
+      flex: 1;
+    }
+    
+    .message .order-card .order-name {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .message .order-card .order-price {
+      font-size: 13px;
+      color: #FF4D4F;
+    }
+    
+    .message .order-card .order-action {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .message .order-card .order-action button {
+      width: 100%;
+      padding: 8px;
+      background: #52C41A;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    
+    /* 输入区域 */
+    .input-area {
+      background: white;
+      border-top: 1px solid #e8e8e8;
+      padding: 12px 24px;
+    }
+    
+    .input-tools {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .input-tools .tool-btn {
+      color: #666;
+      cursor: pointer;
+      font-size: 18px;
+      transition: color 0.2s;
+    }
+    
+    .input-tools .tool-btn:hover {
+      color: #52C41A;
+    }
+    
+    .input-container {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+    
+    .input-wrapper {
+      flex: 1;
+      background: #f5f5f5;
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+    
+    .input-wrapper textarea {
+      width: 100%;
+      border: none;
+      background: transparent;
+      outline: none;
+      resize: none;
+      font-size: 14px;
+      line-height: 1.5;
+      max-height: 120px;
+      font-family: inherit;
+    }
+    
+    .input-wrapper textarea::placeholder {
+      color: #999;
+    }
+    
+    .send-btn {
+      padding: 12px 24px;
+      background: #52C41A;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .send-btn:hover {
+      background: #45a818;
+    }
+    
+    .send-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    /* 快捷回复 */
+    .quick-reply {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .quick-reply-title {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .quick-reply-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .quick-reply-item {
+      padding: 6px 12px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 16px;
+      font-size: 12px;
+      color: #52C41A;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .quick-reply-item:hover {
+      background: #dcfce7;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+    }
+    
+    .empty-state i {
+      font-size: 64px;
+      margin-bottom: 16px;
+      color: #ddd;
+    }
+    
+    .empty-state .text {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    
+    .empty-state .hint {
+      font-size: 13px;
+    }
+    
+    /* 滚动条样式 */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 3px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <i class="fas fa-store"></i>
+        </div>
+        <span class="logo-text">臻伟福利</span>
+      </div>
+      <nav class="sidebar-menu">
+        <div class="menu-item">
+          <i class="fas fa-home"></i>
+          <span>工作台</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-clipboard-list"></i>
+          <span>订单管理</span>
+          <span class="badge">28</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-undo-alt"></i>
+          <span>售后管理</span>
+          <span class="badge">5</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-truck"></i>
+          <span>物流查询</span>
+        </div>
+        <div class="menu-item active">
+          <i class="fas fa-comments"></i>
+          <span>客服对话</span>
+          <span class="badge">12</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-gift"></i>
+          <span>兑换记录</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-chart-bar"></i>
+          <span>数据统计</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-bell"></i>
+          <span>消息中心</span>
+          <span class="badge">3</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-cog"></i>
+          <span>店铺设置</span>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 顶部栏 -->
+      <header class="topbar">
+        <div class="topbar-title">
+          <i class="fas fa-comments"></i>
+          客服对话
+        </div>
+        <div class="topbar-actions">
+          <div class="notification-btn">
+            <i class="fas fa-bell"></i>
+            <span class="badge">3</span>
+          </div>
+          <div class="avatar">
+            <i class="fas fa-user"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- 聊天区域 -->
+      <div class="chat-container">
+        <!-- 左侧会话列表 -->
+        <div class="conversation-list">
+          <div class="conversation-header">
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="搜索用户或消息">
+            </div>
+          </div>
+          <div class="conversation-tabs">
+            <div class="conversation-tab active">全部<span class="tab-badge">12</span></div>
+            <div class="conversation-tab">待处理<span class="tab-badge">5</span></div>
+            <div class="conversation-tab">已完成</div>
+          </div>
+          <div class="conversations">
+            <!-- 会话项1 - 选中状态 -->
+            <div class="conversation-item active">
+              <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2)">张</div>
+              <div class="info">
+                <div class="name">
+                  <span>张小明</span>
+                  <span class="time">刚刚</span>
+                </div>
+                <div class="last-msg">好的，麻烦帮我查一下订单状态</div>
+              </div>
+              <span class="unread-badge">2</span>
+            </div>
+            
+            <!-- 会话项2 -->
+            <div class="conversation-item">
+              <div class="avatar" style="background: linear-gradient(135deg, #f093fb, #f5576c)">李</div>
+              <div class="info">
+                <div class="name">
+                  <span>李小红</span>
+                  <span class="time">5分钟前</span>
+                </div>
+                <div class="last-msg">收到商品了，质量很好！</div>
+              </div>
+              <span class="unread-badge">1</span>
+            </div>
+            
+            <!-- 会话项3 -->
+            <div class="conversation-item">
+              <div class="avatar" style="background: linear-gradient(135deg, #4facfe, #00f2fe)">王</div>
+              <div class="info">
+                <div class="name">
+                  <span>王大伟</span>
+                  <span class="time">10分钟前</span>
+                </div>
+                <div class="last-msg">请问什么时候发货？</div>
+              </div>
+              <span class="unread-badge">3</span>
+            </div>
+            
+            <!-- 会话项4 -->
+            <div class="conversation-item">
+              <div class="avatar" style="background: linear-gradient(135deg, #43e97b, #38f9d7)">赵</div>
+              <div class="info">
+                <div class="name">
+                  <span>赵小芳</span>
+                  <span class="time">30分钟前</span>
+                </div>
+                <div class="last-msg">想问一下退货流程</div>
+              </div>
+            </div>
+            
+            <!-- 会话项5 -->
+            <div class="conversation-item">
+              <div class="avatar" style="background: linear-gradient(135deg, #fa709a, #fee140)">孙</div>
+              <div class="info">
+                <div class="name">
+                  <span>孙强</span>
+                  <span class="time">1小时前</span>
+                </div>
+                <div class="last-msg">订单号是20260319005</div>
+              </div>
+            </div>
+            
+            <!-- 会话项6 -->
+            <div class="conversation-item">
+              <div class="avatar" style="background: linear-gradient(135deg, #a8edea, #fed6e3)">周</div>
+              <div class="info">
+                <div class="name">
+                  <span>周小婷</span>
+                  <span class="time">2小时前</span>
+                </div>
+                <div class="last-msg">谢谢您的耐心解答</div>
+              </div>
+            </div>
+            
+            <!-- 会话项7 -->
+            <div class="conversation-item">
+              <div class="avatar" style="background: linear-gradient(135deg, #ffecd2, #fcb69f)">吴</div>
+              <div class="info">
+                <div class="name">
+                  <span>吴大刚</span>
+                  <span class="time">昨天</span>
+                </div>
+                <div class="last-msg">已经收到了，非常满意</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧聊天区域 -->
+        <div class="chat-area">
+          <div class="chat-header">
+            <div class="user-info">
+              <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2)">张</div>
+              <div class="details">
+                <div class="name">张小明</div>
+                <div class="status">
+                  <i class="fas fa-circle" style="font-size: 8px"></i>
+                  在线
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <div class="action-btn" title="查看订单">
+                <i class="fas fa-file-invoice"></i>
+              </div>
+              <div class="action-btn" title="标记已处理">
+                <i class="fas fa-check"></i>
+              </div>
+              <div class="action-btn" title="更多">
+                <i class="fas fa-ellipsis-v"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- 消息列表 -->
+          <div class="message-list">
+            <div class="message-date">
+              <span>今天</span>
+            </div>
+            
+            <div class="message received">
+              <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2)">张</div>
+              <div class="content">
+                <div class="bubble">你好，我想问一下我的订单什么时候发货？</div>
+                <div class="time">14:30</div>
+              </div>
+            </div>
+            
+            <div class="message sent">
+              <div class="avatar" style="background: #52C41A">客</div>
+              <div class="content">
+                <div class="bubble">您好，请问您的订单号是多少？我帮您查询一下</div>
+                <div class="time">14:31</div>
+              </div>
+            </div>
+            
+            <div class="message received">
+              <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2)">张</div>
+              <div class="content">
+                <div class="bubble">订单号是 20260319001</div>
+                <div class="time">14:32</div>
+              </div>
+            </div>
+            
+            <div class="message sent">
+              <div class="avatar" style="background: #52C41A">客</div>
+              <div class="content">
+                <div class="bubble">好的，我查到了您的订单信息</div>
+                <div class="time">14:33</div>
+                <div class="order-card">
+                  <div class="order-title">订单信息</div>
+                  <div class="order-info">
+                    <div class="order-img">
+                      <i class="fas fa-image"></i>
+                    </div>
+                    <div class="order-detail">
+                      <div class="order-name">iPhone手机壳</div>
+                      <div class="order-price">¥29.90</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:8px;font-size:12px;color:#999">
+                    订单号: 20260319001<br>
+                    状态: 待发货
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="message sent">
+              <div class="avatar" style="background: #52C41A">客</div>
+              <div class="content">
+                <div class="bubble">您的订单已经打包完成，预计今天下午发出，明天可以到达</div>
+                <div class="time">14:33</div>
+              </div>
+            </div>
+            
+            <div class="message received">
+              <div class="avatar" style="background: linear-gradient(135deg, #667eea, #764ba2)">张</div>
+              <div class="content">
+                <div class="bubble">好的，麻烦帮我查一下订单状态</div>
+                <div class="time">14:35</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 输入区域 -->
+          <div class="input-area">
+            <div class="input-tools">
+              <i class="fas fa-smile tool-btn" title="表情"></i>
+              <i class="fas fa-image tool-btn" title="图片"></i>
+              <i class="fas fa-paperclip tool-btn" title="附件"></i>
+              <i class="fas fa-history tool-btn" title="历史记录"></i>
+            </div>
+            <div class="input-container">
+              <div class="input-wrapper">
+                <textarea rows="1" placeholder="输入消息..."></textarea>
+              </div>
+              <button class="send-btn">
+                <i class="fas fa-paper-plane"></i>
+                发送
+              </button>
+            </div>
+            <!-- 快捷回复 -->
+            <div class="quick-reply">
+              <div class="quick-reply-title">
+                <i class="fas fa-bolt"></i>
+                快捷回复
+              </div>
+              <div class="quick-reply-list">
+                <span class="quick-reply-item">您好，请问有什么可以帮您？</span>
+                <span class="quick-reply-item">请稍等，我帮您查询一下</span>
+                <span class="quick-reply-item">感谢您的耐心等待</span>
+                <span class="quick-reply-item">您的订单已发货</span>
+                <span class="quick-reply-item">收到，马上为您处理</span>
+                <span class="quick-reply-item">还有其他问题吗？</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 自动调整输入框高度
+    const textarea = document.querySelector('textarea');
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+    });
+
+    // 快捷回复点击
+    document.querySelectorAll('.quick-reply-item').forEach(item => {
+      item.addEventListener('click', function() {
+        textarea.value = this.textContent;
+        textarea.focus();
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+      });
+    });
+
+    // 会话项点击
+    document.querySelectorAll('.conversation-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.conversation-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Tab切换
+    document.querySelectorAll('.conversation-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.conversation-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // 发送消息
+    document.querySelector('.send-btn').addEventListener('click', function() {
+      const text = textarea.value.trim();
+      if (text) {
+        // 添加发送消息的UI逻辑可以在这里实现
+        textarea.value = '';
+        textarea.style.height = 'auto';
+      }
+    });
+
+    // Enter发送（Shift+Enter换行）
+    textarea.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        document.querySelector('.send-btn').click();
+      }
+    });
+  </script>
+</body>
+</html>

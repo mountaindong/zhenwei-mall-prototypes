@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 商品管理</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 页面标题 */
+    .page-header {
+      margin-bottom: 20px;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    .page-subtitle {
+      font-size: 13px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    /* 操作栏 */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .action-left {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      font-weight: 500;
+    }
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    .btn-default {
+      background: white;
+      color: #333;
+      border: 1px solid #d9d9d9;
+    }
+    .btn-default:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    .btn-link {
+      background: none;
+      border: none;
+      color: #1890FF;
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+    .btn-link:hover {
+      color: #40a9ff;
+    }
+    .btn-danger {
+      color: #FF4D4F;
+    }
+    .btn-danger:hover {
+      color: #ff7875;
+    }
+    .btn-success {
+      color: #52C41A;
+    }
+    .btn-success:hover {
+      color: #73d13d;
+    }
+    
+    /* 筛选区 */
+    .filter-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-label {
+      font-size: 13px;
+      color: #666;
+      white-space: nowrap;
+    }
+    .filter-select {
+      padding: 6px 32px 6px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      background: white;
+      cursor: pointer;
+      min-width: 120px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    .filter-select:focus {
+      outline: none;
+      border-color: #1890FF;
+    }
+    .filter-input {
+      padding: 6px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      width: 200px;
+    }
+    .filter-input:focus {
+      outline: none;
+      border-color: #1890FF;
+    }
+    .filter-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: auto;
+    }
+    
+    /* 数据表格 */
+    .data-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 14px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table th:first-child {
+      padding-left: 24px;
+    }
+    .data-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+      vertical-align: middle;
+    }
+    .data-table td:first-child {
+      padding-left: 24px;
+    }
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* 商品图片 */
+    .product-img {
+      width: 60px;
+      height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #f5f5f5;
+    }
+    
+    /* 商品名称 */
+    .product-name {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .product-title {
+      font-weight: 500;
+      color: #333;
+    }
+    .product-id {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-tag.success {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    .status-tag.warning {
+      background: #fffbe6;
+      color: #FAAD14;
+      border: 1px solid #ffe58f;
+    }
+    .status-tag.error {
+      background: #fff2f0;
+      color: #FF4D4F;
+      border: 1px solid #ffccc7;
+    }
+    .status-tag.default {
+      background: #f5f5f5;
+      color: #666;
+      border: 1px solid #d9d9d9;
+    }
+    
+    /* 价格 */
+    .price {
+      color: #FF4D4F;
+      font-weight: 600;
+    }
+    
+    /* 操作按钮组 */
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* 分页 */
+    .pagination-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+    }
+    .pagination-info {
+      font-size: 13px;
+      color: #666;
+    }
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 0 8px;
+    }
+    .page-btn:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    .page-btn.active {
+      background: #1890FF;
+      color: white;
+      border-color: #1890FF;
+    }
+    .page-btn:disabled {
+      color: #d9d9d9;
+      border-color: #d9d9d9;
+      cursor: not-allowed;
+      background: #fafafa;
+    }
+    .page-ellipsis {
+      color: #999;
+      padding: 0 8px;
+    }
+    .page-size-select {
+      padding: 6px 28px 6px 10px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      background: white;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+    
+    /* 复选框 */
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .checkbox {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    
+    /* 批量操作栏 */
+    .batch-action-bar {
+      display: none;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      background: #e6f7ff;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .batch-action-bar.show {
+      display: flex;
+    }
+    .batch-count {
+      font-size: 13px;
+      color: #1890FF;
+      font-weight: 500;
+    }
+    
+    /* Dropdown */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      margin-top: 4px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      min-width: 140px;
+      z-index: 10;
+      overflow: hidden;
+    }
+    .dropdown:hover .dropdown-menu {
+      display: block;
+    }
+    .dropdown-item {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dropdown-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .dropdown-item.danger {
+      color: #FF4D4F;
+    }
+    .dropdown-item.danger:hover {
+      background: #fff2f0;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h1 class="page-title">商品管理</h1>
+      <div class="page-subtitle">管理平台所有商品，支持审核、上下架等操作</div>
+    </div>
+
+    <!-- 操作栏 -->
+    <div class="action-bar">
+      <div class="action-left">
+        <button class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          新增商品
+        </button>
+        <div class="dropdown">
+          <button class="btn btn-default">
+            <i class="fas fa-tasks"></i>
+            批量操作
+            <i class="fas fa-chevron-down" style="font-size:10px;margin-left:4px"></i>
+          </button>
+          <div class="dropdown-menu">
+            <div class="dropdown-item"><i class="fas fa-check-circle" style="width:16px;margin-right:8px;color:#52C41A"></i>批量上架</div>
+            <div class="dropdown-item"><i class="fas fa-times-circle" style="width:16px;margin-right:8px;color:#FF4D4F"></i>批量下架</div>
+            <div class="dropdown-item"><i class="fas fa-trash-alt" style="width:16px;margin-right:8px;color:#FF4D4F"></i>批量删除</div>
+            <div class="dropdown-item"><i class="fas fa-file-export" style="width:16px;margin-right:8px;color:#1890FF"></i>导出数据</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 筛选区 -->
+    <div class="filter-card">
+      <div class="filter-row">
+        <div class="filter-item">
+          <span class="filter-label">商品状态</span>
+          <select class="filter-select">
+            <option value="">全部状态</option>
+            <option value="online">已上架</option>
+            <option value="offline">已下架</option>
+            <option value="pending">待审核</option>
+            <option value="rejected">审核拒绝</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">商品分类</span>
+          <select class="filter-select">
+            <option value="">全部分类</option>
+            <option value="electronics">数码电子</option>
+            <option value="food">食品饮料</option>
+            <option value="daily">日用百货</option>
+            <option value="clothing">服装鞋帽</option>
+            <option value="home">家居家装</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">所属商家</span>
+          <select class="filter-select">
+            <option value="">全部商家</option>
+            <option value="1">华为旗舰店</option>
+            <option value="2">小米之家</option>
+            <option value="3">京东超市</option>
+            <option value="4">天猫国际</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <input type="text" class="filter-input" placeholder="搜索商品名称、ID">
+        </div>
+        <div class="filter-actions">
+          <button class="btn btn-primary" style="padding:6px 16px">
+            <i class="fas fa-search"></i>
+            搜索
+          </button>
+          <button class="btn btn-default" style="padding:6px 16px">
+            <i class="fas fa-redo"></i>
+            重置
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 批量操作栏（选中时显示） -->
+    <div class="batch-action-bar" id="batchActionBar">
+      <span class="batch-count">已选择 <strong>3</strong> 件商品</span>
+      <button class="btn btn-default" style="padding:4px 12px;font-size:12px">批量上架</button>
+      <button class="btn btn-default" style="padding:4px 12px;font-size:12px">批量下架</button>
+      <button class="btn btn-default" style="padding:4px 12px;font-size:12px;color:#FF4D4F">批量删除</button>
+      <button class="btn btn-link" onclick="document.getElementById('batchActionBar').classList.remove('show')">取消选择</button>
+    </div>
+
+    <!-- 数据表格 -->
+    <div class="data-card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:50px">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </th>
+            <th style="width:80px">图片</th>
+            <th>商品名称</th>
+            <th style="width:120px">所属商家</th>
+            <th style="width:100px">分类</th>
+            <th style="width:100px">价格</th>
+            <th style="width:80px">状态</th>
+            <th style="width:160px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=iPhone" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">iPhone 15 Pro Max 256GB 原色钛金属</span>
+                <span class="product-id">ID: SP202403150001</span>
+              </div>
+            </td>
+            <td>华为旗舰店</td>
+            <td>数码电子</td>
+            <td><span class="price">¥9,999.00</span></td>
+            <td><span class="status-tag success">已上架</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link">编辑</button>
+                <button class="btn btn-link btn-danger">下架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=Watch" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">Apple Watch Ultra 2 钛金属表壳</span>
+                <span class="product-id">ID: SP202403150002</span>
+              </div>
+            </td>
+            <td>小米之家</td>
+            <td>数码电子</td>
+            <td><span class="price">¥6,499.00</span></td>
+            <td><span class="status-tag warning">待审核</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link btn-success">审核</button>
+                <button class="btn btn-link">编辑</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=Ear" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">AirPods Pro 2 无线蓝牙降噪耳机</span>
+                <span class="product-id">ID: SP202403150003</span>
+              </div>
+            </td>
+            <td>华为旗舰店</td>
+            <td>数码电子</td>
+            <td><span class="price">¥1,899.00</span></td>
+            <td><span class="status-tag success">已上架</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link">编辑</button>
+                <button class="btn btn-link btn-danger">下架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=Bag" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">新秀丽商务双肩包 15.6寸笔记本电脑包</span>
+                <span class="product-id">ID: SP202403150004</span>
+              </div>
+            </td>
+            <td>京东超市</td>
+            <td>日用百货</td>
+            <td><span class="price">¥599.00</span></td>
+            <td><span class="status-tag default">已下架</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link">编辑</button>
+                <button class="btn btn-link btn-success">上架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=Chair" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">西昊M57人体工学椅 电脑椅办公椅</span>
+                <span class="product-id">ID: SP202403150005</span>
+              </div>
+            </td>
+            <td>天猫国际</td>
+            <td>家居家装</td>
+            <td><span class="price">¥1,299.00</span></td>
+            <td><span class="status-tag error">审核拒绝</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link">编辑</button>
+                <button class="btn btn-link btn-danger">删除</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=Food" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">三只松鼠坚果大礼包 混合坚果礼盒</span>
+                <span class="product-id">ID: SP202403150006</span>
+              </div>
+            </td>
+            <td>京东超市</td>
+            <td>食品饮料</td>
+            <td><span class="price">¥168.00</span></td>
+            <td><span class="status-tag success">已上架</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link">编辑</button>
+                <button class="btn btn-link btn-danger">下架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=Dress" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">优衣库女装连衣裙 法兰绒格子长袖</span>
+                <span class="product-id">ID: SP202403150007</span>
+              </div>
+            </td>
+            <td>天猫国际</td>
+            <td>服装鞋帽</td>
+            <td><span class="price">¥299.00</span></td>
+            <td><span class="status-tag warning">待审核</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link btn-success">审核</button>
+                <button class="btn btn-link">编辑</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox">
+              </div>
+            </td>
+            <td><img src="https://via.placeholder.com/60x60/f5f5f5/999?text=Shoe" alt="商品图" class="product-img"></td>
+            <td>
+              <div class="product-name">
+                <span class="product-title">耐克 Air Max 270 男子运动鞋</span>
+                <span class="product-id">ID: SP202403150008</span>
+              </div>
+            </td>
+            <td>华为旗舰店</td>
+            <td>服装鞋帽</td>
+            <td><span class="price">¥1,199.00</span></td>
+            <td><span class="status-tag success">已上架</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-link">查看</button>
+                <button class="btn btn-link">编辑</button>
+                <button class="btn btn-link btn-danger">下架</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- 分页 -->
+      <div class="pagination-wrapper">
+        <div class="pagination-info">
+          共 <strong>256</strong> 条记录，第 <strong>1</strong> / <strong>32</strong> 页
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <select class="page-size-select">
+            <option value="10">10条/页</option>
+            <option value="20">20条/页</option>
+            <option value="50">50条/页</option>
+            <option value="100">100条/页</option>
+          </select>
+          <div class="pagination">
+            <button class="page-btn" disabled><i class="fas fa-angle-left"></i></button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">4</button>
+            <button class="page-btn">5</button>
+            <span class="page-ellipsis">...</span>
+            <button class="page-btn">32</button>
+            <button class="page-btn"><i class="fas fa-angle-right"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

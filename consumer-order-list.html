@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 我的订单</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      background: #e5e5e5;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+    }
+    
+    /* 手机框架 - 模拟iPhone */
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 滚动区域 */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    /* Tab导航 */
+    .tab-nav {
+      background: white;
+      display: flex;
+      border-bottom: 1px solid #f0f0f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .tab-item {
+      flex: 1;
+      text-align: center;
+      padding: 14px 0;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .tab-item.active {
+      color: #1890FF;
+      font-weight: 600;
+    }
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 3px;
+      background: #1890FF;
+      border-radius: 2px 2px 0 0;
+    }
+    .tab-item .badge {
+      position: absolute;
+      top: 8px;
+      right: calc(50% - 24px);
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+    
+    /* 订单卡片 */
+    .order-card {
+      background: white;
+      margin: 12px 16px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .order-no {
+      font-size: 13px;
+      color: #999;
+    }
+    .order-status {
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .order-status.pending-payment {
+      color: #FF4D4F;
+    }
+    .order-status.pending-shipping {
+      color: #FAAD14;
+    }
+    .order-status.shipped {
+      color: #1890FF;
+    }
+    .order-status.completed {
+      color: #52C41A;
+    }
+    .order-status.cancelled {
+      color: #999;
+    }
+    
+    /* 商品项 */
+    .product-item {
+      display: flex;
+      padding: 12px 14px;
+      gap: 12px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .product-item:last-child {
+      border-bottom: none;
+    }
+    .product-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .product-image i {
+      font-size: 28px;
+      color: #d1d5db;
+    }
+    .product-image .quantity-badge {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+    .product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-name {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .product-spec {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    .product-price {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .product-price .price {
+      font-size: 15px;
+      color: #FF4D4F;
+      font-weight: 600;
+    }
+    .product-price .count {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    /* 订单金额 */
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-top: 1px solid #f5f5f5;
+      background: #fafafa;
+    }
+    .order-total {
+      font-size: 13px;
+      color: #666;
+    }
+    .order-total .amount {
+      font-size: 16px;
+      color: #FF4D4F;
+      font-weight: 700;
+      margin-left: 4px;
+    }
+    .order-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid #d9d9d9;
+      background: white;
+      color: #666;
+      transition: all 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.96);
+    }
+    .btn-primary {
+      background: #1890FF;
+      border-color: #1890FF;
+      color: white;
+    }
+    .btn-danger {
+      border-color: #FF4D4F;
+      color: #FF4D4F;
+    }
+    .btn-success {
+      border-color: #52C41A;
+      color: #52C41A;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .empty-state i {
+      font-size: 64px;
+      color: #d9d9d9;
+      margin-bottom: 16px;
+    }
+    .empty-state .title {
+      font-size: 15px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    .empty-state .desc {
+      font-size: 13px;
+      color: #bbb;
+      margin-bottom: 20px;
+    }
+    .empty-state .btn-shop {
+      background: #1890FF;
+      color: white;
+      border: none;
+      padding: 10px 32px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    /* 底部导航 */
+    .bottom-nav {
+      width: 390px;
+      margin: 0 auto;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      cursor: pointer;
+      padding: 6px 24px;
+    }
+    .nav-item.active {
+      color: #1890FF;
+    }
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+    .nav-item span {
+      font-size: 11px;
+    }
+    
+    /* 订单数量徽标 */
+    .count-badge {
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- 滚动内容区 -->
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#1890FF,#40a9ff)"></div>
+      
+      <!-- 顶部标题栏 -->
+      <div style="background:linear-gradient(135deg,#1890FF,#40a9ff);padding:8px 16px 12px">
+        <div style="display:flex;align-items:center;justify-content:center;position:relative">
+          <i class="fas fa-chevron-left" style="color:white;font-size:18px;position:absolute;left:0;cursor:pointer"></i>
+          <span style="color:white;font-size:17px;font-weight:600">我的订单</span>
+        </div>
+      </div>
+
+      <!-- Tab导航 -->
+      <nav class="tab-nav">
+        <div class="tab-item active" data-tab="all">全部</div>
+        <div class="tab-item" data-tab="pending-payment">
+          待付款
+          <span class="badge">2</span>
+        </div>
+        <div class="tab-item" data-tab="pending-shipping">待发货</div>
+        <div class="tab-item" data-tab="shipped">
+          待收货
+          <span class="badge">1</span>
+        </div>
+        <div class="tab-item" data-tab="completed">已完成</div>
+      </nav>
+
+      <!-- 订单列表 -->
+      <div id="order-list">
+        <!-- 订单卡片1：待付款 -->
+        <div class="order-card">
+          <div class="order-header">
+            <span class="order-no">订单号：2024031915070001</span>
+            <span class="order-status pending-payment">待付款</span>
+          </div>
+          
+          <div class="product-item">
+            <div class="product-image" style="background:linear-gradient(135deg,#f3f4f6,#e5e7eb)">
+              <i class="fas fa-mobile-alt"></i>
+              <span class="quantity-badge">×1</span>
+            </div>
+            <div class="product-info">
+              <div>
+                <div class="product-name">iPhone 15 Pro Max 手机壳 磁吸支架保护套</div>
+                <div class="product-spec">黑色 / 适用iPhone 15 Pro Max</div>
+              </div>
+              <div class="product-price">
+                <span class="price">¥59.00</span>
+                <span class="count">共1件</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-footer">
+            <div class="order-total">
+              合计：<span class="amount">¥59.00</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn" onclick="cancelOrder()">取消订单</button>
+              <button class="btn btn-primary" onclick="payOrder()">立即付款</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 订单卡片2：待发货 -->
+        <div class="order-card">
+          <div class="order-header">
+            <span class="order-no">订单号：2024031814230088</span>
+            <span class="order-status pending-shipping">待发货</span>
+          </div>
+          
+          <div class="product-item">
+            <div class="product-image" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">
+              <i class="fas fa-battery-full" style="color:#93c5fd"></i>
+              <span class="quantity-badge">×1</span>
+            </div>
+            <div class="product-info">
+              <div>
+                <div class="product-name">无线充电器 快充支架 15W适用全机型</div>
+                <div class="product-spec">白色</div>
+              </div>
+              <div class="product-price">
+                <span class="price">¥79.00</span>
+                <span class="count">共1件</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-footer">
+            <div class="order-total">
+              合计：<span class="amount">¥79.00</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn" onclick="contactService()">联系客服</button>
+              <button class="btn btn-primary" onclick="remindShip()">提醒发货</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 订单卡片3：待收货 -->
+        <div class="order-card">
+          <div class="order-header">
+            <span class="order-no">订单号：2024031712050036</span>
+            <span class="order-status shipped">待收货</span>
+          </div>
+          
+          <div class="product-item">
+            <div class="product-image" style="background:linear-gradient(135deg,#faf5ff,#f3e8ff)">
+              <i class="fas fa-headphones" style="color:#d8b4fe"></i>
+              <span class="quantity-badge">×1</span>
+            </div>
+            <div class="product-info">
+              <div>
+                <div class="product-name">蓝牙耳机 主动降噪 超长续航40小时</div>
+                <div class="product-spec">星空黑</div>
+              </div>
+              <div class="product-price">
+                <span class="price">¥199.00</span>
+                <span class="count">共1件</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="product-item">
+            <div class="product-image" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7)">
+              <i class="fas fa-plug" style="color:#86efac"></i>
+              <span class="quantity-badge">×2</span>
+            </div>
+            <div class="product-info">
+              <div>
+                <div class="product-name">Type-C数据线 快充闪充 编织耐磨</div>
+                <div class="product-spec">黑色 / 1米</div>
+              </div>
+              <div class="product-price">
+                <span class="price">¥38.00</span>
+                <span class="count">共2件</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-footer">
+            <div class="order-total">
+              合计：<span class="amount">¥237.00</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn" onclick="viewLogistics()">查看物流</button>
+              <button class="btn btn-success" onclick="confirmReceive()">确认收货</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 订单卡片4：已完成 -->
+        <div class="order-card">
+          <div class="order-header">
+            <span class="order-no">订单号：2024031509380021</span>
+            <span class="order-status completed">已完成</span>
+          </div>
+          
+          <div class="product-item">
+            <div class="product-image" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">
+              <i class="fas fa-keyboard" style="color:#fbbf24"></i>
+              <span class="quantity-badge">×1</span>
+            </div>
+            <div class="product-info">
+              <div>
+                <div class="product-name">机械键盘 青轴 RGB背光 87键</div>
+                <div class="product-spec">白色 / 青轴</div>
+              </div>
+              <div class="product-price">
+                <span class="price">¥259.00</span>
+                <span class="count">共1件</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-footer">
+            <div class="order-total">
+              合计：<span class="amount">¥259.00</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn" onclick="viewDetail()">查看详情</button>
+              <button class="btn btn-primary" onclick="reviewOrder()">评价</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 订单卡片5：已取消 -->
+        <div class="order-card">
+          <div class="order-header">
+            <span class="order-no">订单号：2024031018220015</span>
+            <span class="order-status cancelled">已取消</span>
+          </div>
+          
+          <div class="product-item">
+            <div class="product-image" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">
+              <i class="fas fa-mouse" style="color:#f472b6"></i>
+              <span class="quantity-badge">×1</span>
+            </div>
+            <div class="product-info">
+              <div>
+                <div class="product-name">无线鼠标 静音充电 蓝牙双模</div>
+                <div class="product-spec">粉色</div>
+              </div>
+              <div class="product-price">
+                <span class="price" style="color:#999;text-decoration:line-through">¥89.00</span>
+                <span class="count">共1件</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="order-footer">
+            <div class="order-total">
+              <span style="color:#999;font-size:12px">订单已取消</span>
+            </div>
+            <div class="order-actions">
+              <button class="btn" onclick="deleteOrder()">删除订单</button>
+              <button class="btn btn-primary" onclick="buyAgain()">再次购买</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 空状态（默认隐藏） -->
+      <div id="empty-state" style="display:none">
+        <div class="empty-state">
+          <i class="fas fa-clipboard-list"></i>
+          <div class="title">暂无订单</div>
+          <div class="desc">您还没有相关订单，去逛逛吧</div>
+          <button class="btn-shop" onclick="goShopping()">去购物</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+      <div class="nav-item" onclick="location.href='consumer-home.html'">
+        <i class="fas fa-home"></i>
+        <span>首页</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-th-large"></i>
+        <span>分类</span>
+      </div>
+      <div class="nav-item" style="position:relative">
+        <i class="fas fa-shopping-cart"></i>
+        <span>购物车</span>
+        <span class="count-badge">3</span>
+      </div>
+      <div class="nav-item active">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // Tab切换
+    document.querySelectorAll('.tab-item').forEach(tab => {
+      tab.addEventListener('click', function() {
+        // 切换激活状态
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 根据tab显示不同订单（这里模拟过滤效果）
+        const tabType = this.dataset.tab;
+        const orderList = document.getElementById('order-list');
+        const emptyState = document.getElementById('empty-state');
+        
+        // 模拟不同tab的订单数据
+        const orders = orderList.querySelectorAll('.order-card');
+        
+        // 简单的显示/隐藏逻辑（实际应用中应该根据数据筛选）
+        if (tabType === 'all') {
+          orders.forEach(order => order.style.display = 'block');
+          emptyState.style.display = 'none';
+        } else {
+          // 这里可以根据订单状态进行筛选，演示用
+          orders.forEach(order => {
+            const status = order.querySelector('.order-status');
+            if (tabType === 'pending-payment' && status.classList.contains('pending-payment')) {
+              order.style.display = 'block';
+            } else if (tabType === 'pending-shipping' && status.classList.contains('pending-shipping')) {
+              order.style.display = 'block';
+            } else if (tabType === 'shipped' && status.classList.contains('shipped')) {
+              order.style.display = 'block';
+            } else if (tabType === 'completed' && status.classList.contains('completed')) {
+              order.style.display = 'block';
+            } else {
+              order.style.display = 'none';
+            }
+          });
+          
+          // 检查是否有可见订单
+          const visibleOrders = Array.from(orders).filter(o => o.style.display !== 'none');
+          emptyState.style.display = visibleOrders.length === 0 ? 'block' : 'none';
+        }
+      });
+    });
+
+    // 操作按钮函数
+    function cancelOrder() {
+      if (confirm('确定要取消该订单吗？')) {
+        alert('订单已取消');
+      }
+    }
+
+    function payOrder() {
+      alert('跳转到支付页面');
+    }
+
+    function contactService() {
+      alert('打开客服对话');
+    }
+
+    function remindShip() {
+      alert('已提醒卖家发货');
+    }
+
+    function viewLogistics() {
+      alert('查看物流信息');
+    }
+
+    function confirmReceive() {
+      if (confirm('确认已收到货物吗？')) {
+        alert('已确认收货');
+      }
+    }
+
+    function viewDetail() {
+      alert('查看订单详情');
+    }
+
+    function reviewOrder() {
+      alert('跳转到评价页面');
+    }
+
+    function deleteOrder() {
+      if (confirm('确定要删除该订单吗？')) {
+        alert('订单已删除');
+      }
+    }
+
+    function buyAgain() {
+      alert('加入购物车');
+    }
+
+    function goShopping() {
+      location.href = 'consumer-home.html';
+    }
+
+    // 底部导航切换
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

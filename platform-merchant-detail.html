@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 商家详情页原型</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 卡片 */
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-tag.success {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    .status-tag.warning {
+      background: #fffbe6;
+      color: #FAAD14;
+      border: 1px solid #ffe58f;
+    }
+    .status-tag.error {
+      background: #fff2f0;
+      color: #FF4D4F;
+      border: 1px solid #ffccc7;
+    }
+    .status-tag.default {
+      background: #f5f5f5;
+      color: #666;
+      border: 1px solid #d9d9d9;
+    }
+    
+    /* 按钮 */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+      border-color: #1890FF;
+    }
+    .btn-primary:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+    }
+    .btn-default {
+      background: white;
+      color: #666;
+      border-color: #d9d9d9;
+    }
+    .btn-default:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    .btn-success {
+      background: #52C41A;
+      color: white;
+      border-color: #52C41A;
+    }
+    .btn-success:hover {
+      background: #73d13d;
+      border-color: #73d13d;
+    }
+    .btn-danger {
+      background: white;
+      color: #FF4D4F;
+      border-color: #FF4D4F;
+    }
+    .btn-danger:hover {
+      background: #FF4D4F;
+      color: white;
+    }
+    .btn-small {
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    
+    /* 信息项 */
+    .info-item {
+      display: flex;
+      margin-bottom: 16px;
+    }
+    .info-item:last-child {
+      margin-bottom: 0;
+    }
+    .info-label {
+      width: 100px;
+      font-size: 13px;
+      color: #999;
+      flex-shrink: 0;
+    }
+    .info-value {
+      flex: 1;
+      font-size: 13px;
+      color: #333;
+    }
+    
+    /* 数据卡片 */
+    .stat-card {
+      background: linear-gradient(135deg, #1890FF 0%, #40a9ff 100%);
+      border-radius: 8px;
+      padding: 20px;
+      color: white;
+    }
+    .stat-card.green {
+      background: linear-gradient(135deg, #52C41A 0%, #73d13d 100%);
+    }
+    .stat-card.orange {
+      background: linear-gradient(135deg, #FA8C16 0%, #faad14 100%);
+    }
+    .stat-card.purple {
+      background: linear-gradient(135deg, #722ED1 0%, #9254de 100%);
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    
+    /* 图片占位 */
+    .img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 12px;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid #d9d9d9;
+      background: white;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .page-btn:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .page-btn.active {
+      background: #1890FF;
+      border-color: #1890FF;
+      color: white;
+    }
+    
+    /* 面包屑 */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+    .breadcrumb a {
+      color: #666;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      color: #1890FF;
+    }
+    .breadcrumb span {
+      color: #999;
+    }
+    .breadcrumb .current {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+      <a href="#"><i class="fas fa-store"></i> 商家管理</a>
+      <span>/</span>
+      <span class="current">商家详情</span>
+    </div>
+
+    <!-- 页面标题区 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <h1 style="font-size:20px;font-weight:600;color:#333">商家详情</h1>
+        <span class="status-tag success">
+          <i class="fas fa-check-circle" style="margin-right:4px"></i>
+          正常营业
+        </span>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-danger btn-small">
+          <i class="fas fa-ban"></i>
+          禁用商家
+        </button>
+        <button class="btn btn-primary btn-small">
+          <i class="fas fa-edit"></i>
+          编辑信息
+        </button>
+      </div>
+    </div>
+
+    <!-- 商家基本信息 -->
+    <div class="card">
+      <h3 style="font-size:15px;font-weight:600;color:#333;margin-bottom:20px">
+        <i class="fas fa-info-circle" style="color:#1890FF;margin-right:8px"></i>
+        基本信息
+      </h3>
+      <div style="display:flex;gap:32px">
+        <!-- 左侧：商家头像和名称 -->
+        <div style="display:flex;gap:20px">
+          <div style="width:100px;height:100px;border-radius:8px;overflow:hidden;border:1px solid #f0f0f0">
+            <div class="img-placeholder">
+              <i class="fas fa-store" style="font-size:36px"></i>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:18px;font-weight:600;color:#333;margin-bottom:8px">腾讯官方旗舰店</div>
+            <div style="font-size:13px;color:#999;margin-bottom:4px">商家编号：M202403150001</div>
+            <div style="font-size:13px;color:#999">入驻时间：2024-03-15 10:30:00</div>
+          </div>
+        </div>
+        
+        <!-- 右侧：详细信息 -->
+        <div style="flex:1;display:grid;grid-template-columns:repeat(2,1fr);gap:0 40px">
+          <div class="info-item">
+            <div class="info-label">联系人</div>
+            <div class="info-value">张经理</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">联系电话</div>
+            <div class="info-value">138****8888</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">联系邮箱</div>
+            <div class="info-value">contact@tencent.com</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">所属行业</div>
+            <div class="info-value">数码电子</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">营业执照</div>
+            <div class="info-value" style="color:#1890FF;cursor:pointer">
+              <i class="fas fa-file-image"></i> 点击查看
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">经营地址</div>
+            <div class="info-value">广东省深圳市南山区科技园腾讯大厦</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 经营数据 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px">
+      <div class="stat-card">
+        <div class="stat-label">累计订单数</div>
+        <div class="stat-value">12,856</div>
+        <div style="font-size:12px;opacity:0.85;margin-top:8px">
+          <i class="fas fa-arrow-up"></i> 较上月 +8.5%
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">累计销售额</div>
+        <div class="stat-value">¥2,156,800</div>
+        <div style="font-size:12px;opacity:0.85;margin-top:8px">
+          <i class="fas fa-arrow-up"></i> 较上月 +12.3%
+        </div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-label">本月订单数</div>
+        <div class="stat-value">1,256</div>
+        <div style="font-size:12px;opacity:0.85;margin-top:8px">
+          <i class="fas fa-arrow-up"></i> 较上月 +5.2%
+        </div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">本月销售额</div>
+        <div class="stat-value">¥186,500</div>
+        <div style="font-size:12px;opacity:0.85;margin-top:8px">
+          <i class="fas fa-arrow-up"></i> 较上月 +9.8%
+        </div>
+      </div>
+    </div>
+
+    <!-- 审核记录 -->
+    <div class="card">
+      <h3 style="font-size:15px;font-weight:600;color:#333;margin-bottom:20px">
+        <i class="fas fa-clipboard-check" style="color:#1890FF;margin-right:8px"></i>
+        审核记录
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- 审核项 -->
+        <div style="display:flex;align-items:center;padding:16px;background:#f9fafb;border-radius:8px;gap:16px">
+          <div style="width:40px;height:40px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fas fa-check" style="color:#1890FF"></i>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:14px;color:#333;margin-bottom:4px">入驻审核通过</div>
+            <div style="font-size:12px;color:#999">审核人：管理员 | 2024-03-15 10:30:00</div>
+          </div>
+          <span class="status-tag success">已通过</span>
+        </div>
+        <div style="display:flex;align-items:center;padding:16px;background:#f9fafb;border-radius:8px;gap:16px">
+          <div style="width:40px;height:40px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fas fa-check" style="color:#1890FF"></i>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:14px;color:#333;margin-bottom:4px">资质审核通过</div>
+            <div style="font-size:12px;color:#999">审核人：管理员 | 2024-03-15 10:35:00</div>
+          </div>
+          <span class="status-tag success">已通过</span>
+        </div>
+        <div style="display:flex;align-items:center;padding:16px;background:#f9fafb;border-radius:8px;gap:16px">
+          <div style="width:40px;height:40px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fas fa-check" style="color:#1890FF"></i>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:14px;color:#333;margin-bottom:4px">商品上架审核通过</div>
+            <div style="font-size:12px;color:#999">审核人：管理员 | 2024-03-16 09:15:00</div>
+          </div>
+          <span class="status-tag success">已通过</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商品列表 -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h3 style="font-size:15px;font-weight:600;color:#333">
+          <i class="fas fa-box" style="color:#1890FF;margin-right:8px"></i>
+          商品列表
+        </h3>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="display:flex;align-items:center;background:#f5f5f5;border-radius:6px;padding:0 12px">
+            <i class="fas fa-search" style="color:#999;font-size:12px"></i>
+            <input type="text" placeholder="搜索商品名称" style="border:none;background:transparent;padding:8px 12px;font-size:13px;outline:none;width:160px">
+          </div>
+          <select style="padding:8px 12px;border:1px solid #d9d9d9;border-radius:6px;font-size:13px;outline:none;cursor:pointer">
+            <option>全部状态</option>
+            <option>上架中</option>
+            <option>已下架</option>
+            <option>审核中</option>
+          </select>
+        </div>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>商品图片</th>
+            <th>商品名称</th>
+            <th>分类</th>
+            <th>价格</th>
+            <th>库存</th>
+            <th>销量</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="width:60px;height:60px;border-radius:6px;overflow:hidden;border:1px solid #f0f0f0">
+                <div class="img-placeholder" style="font-size:10px">
+                  <i class="fas fa-image"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:500">iPhone 15 Pro 手机壳</div>
+              <div style="font-size:12px;color:#999">ID: P001</div>
+            </td>
+            <td>手机配件</td>
+            <td style="color:#FF4D4F;font-weight:500">¥89.00</td>
+            <td>1,256</td>
+            <td>3,489</td>
+            <td><span class="status-tag success">上架中</span></td>
+            <td>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-default btn-small">查看</button>
+                <button class="btn btn-default btn-small">下架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="width:60px;height:60px;border-radius:6px;overflow:hidden;border:1px solid #f0f0f0">
+                <div class="img-placeholder" style="font-size:10px">
+                  <i class="fas fa-image"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:500">无线蓝牙耳机 Pro</div>
+              <div style="font-size:12px;color:#999">ID: P002</div>
+            </td>
+            <td>数码电子</td>
+            <td style="color:#FF4D4F;font-weight:500">¥299.00</td>
+            <td>856</td>
+            <td>2,156</td>
+            <td><span class="status-tag success">上架中</span></td>
+            <td>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-default btn-small">查看</button>
+                <button class="btn btn-default btn-small">下架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="width:60px;height:60px;border-radius:6px;overflow:hidden;border:1px solid #f0f0f0">
+                <div class="img-placeholder" style="font-size:10px">
+                  <i class="fas fa-image"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:500">快充充电器套装</div>
+              <div style="font-size:12px;color:#999">ID: P003</div>
+            </td>
+            <td>手机配件</td>
+            <td style="color:#FF4D4F;font-weight:500">¥158.00</td>
+            <td>2,356</td>
+            <td>5,689</td>
+            <td><span class="status-tag success">上架中</span></td>
+            <td>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-default btn-small">查看</button>
+                <button class="btn btn-default btn-small">下架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="width:60px;height:60px;border-radius:6px;overflow:hidden;border:1px solid #f0f0f0">
+                <div class="img-placeholder" style="font-size:10px">
+                  <i class="fas fa-image"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:500">智能手表表带</div>
+              <div style="font-size:12px;color:#999">ID: P004</div>
+            </td>
+            <td>穿戴设备</td>
+            <td style="color:#FF4D4F;font-weight:500">¥68.00</td>
+            <td>0</td>
+            <td>1,256</td>
+            <td><span class="status-tag default">已下架</span></td>
+            <td>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-default btn-small">查看</button>
+                <button class="btn btn-success btn-small">上架</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="width:60px;height:60px;border-radius:6px;overflow:hidden;border:1px solid #f0f0f0">
+                <div class="img-placeholder" style="font-size:10px">
+                  <i class="fas fa-image"></i>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="font-weight:500">迷你便携风扇</div>
+              <div style="font-size:12px;color:#999">ID: P005</div>
+            </td>
+            <td>生活用品</td>
+            <td style="color:#FF4D4F;font-weight:500">¥45.00</td>
+            <td>586</td>
+            <td>987</td>
+            <td><span class="status-tag warning">审核中</span></td>
+            <td>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-primary btn-small">审核</button>
+                <button class="btn btn-default btn-small">查看</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- 分页 -->
+      <div class="pagination">
+        <button class="page-btn"><i class="fas fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">...</button>
+        <button class="page-btn">10</button>
+        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+
+    <!-- 操作日志 -->
+    <div class="card">
+      <h3 style="font-size:15px;font-weight:600;color:#333;margin-bottom:20px">
+        <i class="fas fa-history" style="color:#1890FF;margin-right:8px"></i>
+        操作日志
+      </h3>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>操作时间</th>
+            <th>操作人</th>
+            <th>操作类型</th>
+            <th>操作内容</th>
+            <th>备注</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2026-03-19 14:20:00</td>
+            <td>管理员</td>
+            <td><span class="status-tag success">审核通过</span></td>
+            <td>商品上架审核通过</td>
+            <td>商品符合上架标准</td>
+          </tr>
+          <tr>
+            <td>2026-03-18 10:15:00</td>
+            <td>商家</td>
+            <td><span class="status-tag default">商品提交</span></td>
+            <td>提交新商品"迷你便携风扇"</td>
+            <td>等待审核</td>
+          </tr>
+          <tr>
+            <td>2026-03-15 10:30:00</td>
+            <td>管理员</td>
+            <td><span class="status-tag success">审核通过</span></td>
+            <td>商家入驻审核通过</td>
+            <td>资质齐全，允许入驻</td>
+          </tr>
+          <tr>
+            <td>2026-03-15 10:00:00</td>
+            <td>商家</td>
+            <td><span class="status-tag default">入驻申请</span></td>
+            <td>提交入驻申请</td>
+            <td>首次入驻</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

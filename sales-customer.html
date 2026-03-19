@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 我的客户</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #e5e5e5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    .bottom-nav {
+      width: 390px;
+      margin: 0 auto;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      cursor: pointer;
+      padding: 6px 24px;
+    }
+    .nav-item.active { color: #FF6B00; }
+    .nav-item i { font-size: 20px; margin-bottom: 2px; }
+    .nav-item span { font-size: 11px; }
+    
+    /* 搜索框 */
+    .search-box {
+      background: white;
+      border-radius: 22px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(255,107,0,0.1);
+    }
+    .search-box i { color: #999; font-size: 14px; }
+    .search-box input {
+      border: none;
+      outline: none;
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+    }
+    .search-box input::placeholder { color: #bbb; }
+    
+    /* 统计卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    .stat-number {
+      font-size: 36px;
+      font-weight: 700;
+      color: #FF6B00;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      margin-top: 8px;
+    }
+    .stat-card.highlight {
+      background: linear-gradient(135deg, #FF6B00, #ff8533);
+    }
+    .stat-card.highlight .stat-number { color: white; }
+    .stat-card.highlight .stat-label { color: rgba(255,255,255,0.9); }
+    
+    /* 客户列表 */
+    .customer-item {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .customer-item:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, #FF6B00, #ff8533);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    
+    .customer-info { flex: 1; min-width: 0; }
+    .customer-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .customer-name .badge {
+      background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+      color: #D97706;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+    
+    .customer-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #999;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .meta-item i { font-size: 11px; }
+    
+    .commission {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .commission-amount {
+      font-size: 17px;
+      font-weight: 700;
+      color: #FF6B00;
+    }
+    .commission-label {
+      font-size: 11px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    /* 筛选标签 */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+    }
+    .filter-tab {
+      background: white;
+      border: 1px solid #e8e8e8;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 13px;
+      color: #666;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-tab.active {
+      background: #FF6B00;
+      border-color: #FF6B00;
+      color: white;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state i {
+      font-size: 48px;
+      color: #ddd;
+      margin-bottom: 16px;
+    }
+    .empty-state p {
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#FF6B00,#ff8533)"></div>
+      
+      <!-- 标题栏 -->
+      <div style="background:linear-gradient(135deg,#FF6B00,#ff8533);padding:8px 16px 20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <span style="color:white;font-size:18px;font-weight:600">我的客户</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <i class="fas fa-filter" style="color:white;font-size:16px;cursor:pointer"></i>
+            <i class="fas fa-chart-line" style="color:white;font-size:16px;cursor:pointer"></i>
+          </div>
+        </div>
+        
+        <!-- 搜索框 -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="搜索客户昵称或手机号">
+        </div>
+      </div>
+
+      <!-- 统计卡片 -->
+      <div style="margin:-10px 16px 16px;display:flex;gap:12px">
+        <div class="stat-card highlight" style="flex:1">
+          <div class="stat-number">2,847</div>
+          <div class="stat-label">总客户数</div>
+        </div>
+        <div class="stat-card" style="flex:1">
+          <div class="stat-number">156</div>
+          <div class="stat-label">本月新增</div>
+        </div>
+      </div>
+
+      <!-- 筛选标签 -->
+      <div class="filter-tabs">
+        <div class="filter-tab active">全部客户</div>
+        <div class="filter-tab">活跃客户</div>
+        <div class="filter-tab">高价值客户</div>
+        <div class="filter-tab">新增客户</div>
+      </div>
+
+      <!-- 客户列表 -->
+      <div style="padding:0 16px">
+        <!-- 客户1 - VIP -->
+        <div class="customer-item">
+          <div class="avatar">张</div>
+          <div class="customer-info">
+            <div class="customer-name">
+              张伟
+              <span class="badge">VIP</span>
+            </div>
+            <div class="customer-meta">
+              <div class="meta-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>下单 32 次</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>3天前活跃</span>
+              </div>
+            </div>
+          </div>
+          <div class="commission">
+            <div class="commission-amount">¥1,280</div>
+            <div class="commission-label">贡献佣金</div>
+          </div>
+        </div>
+
+        <!-- 客户2 -->
+        <div class="customer-item">
+          <div class="avatar" style="background:linear-gradient(135deg,#667eea,#764ba2)">李</div>
+          <div class="customer-info">
+            <div class="customer-name">李娜</div>
+            <div class="customer-meta">
+              <div class="meta-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>下单 18 次</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>1周前活跃</span>
+              </div>
+            </div>
+          </div>
+          <div class="commission">
+            <div class="commission-amount">¥856</div>
+            <div class="commission-label">贡献佣金</div>
+          </div>
+        </div>
+
+        <!-- 客户3 -->
+        <div class="customer-item">
+          <div class="avatar" style="background:linear-gradient(135deg,#11998e,#38ef7d)">王</div>
+          <div class="customer-info">
+            <div class="customer-name">王强</div>
+            <div class="customer-meta">
+              <div class="meta-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>下单 15 次</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>2周前活跃</span>
+              </div>
+            </div>
+          </div>
+          <div class="commission">
+            <div class="commission-amount">¥720</div>
+            <div class="commission-label">贡献佣金</div>
+          </div>
+        </div>
+
+        <!-- 客户4 -->
+        <div class="customer-item">
+          <div class="avatar" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">刘</div>
+          <div class="customer-info">
+            <div class="customer-name">刘洋</div>
+            <div class="customer-meta">
+              <div class="meta-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>下单 12 次</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>今天活跃</span>
+              </div>
+            </div>
+          </div>
+          <div class="commission">
+            <div class="commission-amount">¥580</div>
+            <div class="commission-label">贡献佣金</div>
+          </div>
+        </div>
+
+        <!-- 客户5 - 新客户 -->
+        <div class="customer-item">
+          <div class="avatar" style="background:linear-gradient(135deg,#f093fb,#f5576c)">陈</div>
+          <div class="customer-info">
+            <div class="customer-name">
+              陈小美
+              <span class="badge" style="background:linear-gradient(135deg,#E0F2FE,#BAE6FD);color:#1890FF">新</span>
+            </div>
+            <div class="customer-meta">
+              <div class="meta-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>下单 3 次</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>今天活跃</span>
+              </div>
+            </div>
+          </div>
+          <div class="commission">
+            <div class="commission-amount">¥168</div>
+            <div class="commission-label">贡献佣金</div>
+          </div>
+        </div>
+
+        <!-- 客户6 -->
+        <div class="customer-item">
+          <div class="avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">周</div>
+          <div class="customer-info">
+            <div class="customer-name">周杰</div>
+            <div class="customer-meta">
+              <div class="meta-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>下单 8 次</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>5天前活跃</span>
+              </div>
+            </div>
+          </div>
+          <div class="commission">
+            <div class="commission-amount">¥445</div>
+            <div class="commission-label">贡献佣金</div>
+          </div>
+        </div>
+
+        <!-- 客户7 -->
+        <div class="customer-item">
+          <div class="avatar" style="background:linear-gradient(135deg,#fa709a,#fee140)">赵</div>
+          <div class="customer-info">
+            <div class="customer-name">赵敏</div>
+            <div class="customer-meta">
+              <div class="meta-item">
+                <i class="fas fa-shopping-bag"></i>
+                <span>下单 6 次</span>
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-clock"></i>
+                <span>1周前活跃</span>
+              </div>
+            </div>
+          </div>
+          <div class="commission">
+            <div class="commission-amount">¥320</div>
+            <div class="commission-label">贡献佣金</div>
+          </div>
+        </div>
+
+        <!-- 加载更多 -->
+        <div style="text-align:center;padding:16px 0">
+          <span style="font-size:13px;color:#999">下拉加载更多</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+      <div class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>首页</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-box"></i>
+        <span>商品</span>
+      </div>
+      <div class="nav-item active">
+        <i class="fas fa-users"></i>
+        <span>客户</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // 底部导航切换
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // 筛选标签切换
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // 搜索框交互
+    const searchInput = document.querySelector('.search-box input');
+    searchInput.addEventListener('focus', function() {
+      this.parentElement.style.boxShadow = '0 4px 12px rgba(255,107,0,0.2)';
+    });
+    searchInput.addEventListener('blur', function() {
+      this.parentElement.style.boxShadow = '0 2px 8px rgba(255,107,0,0.1)';
+    });
+  </script>
+</body>
+</html>

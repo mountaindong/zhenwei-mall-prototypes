@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 数据统计</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #e5e5e5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    .bottom-nav {
+      width: 390px;
+      margin: 0 auto;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      cursor: pointer;
+      padding: 6px 32px;
+    }
+    .nav-item.active { color: #52C41A; }
+    .nav-item i { font-size: 20px; margin-bottom: 2px; }
+    .nav-item span { font-size: 11px; }
+    
+    /* 时间筛选器 */
+    .time-filter {
+      display: flex;
+      background: white;
+      margin: 0 16px;
+      border-radius: 10px;
+      padding: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .time-filter-item {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .time-filter-item.active {
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(82,196,26,0.3);
+    }
+    
+    /* 统计卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    
+    .stat-item {
+      background: #FAFAFA;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    .stat-item:active {
+      transform: scale(0.98);
+    }
+    .stat-item.sell {
+      background: linear-gradient(135deg, #F0FDF4, #DCFCE7);
+      border: 1px solid rgba(82,196,26,0.2);
+    }
+    .stat-item.ship {
+      background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+      border: 1px solid rgba(24,144,255,0.2);
+    }
+    .stat-item.exchange {
+      background: linear-gradient(135deg, #FFF7E6, #FEF3C7);
+      border: 1px solid rgba(250,173,20,0.2);
+    }
+    .stat-item.non-exchange {
+      background: linear-gradient(135deg, #FDF2F8, #FCE7F3);
+      border: 1px solid rgba(235,78,128,0.2);
+    }
+    
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px;
+    }
+    .stat-icon.sell {
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+    }
+    .stat-icon.ship {
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+    }
+    .stat-icon.exchange {
+      background: linear-gradient(135deg, #FAAD14, #fbbf24);
+    }
+    .stat-icon.non-exchange {
+      background: linear-gradient(135deg, #EB4E80, #f472b6);
+    }
+    
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-value.sell { color: #52C41A; }
+    .stat-value.ship { color: #1890FF; }
+    .stat-value.exchange { color: #FA8C16; }
+    .stat-value.non-exchange { color: #EB4E80; }
+    
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .stat-trend {
+      font-size: 11px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .stat-trend.up { color: #52C41A; }
+    .stat-trend.down { color: #FF4D4F; }
+    
+    /* 趋势图表区域 */
+    .chart-container {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    
+    .chart-legend {
+      display: flex;
+      gap: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #666;
+    }
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    /* SVG 图表样式 */
+    .chart-svg {
+      width: 100%;
+      height: 180px;
+    }
+    .grid-line {
+      stroke: #f0f0f0;
+      stroke-width: 1;
+    }
+    .axis-label {
+      font-size: 10px;
+      fill: #999;
+    }
+    .chart-line-sell {
+      fill: none;
+      stroke: #52C41A;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .chart-line-ship {
+      fill: none;
+      stroke: #1890FF;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .chart-dot {
+      stroke: white;
+      stroke-width: 2;
+    }
+    .chart-dot-sell { fill: #52C41A; }
+    .chart-dot-ship { fill: #1890FF; }
+    
+    /* 图表交互提示 */
+    .chart-tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.75);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    /* 数据详情列表 */
+    .detail-list {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    
+    .detail-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f5f5f5;
+      transition: background 0.2s;
+    }
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+    .detail-item:active {
+      background: #fafafa;
+    }
+    
+    .detail-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      font-size: 16px;
+    }
+    
+    .detail-content {
+      flex: 1;
+    }
+    .detail-title {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+    .detail-subtitle {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    .detail-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .detail-value.sell { color: #52C41A; }
+    .detail-value.ship { color: #1890FF; }
+    .detail-value.exchange { color: #FA8C16; }
+    .detail-value.non-exchange { color: #EB4E80; }
+    
+    /* 动画 */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-in {
+      animation: fadeInUp 0.3s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#52C41A,#22c55e)"></div>
+      
+      <!-- 顶部标题栏 -->
+      <div style="background:linear-gradient(135deg,#52C41A,#22c55e);padding:12px 16px 20px">
+        <div style="display:flex;align-items:center;justify-content:center">
+          <div style="color:white;font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px">
+            <i class="fas fa-chart-line" style="font-size:16px"></i>
+            数据统计
+          </div>
+        </div>
+      </div>
+
+      <!-- 时间筛选器 -->
+      <div style="margin:-12px 16px 16px">
+        <div class="time-filter">
+          <div class="time-filter-item active" data-period="today">今日</div>
+          <div class="time-filter-item" data-period="week">本周</div>
+          <div class="time-filter-item" data-period="month">本月</div>
+        </div>
+      </div>
+
+      <!-- 统计数据卡片 -->
+      <div style="padding:0 16px 16px">
+        <div class="stat-card animate-in">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+            <div style="width:3px;height:16px;background:#52C41A;border-radius:2px"></div>
+            <span style="font-weight:600;color:#333;font-size:15px">核心指标</span>
+            <span style="font-size:11px;color:#999;margin-left:auto">点击查看详情</span>
+          </div>
+          
+          <div class="stat-grid">
+            <!-- 卖出数量 -->
+            <div class="stat-item sell">
+              <div class="stat-icon sell">
+                <i class="fas fa-shopping-cart" style="color:white;font-size:18px"></i>
+              </div>
+              <div class="stat-value sell">156</div>
+              <div class="stat-label">卖出数量</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up" style="font-size:10px"></i>
+                <span>12.5%</span>
+              </div>
+            </div>
+            
+            <!-- 发货数量 -->
+            <div class="stat-item ship">
+              <div class="stat-icon ship">
+                <i class="fas fa-truck" style="color:white;font-size:18px"></i>
+              </div>
+              <div class="stat-value ship">142</div>
+              <div class="stat-label">发货数量</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up" style="font-size:10px"></i>
+                <span>8.3%</span>
+              </div>
+            </div>
+            
+            <!-- 兑换数量 -->
+            <div class="stat-item exchange">
+              <div class="stat-icon exchange">
+                <i class="fas fa-gift" style="color:white;font-size:18px"></i>
+              </div>
+              <div class="stat-value exchange">89</div>
+              <div class="stat-label">兑换数量</div>
+              <div class="stat-trend down">
+                <i class="fas fa-arrow-down" style="font-size:10px"></i>
+                <span>3.2%</span>
+              </div>
+            </div>
+            
+            <!-- 非兑换数量 -->
+            <div class="stat-item non-exchange">
+              <div class="stat-icon non-exchange">
+                <i class="fas fa-credit-card" style="color:white;font-size:18px"></i>
+              </div>
+              <div class="stat-value non-exchange">67</div>
+              <div class="stat-label">非兑换数量</div>
+              <div class="stat-trend up">
+                <i class="fas fa-arrow-up" style="font-size:10px"></i>
+                <span>15.7%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 趋势图表 -->
+      <div style="padding:0 16px 16px">
+        <div class="chart-container animate-in" style="animation-delay:0.1s">
+          <div class="chart-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:3px;height:16px;background:#52C41A;border-radius:2px"></div>
+              <span style="font-weight:600;color:#333;font-size:15px">销售趋势</span>
+            </div>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#52C41A"></div>
+                <span>卖出</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#1890FF"></div>
+                <span>发货</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- SVG 折线图 -->
+          <svg class="chart-svg" viewBox="0 0 342 180">
+            <!-- 网格线 -->
+            <line class="grid-line" x1="30" y1="20" x2="330" y2="20"/>
+            <line class="grid-line" x1="30" y1="60" x2="330" y2="60"/>
+            <line class="grid-line" x1="30" y1="100" x2="330" y2="100"/>
+            <line class="grid-line" x1="30" y1="140" x2="330" y2="140"/>
+            
+            <!-- Y轴标签 -->
+            <text class="axis-label" x="5" y="24">200</text>
+            <text class="axis-label" x="5" y="64">150</text>
+            <text class="axis-label" x="5" y="104">100</text>
+            <text class="axis-label" x="5" y="144">50</text>
+            <text class="axis-label" x="5" y="174">0</text>
+            
+            <!-- X轴标签 -->
+            <text class="axis-label" x="50" y="170" text-anchor="middle">周一</text>
+            <text class="axis-label" x="100" y="170" text-anchor="middle">周二</text>
+            <text class="axis-label" x="150" y="170" text-anchor="middle">周三</text>
+            <text class="axis-label" x="200" y="170" text-anchor="middle">周四</text>
+            <text class="axis-label" x="250" y="170" text-anchor="middle">周五</text>
+            <text class="axis-label" x="300" y="170" text-anchor="middle">周六</text>
+            
+            <!-- 卖出折线 (绿色) -->
+            <path class="chart-line-sell" d="M50,80 L100,60 L150,70 L200,40 L250,50 L300,30"/>
+            <!-- 发货折线 (蓝色) -->
+            <path class="chart-line-ship" d="M50,90 L100,75 L150,85 L200,55 L250,65 L300,45"/>
+            
+            <!-- 卖出数据点 -->
+            <circle class="chart-dot chart-dot-sell" cx="50" cy="80" r="5"/>
+            <circle class="chart-dot chart-dot-sell" cx="100" cy="60" r="5"/>
+            <circle class="chart-dot chart-dot-sell" cx="150" cy="70" r="5"/>
+            <circle class="chart-dot chart-dot-sell" cx="200" cy="40" r="5"/>
+            <circle class="chart-dot chart-dot-sell" cx="250" cy="50" r="5"/>
+            <circle class="chart-dot chart-dot-sell" cx="300" cy="30" r="5"/>
+            
+            <!-- 发货数据点 -->
+            <circle class="chart-dot chart-dot-ship" cx="50" cy="90" r="5"/>
+            <circle class="chart-dot chart-dot-ship" cx="100" cy="75" r="5"/>
+            <circle class="chart-dot chart-dot-ship" cx="150" cy="85" r="5"/>
+            <circle class="chart-dot chart-dot-ship" cx="200" cy="55" r="5"/>
+            <circle class="chart-dot chart-dot-ship" cx="250" cy="65" r="5"/>
+            <circle class="chart-dot chart-dot-ship" cx="300" cy="45" r="5"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 数据详情列表 -->
+      <div style="padding:0 16px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#52C41A;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">数据详情</span>
+        </div>
+        
+        <div class="detail-list animate-in" style="animation-delay:0.2s">
+          <!-- 卖出详情 -->
+          <div class="detail-item">
+            <div class="detail-icon" style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7)">
+              <i class="fas fa-shopping-cart" style="color:#52C41A"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-title">卖出数量</div>
+              <div class="detail-subtitle">今日累计销售商品数量</div>
+            </div>
+            <div class="detail-value sell">156件</div>
+          </div>
+          
+          <!-- 发货详情 -->
+          <div class="detail-item">
+            <div class="detail-icon" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE)">
+              <i class="fas fa-truck" style="color:#1890FF"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-title">发货数量</div>
+              <div class="detail-subtitle">已发货待收货商品数量</div>
+            </div>
+            <div class="detail-value ship">142件</div>
+          </div>
+          
+          <!-- 兑换详情 -->
+          <div class="detail-item">
+            <div class="detail-icon" style="background:linear-gradient(135deg,#FFF7E6,#FEF3C7)">
+              <i class="fas fa-gift" style="color:#FA8C16"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-title">兑换数量</div>
+              <div class="detail-subtitle">积分/活动兑换商品数量</div>
+            </div>
+            <div class="detail-value exchange">89件</div>
+          </div>
+          
+          <!-- 非兑换详情 -->
+          <div class="detail-item">
+            <div class="detail-icon" style="background:linear-gradient(135deg,#FDF2F8,#FCE7F3)">
+              <i class="fas fa-credit-card" style="color:#EB4E80"></i>
+            </div>
+            <div class="detail-content">
+              <div class="detail-title">非兑换数量</div>
+              <div class="detail-subtitle">正常购买商品数量</div>
+            </div>
+            <div class="detail-value non-exchange">67件</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快速分析 -->
+      <div style="padding:0 16px 16px">
+        <div class="stat-card animate-in" style="animation-delay:0.3s">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+            <div style="width:3px;height:16px;background:#52C41A;border-radius:2px"></div>
+            <span style="font-weight:600;color:#333;font-size:15px">快速分析</span>
+          </div>
+          
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <!-- 转化率 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#FAFAFA;border-radius:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <i class="fas fa-percentage" style="color:#52C41A;font-size:16px"></i>
+                <span style="font-size:14px;color:#666">发货率</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px;font-weight:600;color:#52C41A">91.0%</span>
+                <span style="font-size:11px;color:#52C41A;background:#F0FDF4;padding:2px 6px;border-radius:4px">良好</span>
+              </div>
+            </div>
+            
+            <!-- 兑换占比 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#FAFAFA;border-radius:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <i class="fas fa-chart-pie" style="color:#FA8C16;font-size:16px"></i>
+                <span style="font-size:14px;color:#666">兑换占比</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px;font-weight:600;color:#FA8C16">57.1%</span>
+                <span style="font-size:11px;color:#FA8C16;background:#FFF7E6;padding:2px 6px;border-radius:4px">正常</span>
+              </div>
+            </div>
+            
+            <!-- 日均销售 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:#FAFAFA;border-radius:10px">
+              <div style="display:flex;align-items:center;gap:10px">
+                <i class="fas fa-calendar-day" style="color:#1890FF;font-size:16px"></i>
+                <span style="font-size:14px;color:#666">日均销售</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:18px;font-weight:600;color:#1890FF">22.3件</span>
+                <span style="font-size:11px;color:#52C41A;background:#F0FDF4;padding:2px 6px;border-radius:4px">↑ 5.2%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 占位空间 -->
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+      <div class="nav-item active">
+        <i class="fas fa-home"></i>
+        <span>工作台</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>订单</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // 时间筛选器交互
+    document.querySelectorAll('.time-filter-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.time-filter-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+        
+        // 模拟数据更新动画
+        document.querySelectorAll('.stat-item, .chart-container, .detail-list').forEach(el => {
+          el.style.animation = 'none';
+          el.offsetHeight; // 触发重排
+          el.style.animation = 'fadeInUp 0.3s ease-out';
+        });
+      });
+    });
+
+    // 统计卡片点击交互
+    document.querySelectorAll('.stat-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const label = this.querySelector('.stat-label').textContent;
+        console.log('查看详情:', label);
+        // 这里可以添加跳转到详情页的逻辑
+      });
+    });
+
+    // 详情列表点击交互
+    document.querySelectorAll('.detail-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const title = this.querySelector('.detail-title').textContent;
+        console.log('查看详情:', title);
+        // 这里可以添加跳转到详情页的逻辑
+      });
+    });
+  </script>
+</body>
+</html>

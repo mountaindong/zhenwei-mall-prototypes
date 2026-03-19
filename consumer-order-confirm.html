@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>确认订单 - 臻伟福利</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      background: #e5e5e5;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+    }
+    
+    /* 手机框架 - 模拟iPhone */
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 滚动区域 */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 70px;
+    }
+    
+    /* 底部提交栏 */
+    .submit-bar {
+      width: 390px;
+      margin: 0 auto;
+      height: 60px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      position: fixed;
+      bottom: 0;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+      z-index: 100;
+    }
+    
+    .submit-bar .total {
+      flex: 1;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    
+    .submit-bar .total-label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .submit-bar .total-amount {
+      font-size: 22px;
+      font-weight: 700;
+      color: #FF4D4F;
+    }
+    
+    .submit-btn {
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      padding: 12px 32px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+      transition: all 0.2s;
+    }
+    
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+    
+    /* 卡片样式 */
+    .card {
+      background: white;
+      border-radius: 12px;
+      margin: 12px 16px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    /* 收货地址卡片 */
+    .address-card {
+      background: white;
+      border-radius: 12px;
+      margin: 12px 16px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .address-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: repeating-linear-gradient(
+        -45deg,
+        #1890FF,
+        #1890FF 10px,
+        #40a9ff 10px,
+        #40a9ff 20px
+      );
+    }
+    
+    .address-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .address-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .address-phone {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .address-detail {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+    }
+    
+    .address-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+      color: #1890FF;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    
+    .address-action {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #1890FF;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    
+    /* 商品清单 */
+    .product-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .product-item:last-child {
+      border-bottom: none;
+    }
+    
+    .product-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .product-title {
+      font-size: 13px;
+      color: #333;
+      line-height: 1.4;
+      max-height: 36px;
+      overflow: hidden;
+    }
+    
+    .product-spec {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    .product-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .product-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: #FF4D4F;
+    }
+    
+    .product-quantity {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    /* 配送方式、优惠券、备注 */
+    .option-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .option-row:last-child {
+      border-bottom: none;
+    }
+    
+    .option-label {
+      font-size: 14px;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .option-value {
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .option-value.highlight {
+      color: #FF4D4F;
+    }
+    
+    .option-value.primary {
+      color: #1890FF;
+    }
+    
+    /* 优惠券标签 */
+    .coupon-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #fff1f0, #ffccc7);
+      color: #FF4D4F;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-right: 4px;
+    }
+    
+    /* 订单备注 */
+    .remark-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: #666;
+      text-align: right;
+      background: transparent;
+    }
+    
+    .remark-input::placeholder {
+      color: #bbb;
+    }
+    
+    /* 价格明细 */
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+    
+    .price-label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .price-value {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    .price-value.discount {
+      color: #FF4D4F;
+    }
+    
+    .price-total {
+      padding-top: 12px;
+      margin-top: 8px;
+      border-top: 1px solid #f5f5f5;
+    }
+    
+    .price-total .price-label {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .price-total .price-value {
+      font-size: 18px;
+      color: #FF4D4F;
+      font-weight: 700;
+    }
+    
+    /* 空状态 */
+    .no-address {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 16px;
+      cursor: pointer;
+    }
+    
+    .no-address-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #1890FF;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- 滚动内容区 -->
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#1890FF,#40a9ff)"></div>
+      
+      <!-- 顶部导航栏 -->
+      <div style="background:linear-gradient(135deg,#1890FF,#40a9ff);padding:12px 16px;display:flex;align-items:center;gap:12px">
+        <i class="fas fa-arrow-left" style="color:white;font-size:18px;cursor:pointer"></i>
+        <span style="color:white;font-size:17px;font-weight:600;flex:1;text-align:center">确认订单</span>
+        <div style="width:18px"></div>
+      </div>
+
+      <!-- 收货地址 -->
+      <div class="address-card">
+        <div class="address-header">
+          <div class="address-name">
+            张三
+            <span class="address-tag">默认</span>
+          </div>
+          <span class="address-phone">138****8888</span>
+        </div>
+        <div class="address-detail">
+          <i class="fas fa-map-marker-alt" style="color:#1890FF;margin-right:6px"></i>
+          广东省深圳市南山区科技园南区深南大道9966号威盛科技大厦1801室
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px">
+          <div class="address-action">
+            修改地址
+            <i class="fas fa-chevron-right" style="font-size:12px"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商品清单 -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+            <span style="font-weight:600;color:#333;font-size:15px">商品清单</span>
+          </div>
+          <span style="font-size:13px;color:#999">共2件商品</span>
+        </div>
+        
+        <!-- 商品1 -->
+        <div class="product-item">
+          <div class="product-image">
+            <i class="fas fa-mobile-alt" style="font-size:32px;color:#d1d5db"></i>
+          </div>
+          <div class="product-info">
+            <div>
+              <div class="product-title">iPhone 15 Pro Max 手机壳 磁吸支架保护套</div>
+              <div class="product-spec">黑色 / 适用于iPhone 15 Pro Max</div>
+            </div>
+            <div class="product-bottom">
+              <div class="product-price">¥59</div>
+              <div class="product-quantity">×1</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 商品2 -->
+        <div class="product-item">
+          <div class="product-image" style="background:linear-gradient(135deg,#eff6ff,#dbeafe)">
+            <i class="fas fa-battery-full" style="font-size:32px;color:#93c5fd"></i>
+          </div>
+          <div class="product-info">
+            <div>
+              <div class="product-title">无线充电器 快充支架 15W适用全机型</div>
+              <div class="product-spec">白色 / 标准版</div>
+            </div>
+            <div class="product-bottom">
+              <div class="product-price">¥79</div>
+              <div class="product-quantity">×1</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 配送方式 -->
+      <div class="card">
+        <div class="option-row">
+          <div class="option-label">
+            <i class="fas fa-truck" style="color:#1890FF"></i>
+            配送方式
+          </div>
+          <div class="option-value primary">
+            快递配送
+            <i class="fas fa-chevron-right" style="font-size:12px;color:#ccc"></i>
+          </div>
+        </div>
+        <div class="option-row">
+          <div class="option-label">
+            <i class="fas fa-clock" style="color:#52C41A"></i>
+            预计送达
+          </div>
+          <div class="option-value">
+            3月22日 周六
+          </div>
+        </div>
+      </div>
+
+      <!-- 优惠券 -->
+      <div class="card">
+        <div class="option-row">
+          <div class="option-label">
+            <i class="fas fa-ticket-alt" style="color:#FF4D4F"></i>
+            优惠券
+          </div>
+          <div class="option-value highlight">
+            <span class="coupon-tag">新人立减</span>
+            -¥20
+            <i class="fas fa-chevron-right" style="font-size:12px;color:#ccc"></i>
+          </div>
+        </div>
+        <div class="option-row">
+          <div class="option-label">
+            <i class="fas fa-coins" style="color:#FAAD14"></i>
+            积分抵扣
+          </div>
+          <div class="option-value">
+            <span style="color:#999">可用 1200 积分抵扣 ¥12</span>
+            <i class="fas fa-toggle-off" style="font-size:16px;color:#ccc"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 订单备注 -->
+      <div class="card">
+        <div class="option-row" style="border:none">
+          <div class="option-label">
+            <i class="fas fa-edit" style="color:#666"></i>
+            订单备注
+          </div>
+          <input type="text" class="remark-input" placeholder="选填，建议先和商家沟通">
+        </div>
+      </div>
+
+      <!-- 价格明细 -->
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">价格明细</span>
+        </div>
+        
+        <div class="price-row">
+          <div class="price-label">商品金额</div>
+          <div class="price-value">¥138.00</div>
+        </div>
+        <div class="price-row">
+          <div class="price-label">运费</div>
+          <div class="price-value">¥0.00</div>
+        </div>
+        <div class="price-row">
+          <div class="price-label">优惠券</div>
+          <div class="price-value discount">-¥20.00</div>
+        </div>
+        <div class="price-row">
+          <div class="price-label">积分抵扣</div>
+          <div class="price-value discount">-¥12.00</div>
+        </div>
+        <div class="price-row price-total">
+          <div class="price-label">合计</div>
+          <div class="price-value">¥106.00</div>
+        </div>
+      </div>
+
+      <!-- 服务保障 -->
+      <div style="padding:12px 16px">
+        <div style="display:flex;align-items:center;justify-content:center;gap:16px;font-size:12px;color:#999">
+          <div style="display:flex;align-items:center;gap:4px">
+            <i class="fas fa-shield-alt" style="color:#52C41A"></i>
+            正品保障
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <i class="fas fa-undo" style="color:#1890FF"></i>
+            7天无理由
+          </div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <i class="fas fa-headset" style="color:#FAAD14"></i>
+            专属客服
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部提交栏 -->
+    <div class="submit-bar">
+      <div class="total">
+        <span class="total-label">合计:</span>
+        <span class="total-amount">¥106.00</span>
+      </div>
+      <button class="submit-btn">提交订单</button>
+    </div>
+  </div>
+
+  <script>
+    // 提交订单按钮交互
+    document.querySelector('.submit-btn').addEventListener('click', function() {
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = 'scale(1)';
+        alert('订单提交成功！');
+      }, 200);
+    });
+
+    // 积分抵扣开关
+    const toggle = document.querySelector('.fa-toggle-off');
+    toggle.addEventListener('click', function() {
+      if (this.classList.contains('fa-toggle-off')) {
+        this.classList.remove('fa-toggle-off');
+        this.classList.add('fa-toggle-on');
+        this.style.color = '#1890FF';
+      } else {
+        this.classList.remove('fa-toggle-on');
+        this.classList.add('fa-toggle-off');
+        this.style.color = '#ccc';
+      }
+    });
+  </script>
+</body>
+</html>

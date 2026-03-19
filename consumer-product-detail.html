@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 商品详情原型</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      background: #e5e5e5;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+    }
+    
+    /* 手机框架 - 模拟iPhone */
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 滚动区域 */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 70px;
+    }
+    
+    /* 商品图片轮播 */
+    .swiper-container {
+      position: relative;
+      width: 100%;
+      height: 390px;
+      overflow: hidden;
+    }
+    .swiper-wrapper {
+      display: flex;
+      transition: transform 0.3s ease;
+    }
+    .swiper-slide {
+      min-width: 390px;
+      height: 390px;
+    }
+    .swiper-pagination {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+    }
+    .swiper-pagination-bullet {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.5);
+      transition: all 0.3s;
+    }
+    .swiper-pagination-bullet-active {
+      width: 18px;
+      border-radius: 3px;
+      background: white;
+    }
+    
+    /* 规格选择弹层 */
+    .spec-modal {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 390px;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      display: none;
+    }
+    .spec-modal.active {
+      display: flex;
+      align-items: flex-end;
+    }
+    .spec-content {
+      width: 100%;
+      background: white;
+      border-radius: 16px 16px 0 0;
+      padding: 20px;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    
+    /* 规格选项 */
+    .spec-option {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      margin: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 13px;
+      color: #333;
+    }
+    .spec-option:hover {
+      border-color: #1890FF;
+    }
+    .spec-option.active {
+      border-color: #1890FF;
+      background: #e6f4ff;
+      color: #1890FF;
+    }
+    .spec-option.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    
+    /* 底部操作栏 */
+    .action-bar {
+      width: 390px;
+      margin: 0 auto;
+      height: 60px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .action-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 14px;
+      color: #666;
+      cursor: pointer;
+    }
+    .action-icon i {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+    .action-icon span {
+      font-size: 10px;
+    }
+    .action-buttons {
+      flex: 1;
+      display: flex;
+      gap: 10px;
+      margin-left: 8px;
+    }
+    .btn {
+      flex: 1;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn-cart {
+      background: linear-gradient(135deg, #FF9500, #FF6B00);
+      color: white;
+    }
+    .btn-buy {
+      background: linear-gradient(135deg, #FF4D4F, #F5222D);
+      color: white;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+      color: white;
+    }
+    
+    /* 评价卡片 */
+    .review-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    
+    /* 动画 */
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- 滚动内容区 -->
+    <div class="scroll-area">
+      <!-- 顶部导航 -->
+      <div style="position:sticky;top:0;z-index:10;background:white;display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:44px;border-bottom:1px solid #f0f0f0">
+        <div style="width:44px;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="history.back()">
+          <i class="fas fa-chevron-left" style="font-size:18px;color:#333"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">商品详情</span>
+        <div style="width:44px;display:flex;align-items:center;justify-content:center;gap:16px;cursor:pointer">
+          <i class="far fa-heart" style="font-size:18px;color:#666"></i>
+        </div>
+      </div>
+
+      <!-- 商品图片轮播 -->
+      <div class="swiper-container" id="swiper">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide" style="background:linear-gradient(135deg,#f3f4f6,#e5e7eb);display:flex;align-items:center;justify-content:center">
+            <i class="fas fa-mobile-alt" style="font-size:120px;color:#d1d5db"></i>
+          </div>
+          <div class="swiper-slide" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);display:flex;align-items:center;justify-content:center">
+            <div style="text-align:center">
+              <i class="fas fa-mobile-alt" style="font-size:120px;color:#93c5fd"></i>
+              <div style="margin-top:12px;color:#1890FF;font-size:14px">侧面展示</div>
+            </div>
+          </div>
+          <div class="swiper-slide" style="background:linear-gradient(135deg,#faf5ff,#f3e8ff);display:flex;align-items:center;justify-content:center">
+            <div style="text-align:center">
+              <i class="fas fa-mobile-alt" style="font-size:120px;color:#d8b4fe"></i>
+              <div style="margin-top:12px;color:#a855f7;font-size:14px">背部展示</div>
+            </div>
+          </div>
+          <div class="swiper-slide" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);display:flex;align-items:center;justify-content:center">
+            <div style="text-align:center">
+              <i class="fas fa-mobile-alt" style="font-size:120px;color:#86efac"></i>
+              <div style="margin-top:12px;color:#52C41A;font-size:14px">内部结构</div>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-pagination" id="pagination">
+          <div class="swiper-pagination-bullet swiper-pagination-bullet-active"></div>
+          <div class="swiper-pagination-bullet"></div>
+          <div class="swiper-pagination-bullet"></div>
+          <div class="swiper-pagination-bullet"></div>
+        </div>
+      </div>
+
+      <!-- 商品信息 -->
+      <div style="background:white;padding:16px">
+        <!-- 价格行 -->
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">
+          <span style="color:#FF4D4F;font-size:28px;font-weight:700">¥59</span>
+          <span style="color:#999;font-size:14px;text-decoration:line-through">¥129</span>
+          <span style="background:linear-gradient(135deg,#FF4D4F,#FF7875);color:white;font-size:11px;padding:2px 6px;border-radius:4px;margin-left:4px">限时5折</span>
+        </div>
+        
+        <!-- 标题 -->
+        <h1 style="font-size:16px;color:#333;font-weight:600;line-height:1.5;margin-bottom:8px">
+          iPhone 15 Pro Max 手机壳 透明磁吸支架保护套 Magsafe磁吸支架防摔
+        </h1>
+        
+        <!-- 销量与好评 -->
+        <div style="display:flex;align-items:center;gap:16px;font-size:12px;color:#999">
+          <span><i class="fas fa-fire" style="color:#FF4D4F;margin-right:4px"></i>已售 2.3万+</span>
+          <span><i class="fas fa-star" style="color:#FAAD14;margin-right:4px"></i>4.9分</span>
+          <span><i class="fas fa-thumbs-up" style="color:#52C41A;margin-right:4px"></i>好评率98%</span>
+        </div>
+      </div>
+
+      <!-- 规格选择入口 -->
+      <div style="background:white;margin-top:10px;padding:16px;cursor:pointer" onclick="openSpecModal()">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="color:#666;font-size:14px">规格</span>
+            <span style="color:#333;font-size:14px">选择 颜色 / 尺寸</span>
+          </div>
+          <i class="fas fa-chevron-right" style="color:#ccc;font-size:14px"></i>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:4px 10px;border-radius:4px">深空黑</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:4px 10px;border-radius:4px">星光白</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:4px 10px;border-radius:4px">天空蓝</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:4px 10px;border-radius:4px">玫瑰金</span>
+        </div>
+      </div>
+
+      <!-- 优惠活动 -->
+      <div style="background:white;margin-top:10px;padding:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span style="background:#FF4D4F;color:white;font-size:11px;padding:2px 6px;border-radius:2px">优惠</span>
+          <span style="color:#333;font-size:13px">满199减30，满399减80</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="background:#FAAD14;color:white;font-size:11px;padding:2px 6px;border-radius:2px">活动</span>
+          <span style="color:#333;font-size:13px">新人专享，首单立减50元</span>
+        </div>
+      </div>
+
+      <!-- 服务保障 -->
+      <div style="background:white;margin-top:10px;padding:16px">
+        <div style="display:flex;align-items:center;gap:16px;font-size:12px;color:#666;flex-wrap:wrap">
+          <span><i class="fas fa-check-circle" style="color:#52C41A;margin-right:4px"></i>正品保障</span>
+          <span><i class="fas fa-check-circle" style="color:#52C41A;margin-right:4px"></i>7天无理由</span>
+          <span><i class="fas fa-check-circle" style="color:#52C41A;margin-right:4px"></i>运费险</span>
+          <span><i class="fas fa-check-circle" style="color:#52C41A;margin-right:4px"></i>极速退款</span>
+        </div>
+      </div>
+
+      <!-- 商品详情 -->
+      <div style="background:white;margin-top:10px;padding:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">商品详情</span>
+        </div>
+        
+        <!-- 详情图片占位 -->
+        <div style="background:linear-gradient(135deg,#f3f4f6,#e5e7eb);height:300px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+          <div style="text-align:center;color:#999">
+            <i class="fas fa-image" style="font-size:48px;margin-bottom:8px"></i>
+            <div style="font-size:14px">商品详情图 1</div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#eff6ff,#dbeafe);height:300px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
+          <div style="text-align:center;color:#1890FF">
+            <i class="fas fa-shield-alt" style="font-size:48px;margin-bottom:8px"></i>
+            <div style="font-size:14px">军工级防摔保护</div>
+          </div>
+        </div>
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);height:300px;border-radius:12px;display:flex;align-items:center;justify-content:center">
+          <div style="text-align:center;color:#52C41A">
+            <i class="fas fa-magnet" style="font-size:48px;margin-bottom:8px"></i>
+            <div style="font-size:14px">强力磁吸支架</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 用户评价 -->
+      <div style="background:white;margin-top:10px;padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:3px;height:16px;background:#1890FF;border-radius:2px"></div>
+            <span style="font-weight:600;color:#333;font-size:15px">用户评价</span>
+            <span style="color:#999;font-size:12px">(2,368条)</span>
+          </div>
+          <span style="font-size:13px;color:#999;display:flex;align-items:center;gap:4px;cursor:pointer">
+            查看全部 <i class="fas fa-chevron-right" style="font-size:10px"></i>
+          </span>
+        </div>
+
+        <!-- 评价标签 -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
+          <span style="background:#e6f4ff;color:#1890FF;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">全部(2368)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">有图(568)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">质量好(892)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">手感好(756)</span>
+          <span style="background:#f5f5f5;color:#666;font-size:12px;padding:6px 12px;border-radius:16px;white-space:nowrap">磁吸强(534)</span>
+        </div>
+
+        <!-- 评价1 -->
+        <div class="review-card" style="background:#f9fafb">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#bae6fd);display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-user" style="color:#1890FF;font-size:14px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:13px;color:#333">用户***123</div>
+              <div style="font-size:11px;color:#999">2024-03-15</div>
+            </div>
+            <div style="display:flex;gap:2px">
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+            </div>
+          </div>
+          <div style="font-size:13px;color:#333;line-height:1.6;margin-bottom:10px">
+            质量非常好，手感很棒，磁吸力度也够强，手机放支架上很稳，强烈推荐购买！
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="width:60px;height:60px;border-radius:8px;background:linear-gradient(135deg,#f3f4f6,#e5e7eb);display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-image" style="color:#ccc;font-size:20px"></i>
+            </div>
+            <div style="width:60px;height:60px;border-radius:8px;background:linear-gradient(135deg,#f3f4f6,#e5e7eb);display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-image" style="color:#ccc;font-size:20px"></i>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#999">
+            规格：深空黑 / iPhone 15 Pro Max
+          </div>
+        </div>
+
+        <!-- 评价2 -->
+        <div class="review-card" style="background:#f9fafb">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg:#fce7f3,#fbcfe8);display:flex;align-items:center;justify-content:center">
+              <i class="fas fa-user" style="color:#ec4899;font-size:14px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:13px;color:#333">小**花</div>
+              <div style="font-size:11px;color:#999">2024-03-14</div>
+            </div>
+            <div style="display:flex;gap:2px">
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+              <i class="fas fa-star" style="color:#FAAD14;font-size:12px"></i>
+            </div>
+          </div>
+          <div style="font-size:13px;color:#333;line-height:1.6">
+            买了两个颜色，都很漂亮，透明度很好，支架设计很方便，性价比超高！
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:#999">
+            规格：星光白 / iPhone 15 Pro Max
+          </div>
+        </div>
+
+        <!-- 加载更多 -->
+        <div style="text-align:center;padding:12px;color:#1890FF;font-size:13px;cursor:pointer">
+          点击查看更多评价 <i class="fas fa-chevron-down" style="margin-left:4px"></i>
+        </div>
+      </div>
+
+      <!-- 底部占位 -->
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="action-bar">
+      <!-- 客服 -->
+      <div class="action-icon">
+        <i class="far fa-comment-dots"></i>
+        <span>客服</span>
+      </div>
+      <!-- 购物车 -->
+      <div class="action-icon" style="position:relative">
+        <i class="fas fa-shopping-cart"></i>
+        <span>购物车</span>
+        <span style="position:absolute;top:-2px;right:4px;background:#FF4D4F;color:white;font-size:10px;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center">3</span>
+      </div>
+      <!-- 加入购物车 -->
+      <div class="action-buttons">
+        <button class="btn btn-cart" onclick="addToCart()">
+          <i class="fas fa-cart-plus"></i>
+          加入购物车
+        </button>
+        <button class="btn btn-buy" onclick="buyNow()">
+          <i class="fas fa-bolt"></i>
+          立即购买
+        </button>
+      </div>
+    </div>
+
+    <!-- 规格选择弹层 -->
+    <div class="spec-modal" id="specModal">
+      <div class="spec-content">
+        <!-- 关闭按钮 -->
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;cursor:pointer" onclick="closeSpecModal()">
+          <i class="fas fa-times" style="color:#999;font-size:20px"></i>
+        </div>
+        
+        <!-- 商品信息 -->
+        <div style="display:flex;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #f0f0f0">
+          <div style="width:80px;height:80px;border-radius:8px;background:linear-gradient(135deg,#f3f4f6,#e5e7eb);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="fas fa-mobile-alt" style="font-size:36px;color:#d1d5db"></i>
+          </div>
+          <div style="flex:1">
+            <div style="color:#FF4D4F;font-size:20px;font-weight:700">¥59</div>
+            <div style="color:#999;font-size:12px;text-decoration:line-through;margin-top:2px">¥129</div>
+            <div style="color:#666;font-size:12px;margin-top:6px">已选：深空黑 / iPhone 15 Pro Max</div>
+          </div>
+        </div>
+
+        <!-- 颜色选择 -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:14px;color:#333;margin-bottom:12px;font-weight:500">颜色</div>
+          <div style="display:flex;flex-wrap:wrap">
+            <div class="spec-option active">
+              <span style="width:16px;height:16px;border-radius:50%;background:#1f2937;margin-right:6px"></span>
+              深空黑
+            </div>
+            <div class="spec-option">
+              <span style="width:16px;height:16px;border-radius:50%;background:#f5f5f5;border:1px solid #e5e7eb;margin-right:6px"></span>
+              星光白
+            </div>
+            <div class="spec-option">
+              <span style="width:16px;height:16px;border-radius:50%;background:#3b82f6;margin-right:6px"></span>
+              天空蓝
+            </div>
+            <div class="spec-option">
+              <span style="width:16px;height:16px;border-radius:50%;background:linear-gradient(135deg,#fbbf24,#f59e0b);margin-right:6px"></span>
+              玫瑰金
+            </div>
+            <div class="spec-option">
+              <span style="width:16px;height:16px;border-radius:50%;background:#a855f7;margin-right:6px"></span>
+              梦幻紫
+            </div>
+            <div class="spec-option">
+              <span style="width:16px;height:16px;border-radius:50%;background:#ef4444;margin-right:6px"></span>
+              中国红
+            </div>
+          </div>
+        </div>
+
+        <!-- 尺寸选择 -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:14px;color:#333;margin-bottom:12px;font-weight:500">适用机型</div>
+          <div style="display:flex;flex-wrap:wrap">
+            <div class="spec-option active">iPhone 15 Pro Max</div>
+            <div class="spec-option">iPhone 15 Pro</div>
+            <div class="spec-option">iPhone 15 Plus</div>
+            <div class="spec-option">iPhone 15</div>
+            <div class="spec-option">iPhone 14 Pro Max</div>
+            <div class="spec-option">iPhone 14 Pro</div>
+            <div class="spec-option disabled">iPhone 13 Pro <span style="margin-left:4px;color:#999;font-size:11px">售罄</span></div>
+          </div>
+        </div>
+
+        <!-- 数量选择 -->
+        <div style="margin-bottom:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:14px;color:#333;font-weight:500">数量</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <button id="decreaseBtn" style="width:28px;height:28px;border-radius:6px;border:1px solid #e5e7eb;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="changeQuantity(-1)">
+                <i class="fas fa-minus" style="font-size:12px;color:#999"></i>
+              </button>
+              <span id="quantity" style="font-size:14px;color:#333;min-width:30px;text-align:center">1</span>
+              <button style="width:28px;height:28px;border-radius:6px;border:1px solid #e5e7eb;background:white;cursor:pointer;display:flex;align-items:center;justify-content:center" onclick="changeQuantity(1)">
+                <i class="fas fa-plus" style="font-size:12px;color:#1890FF"></i>
+              </button>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#999;margin-top:8px">库存：999件</div>
+        </div>
+
+        <!-- 确认按钮 -->
+        <button class="btn btn-primary" style="width:100%;height:44px;font-size:16px;border-radius:22px" onclick="confirmSpec()">
+          确认
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 图片轮播
+    let currentSlide = 0;
+    const swiper = document.getElementById('swiper');
+    const pagination = document.getElementById('pagination');
+    const totalSlides = 4;
+
+    function goToSlide(index) {
+      currentSlide = index;
+      swiper.querySelector('.swiper-wrapper').style.transform = `translateX(-${index * 390}px)`;
+      
+      // 更新指示器
+      const bullets = pagination.querySelectorAll('.swiper-pagination-bullet');
+      bullets.forEach((bullet, i) => {
+        bullet.classList.toggle('swiper-pagination-bullet-active', i === index);
+      });
+    }
+
+    // 自动轮播
+    setInterval(() => {
+      goToSlide((currentSlide + 1) % totalSlides);
+    }, 4000);
+
+    // 触摸滑动支持
+    let touchStartX = 0;
+    swiper.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+
+    swiper.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentSlide < totalSlides - 1) {
+          goToSlide(currentSlide + 1);
+        } else if (diff < 0 && currentSlide > 0) {
+          goToSlide(currentSlide - 1);
+        }
+      }
+    });
+
+    // 规格选择弹层
+    function openSpecModal() {
+      document.getElementById('specModal').classList.add('active');
+    }
+
+    function closeSpecModal() {
+      document.getElementById('specModal').classList.remove('active');
+    }
+
+    // 规格选项点击
+    document.querySelectorAll('.spec-option:not(.disabled)').forEach(option => {
+      option.addEventListener('click', function() {
+        const parent = this.parentElement;
+        parent.querySelectorAll('.spec-option:not(.disabled)').forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // 数量选择
+    let quantity = 1;
+    function changeQuantity(delta) {
+      quantity = Math.max(1, Math.min(99, quantity + delta));
+      document.getElementById('quantity').textContent = quantity;
+      document.getElementById('decreaseBtn').style.opacity = quantity === 1 ? 0.5 : 1;
+    }
+
+    // 确认规格
+    function confirmSpec() {
+      closeSpecModal();
+      // 这里可以添加确认后的逻辑
+    }
+
+    // 加入购物车
+    function addToCart() {
+      openSpecModal();
+    }
+
+    // 立即购买
+    function buyNow() {
+      openSpecModal();
+    }
+
+    // 点击遮罩关闭
+    document.getElementById('specModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeSpecModal();
+      }
+    });
+  </script>
+
+  <!-- 底部导航 -->
+  <nav class="bottom-nav">
+    <div class="nav-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="nav-item active">
+      <i class="fas fa-th-large"></i>
+      <span>分类</span>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-shopping-cart"></i>
+      <span>购物车</span>
+    </div>
+    <div class="nav-item">
+      <i class="fas fa-user"></i>
+      <span>我的</span>
+    </div>
+  </nav>
+</body>
+</html>

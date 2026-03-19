@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 销售管理</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 统计卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    
+    /* 筛选区域 */
+    .filter-section {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-item label {
+      font-size: 13px;
+      color: #666;
+    }
+    .filter-item select {
+      padding: 6px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      background: white;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .filter-item select:focus {
+      border-color: #1890FF;
+    }
+    .filter-btn {
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn.primary {
+      background: #1890FF;
+      color: white;
+      border: none;
+    }
+    .filter-btn.primary:hover {
+      background: #40a9ff;
+    }
+    .filter-btn.default {
+      background: white;
+      color: #666;
+      border: 1px solid #d9d9d9;
+    }
+    .filter-btn.default:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    
+    /* 搜索框 */
+    .search-input {
+      padding: 6px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus {
+      border-color: #1890FF;
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    
+    /* 头像 */
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    
+    /* 等级标签 */
+    .level-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .level-tag.gold {
+      background: linear-gradient(135deg, #FFF7E6, #FFE7BA);
+      color: #FA8C16;
+      border: 1px solid #FFD591;
+    }
+    .level-tag.silver {
+      background: linear-gradient(135deg, #F5F5F5, #E8E8E8);
+      color: #666;
+      border: 1px solid #D9D9D9;
+    }
+    .level-tag.bronze {
+      background: linear-gradient(135deg, #FFF1E6, #FFE4D4);
+      color: #AD6800;
+      border: 1px solid #FFBB96;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .status-tag.active {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    .status-tag.inactive {
+      background: #f5f5f5;
+      color: #999;
+      border: 1px solid #d9d9d9;
+    }
+    .status-tag.pending {
+      background: #fffbe6;
+      color: #FAAD14;
+      border: 1px solid #ffe58f;
+    }
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .status-tag.active .status-dot {
+      background: #52C41A;
+    }
+    .status-tag.inactive .status-dot {
+      background: #999;
+    }
+    .status-tag.pending .status-dot {
+      background: #FAAD14;
+    }
+    
+    /* 操作按钮 */
+    .action-btn {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      margin-right: 8px;
+    }
+    .action-btn.view {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .action-btn.view:hover {
+      background: #bae7ff;
+    }
+    .action-btn.audit {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .action-btn.audit:hover {
+      background: #d9f7be;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 16px 0;
+    }
+    .pagination span {
+      font-size: 13px;
+      color: #666;
+    }
+    .pagination button {
+      padding: 6px 12px;
+      border: 1px solid #d9d9d9;
+      background: white;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pagination button:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    .pagination button.active {
+      background: #1890FF;
+      color: white;
+      border-color: #1890FF;
+    }
+    .pagination button:disabled {
+      color: #d9d9d9;
+      border-color: #d9d9d9;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面标题 -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:20px;font-weight:600;color:#333">销售管理</h1>
+      <div style="font-size:13px;color:#999;margin-top:4px">管理平台销售员信息与审核</div>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+      <div class="stat-card">
+        <div class="stat-label">销售员总数</div>
+        <div class="stat-value" style="color:#1890FF">1,280</div>
+        <div style="font-size:12px;color:#999;margin-top:4px">
+          <i class="fas fa-arrow-up" style="color:#52C41A"></i>
+          <span style="color:#52C41A">+32</span> 本月新增
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">活跃销售员</div>
+        <div class="stat-value" style="color:#52C41A">986</div>
+        <div style="font-size:12px;color:#999;margin-top:4px">
+          近30天有交易
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">待审核</div>
+        <div class="stat-value" style="color:#FAAD14">15</div>
+        <div style="font-size:12px;color:#999;margin-top:4px">
+          需要及时处理
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">总佣金发放</div>
+        <div class="stat-value" style="color:#722ED1">¥256,800</div>
+        <div style="font-size:12px;color:#999;margin-top:4px">
+          本月累计
+        </div>
+      </div>
+    </div>
+
+    <!-- 筛选区域 -->
+    <div class="filter-section" style="margin-bottom:20px">
+      <div class="filter-item">
+        <label>等级：</label>
+        <select>
+          <option value="">全部等级</option>
+          <option value="gold">金牌销售</option>
+          <option value="silver">银牌销售</option>
+          <option value="bronze">铜牌销售</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label>状态：</label>
+        <select>
+          <option value="">全部状态</option>
+          <option value="active">活跃</option>
+          <option value="inactive">未活跃</option>
+          <option value="pending">待审核</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <input type="text" class="search-input" placeholder="搜索昵称/手机号">
+      </div>
+      <button class="filter-btn primary">
+        <i class="fas fa-search"></i> 搜索
+      </button>
+      <button class="filter-btn default">
+        <i class="fas fa-redo"></i> 重置
+      </button>
+      <div style="flex:1"></div>
+      <button class="filter-btn primary" style="background:#52C41A">
+        <i class="fas fa-download"></i> 导出数据
+      </button>
+    </div>
+
+    <!-- 表格区域 -->
+    <div class="stat-card" style="padding:0;overflow:hidden">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:50px">
+              <input type="checkbox" style="cursor:pointer">
+            </th>
+            <th>销售员信息</th>
+            <th>等级</th>
+            <th>客户数</th>
+            <th>订单数</th>
+            <th>累计佣金</th>
+            <th>本月佣金</th>
+            <th>状态</th>
+            <th>注册时间</th>
+            <th style="width:140px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" style="cursor:pointer"></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sales1" class="avatar">
+                <div>
+                  <div style="font-weight:500;color:#333">王小明</div>
+                  <div style="font-size:12px;color:#999">138****8888</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="level-tag gold"><i class="fas fa-crown"></i> 金牌</span></td>
+            <td style="color:#1890FF;font-weight:500">256</td>
+            <td>1,024</td>
+            <td style="color:#722ED1;font-weight:500">¥12,580</td>
+            <td style="color:#52C41A;font-weight:500">¥2,350</td>
+            <td><span class="status-tag active"><span class="status-dot"></span>活跃</span></td>
+            <td>2025-06-15</td>
+            <td>
+              <button class="action-btn view">查看详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="cursor:pointer"></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sales2" class="avatar">
+                <div>
+                  <div style="font-weight:500;color:#333">李晓红</div>
+                  <div style="font-size:12px;color:#999">139****6666</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="level-tag gold"><i class="fas fa-crown"></i> 金牌</span></td>
+            <td style="color:#1890FF;font-weight:500">198</td>
+            <td>892</td>
+            <td style="color:#722ED1;font-weight:500">¥9,860</td>
+            <td style="color:#52C41A;font-weight:500">¥1,890</td>
+            <td><span class="status-tag active"><span class="status-dot"></span>活跃</span></td>
+            <td>2025-07-20</td>
+            <td>
+              <button class="action-btn view">查看详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="cursor:pointer"></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sales3" class="avatar">
+                <div>
+                  <div style="font-weight:500;color:#333">张伟</div>
+                  <div style="font-size:12px;color:#999">137****5555</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="level-tag silver"><i class="fas fa-medal"></i> 银牌</span></td>
+            <td style="color:#1890FF;font-weight:500">128</td>
+            <td>456</td>
+            <td style="color:#722ED1;font-weight:500">¥5,230</td>
+            <td style="color:#52C41A;font-weight:500">¥980</td>
+            <td><span class="status-tag active"><span class="status-dot"></span>活跃</span></td>
+            <td>2025-08-10</td>
+            <td>
+              <button class="action-btn view">查看详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="cursor:pointer"></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sales4" class="avatar">
+                <div>
+                  <div style="font-weight:500;color:#333">刘芳</div>
+                  <div style="font-size:12px;color:#999">136****4444</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="level-tag silver"><i class="fas fa-medal"></i> 银牌</span></td>
+            <td style="color:#1890FF;font-weight:500">89</td>
+            <td>312</td>
+            <td style="color:#722ED1;font-weight:500">¥3,560</td>
+            <td style="color:#52C41A;font-weight:500">¥720</td>
+            <td><span class="status-tag inactive"><span class="status-dot"></span>未活跃</span></td>
+            <td>2025-09-05</td>
+            <td>
+              <button class="action-btn view">查看详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="cursor:pointer"></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sales5" class="avatar">
+                <div>
+                  <div style="font-weight:500;color:#333">陈强</div>
+                  <div style="font-size:12px;color:#999">135****3333</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="level-tag bronze"><i class="fas fa-award"></i> 铜牌</span></td>
+            <td style="color:#1890FF;font-weight:500">45</td>
+            <td>156</td>
+            <td style="color:#722ED1;font-weight:500">¥1,280</td>
+            <td style="color:#52C41A;font-weight:500">¥280</td>
+            <td><span class="status-tag active"><span class="status-dot"></span>活跃</span></td>
+            <td>2025-10-12</td>
+            <td>
+              <button class="action-btn view">查看详情</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="cursor:pointer"></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sales6" class="avatar">
+                <div>
+                  <div style="font-weight:500;color:#333">周杰</div>
+                  <div style="font-size:12px;color:#999">134****2222</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="level-tag bronze"><i class="fas fa-award"></i> 铜牌</span></td>
+            <td style="color:#1890FF;font-weight:500">32</td>
+            <td>98</td>
+            <td style="color:#722ED1;font-weight:500">¥860</td>
+            <td style="color:#52C41A;font-weight:500">¥180</td>
+            <td><span class="status-tag pending"><span class="status-dot"></span>待审核</span></td>
+            <td>2026-03-18</td>
+            <td>
+              <button class="action-btn view">查看详情</button>
+              <button class="action-btn audit">审核</button>
+            </td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" style="cursor:pointer"></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=sales7" class="avatar">
+                <div>
+                  <div style="font-weight:500;color:#333">吴婷</div>
+                  <div style="font-size:12px;color:#999">133****1111</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="level-tag bronze"><i class="fas fa-award"></i> 铜牌</span></td>
+            <td style="color:#1890FF;font-weight:500">18</td>
+            <td>56</td>
+            <td style="color:#722ED1;font-weight:500">¥420</td>
+            <td style="color:#52C41A;font-weight:500">¥85</td>
+            <td><span class="status-tag pending"><span class="status-dot"></span>待审核</span></td>
+            <td>2026-03-19</td>
+            <td>
+              <button class="action-btn view">查看详情</button>
+              <button class="action-btn audit">审核</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination">
+      <span>共 1,280 条</span>
+      <button disabled><i class="fas fa-chevron-left"></i></button>
+      <button class="active">1</button>
+      <button>2</button>
+      <button>3</button>
+      <button>4</button>
+      <button>5</button>
+      <span>...</span>
+      <button>128</button>
+      <button><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </main>
+</body>
+</html>

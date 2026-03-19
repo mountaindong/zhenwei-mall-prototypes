@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 操作日志</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 卡片容器 */
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    /* 筛选区 */
+    .filter-section {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .filter-label {
+      font-size: 13px;
+      color: #666;
+    }
+    .filter-input {
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      min-width: 180px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .filter-input:focus {
+      border-color: #1890FF;
+      box-shadow: 0 0 0 2px rgba(24,144,255,0.1);
+    }
+    .filter-select {
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #333;
+      min-width: 180px;
+      outline: none;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-select:focus {
+      border-color: #1890FF;
+      box-shadow: 0 0 0 2px rgba(24,144,255,0.1);
+    }
+    .btn {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    .btn-default {
+      background: white;
+      color: #666;
+      border: 1px solid #d9d9d9;
+    }
+    .btn-default:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    
+    /* 操作类型标签 */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .tag-login { background: #e6f7ff; color: #1890FF; }
+    .tag-add { background: #f6ffed; color: #52C41A; }
+    .tag-edit { background: #fff7e6; color: #FA8C16; }
+    .tag-delete { background: #fff2f0; color: #FF4D4F; }
+    .tag-export { background: #f9f0ff; color: #722ED1; }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .pagination-info {
+      font-size: 13px;
+      color: #666;
+      margin-right: 12px;
+    }
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      background: white;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .page-btn:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .page-btn.active {
+      background: #1890FF;
+      border-color: #1890FF;
+      color: white;
+    }
+    .page-btn:disabled {
+      color: #d9d9d9;
+      cursor: not-allowed;
+    }
+    .page-btn:disabled:hover {
+      border-color: #d9d9d9;
+      color: #d9d9d9;
+    }
+    .page-size-select {
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #666;
+      background: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 面包屑 -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:13px;color:#999">
+      <span style="color:#1890FF;cursor:pointer">系统设置</span>
+      <i class="fas fa-chevron-right" style="font-size:10px"></i>
+      <span style="color:#333">操作日志</span>
+    </div>
+
+    <!-- 页面标题 -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:20px;font-weight:600;color:#333">操作日志</h1>
+      <div style="font-size:13px;color:#999;margin-top:4px">查看系统所有操作记录</div>
+    </div>
+
+    <!-- 筛选区域 -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="filter-section">
+        <div class="filter-item">
+          <label class="filter-label">操作人</label>
+          <input type="text" class="filter-input" placeholder="请输入操作人姓名">
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">操作类型</label>
+          <select class="filter-select">
+            <option value="">全部类型</option>
+            <option value="login">登录</option>
+            <option value="add">新增</option>
+            <option value="edit">编辑</option>
+            <option value="delete">删除</option>
+            <option value="export">导出</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">时间范围</label>
+          <input type="date" class="filter-input" style="min-width:150px">
+          <span style="color:#d9d9d9;margin:0 8px">至</span>
+          <input type="date" class="filter-input" style="min-width:150px">
+        </div>
+        <div style="display:flex;gap:8px;margin-left:auto">
+          <button class="btn btn-primary">
+            <i class="fas fa-search"></i>
+            查询
+          </button>
+          <button class="btn btn-default">
+            <i class="fas fa-redo"></i>
+            重置
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 日志表格 -->
+    <div class="card">
+      <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+        <h3 style="font-size:15px;font-weight:600;color:#333">操作记录</h3>
+        <button class="btn btn-default">
+          <i class="fas fa-download"></i>
+          导出日志
+        </button>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>时间</th>
+            <th>操作人</th>
+            <th>操作类型</th>
+            <th>操作内容</th>
+            <th>IP地址</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2026-03-19 19:35:22</td>
+            <td>管理员</td>
+            <td><span class="tag tag-login">登录</span></td>
+            <td>登录系统后台</td>
+            <td>192.168.1.100</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 19:28:15</td>
+            <td>张经理</td>
+            <td><span class="tag tag-edit">编辑</span></td>
+            <td>修改商品"iPhone手机壳"价格</td>
+            <td>192.168.1.102</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 19:20:08</td>
+            <td>李专员</td>
+            <td><span class="tag tag-add">新增</span></td>
+            <td>新增商品"无线充电器"</td>
+            <td>192.168.1.105</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 18:55:30</td>
+            <td>管理员</td>
+            <td><span class="tag tag-delete">删除</span></td>
+            <td>删除用户"测试账号123"</td>
+            <td>192.168.1.100</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 18:42:18</td>
+            <td>王主管</td>
+            <td><span class="tag tag-export">导出</span></td>
+            <td>导出本月销售数据报表</td>
+            <td>192.168.1.108</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 18:30:05</td>
+            <td>张经理</td>
+            <td><span class="tag tag-edit">编辑</span></td>
+            <td>修改商家"优品商城"审核状态</td>
+            <td>192.168.1.102</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 18:15:42</td>
+            <td>李专员</td>
+            <td><span class="tag tag-add">新增</span></td>
+            <td>新增销售员"陈小明"</td>
+            <td>192.168.1.105</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 17:58:33</td>
+            <td>管理员</td>
+            <td><span class="tag tag-edit">编辑</span></td>
+            <td>修改系统参数"提现手续费"</td>
+            <td>192.168.1.100</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 17:45:20</td>
+            <td>王主管</td>
+            <td><span class="tag tag-login">登录</span></td>
+            <td>登录系统后台</td>
+            <td>192.168.1.108</td>
+          </tr>
+          <tr>
+            <td>2026-03-19 17:30:11</td>
+            <td>张经理</td>
+            <td><span class="tag tag-delete">删除</span></td>
+            <td>删除过期商品"旧款数据线"</td>
+            <td>192.168.1.102</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 分页 -->
+      <div class="pagination">
+        <span class="pagination-info">共 256 条记录</span>
+        <select class="page-size-select">
+          <option>10条/页</option>
+          <option>20条/页</option>
+          <option>50条/页</option>
+          <option>100条/页</option>
+        </select>
+        <button class="page-btn" disabled><i class="fas fa-angle-double-left"></i></button>
+        <button class="page-btn" disabled><i class="fas fa-angle-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <span style="color:#d9d9d9">...</span>
+        <button class="page-btn">26</button>
+        <button class="page-btn"><i class="fas fa-angle-right"></i></button>
+        <button class="page-btn"><i class="fas fa-angle-double-right"></i></button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

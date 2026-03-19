@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 商品分类</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      background: #e5e5e5;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+    }
+    
+    /* 手机框架 - 模拟iPhone */
+    .phone-frame {
+      width: 390px;
+      height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* 顶部搜索区 */
+    .search-header {
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+      padding: 0 16px 12px;
+      flex-shrink: 0;
+    }
+    .status-bar {
+      height: 44px;
+    }
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 20px;
+      padding: 10px 16px;
+      gap: 8px;
+    }
+    .search-bar input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: #333;
+    }
+    .search-bar input::placeholder {
+      color: #bbb;
+    }
+    
+    /* 分类主体区域 */
+    .category-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    /* 左侧一级分类 */
+    .category-left {
+      width: 90px;
+      background: #f5f5f5;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .category-item {
+      padding: 16px 12px;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .category-item:hover {
+      background: #eee;
+    }
+    .category-item.active {
+      background: white;
+      color: #1890FF;
+      font-weight: 600;
+    }
+    .category-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 20px;
+      background: #1890FF;
+      border-radius: 0 2px 2px 0;
+    }
+    .category-icon {
+      font-size: 22px;
+      margin-bottom: 6px;
+      display: block;
+    }
+    
+    /* 右侧二级分类 */
+    .category-right {
+      flex: 1;
+      background: white;
+      overflow-y: auto;
+      padding: 16px;
+    }
+    .subcategory-header {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .subcategory-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px 12px;
+    }
+    .subcategory-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .subcategory-item:active {
+      transform: scale(0.95);
+    }
+    .subcategory-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      font-size: 26px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .subcategory-name {
+      font-size: 12px;
+      color: #333;
+      text-align: center;
+      line-height: 1.4;
+    }
+    
+    /* 推荐商品区 */
+    .recommend-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .recommend-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .recommend-header .line {
+      width: 3px;
+      height: 16px;
+      background: #1890FF;
+      border-radius: 2px;
+    }
+    .recommend-header span {
+      font-weight: 600;
+      color: #333;
+      font-size: 15px;
+    }
+    .recommend-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .recommend-item {
+      background: #fafafa;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .recommend-item:active {
+      transform: scale(0.98);
+    }
+    .recommend-item .img {
+      width: 100%;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    .recommend-item .info {
+      padding: 8px 10px;
+    }
+    .recommend-item .name {
+      font-size: 12px;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .recommend-item .price {
+      font-size: 14px;
+      color: #FF4D4F;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    
+    /* 底部导航 */
+    .bottom-nav {
+      width: 100%;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      cursor: pointer;
+      padding: 6px 24px;
+    }
+    .nav-item.active {
+      color: #1890FF;
+    }
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+    .nav-item span {
+      font-size: 11px;
+    }
+    .nav-item .badge {
+      position: absolute;
+      top: 0;
+      right: 10px;
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-item.has-badge {
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- 顶部搜索区 -->
+    <div class="search-header">
+      <div class="status-bar"></div>
+      <div class="search-bar">
+        <i class="fas fa-search" style="color: #bbb"></i>
+        <input type="text" placeholder="搜索商品">
+        <i class="fas fa-microphone" style="color: #bbb"></i>
+      </div>
+    </div>
+
+    <!-- 分类主体 -->
+    <div class="category-container">
+      <!-- 左侧一级分类 -->
+      <div class="category-left">
+        <div class="category-item active" data-category="phone">
+          <i class="fas fa-mobile-alt category-icon"></i>
+          <span>手机数码</span>
+        </div>
+        <div class="category-item" data-category="computer">
+          <i class="fas fa-laptop category-icon"></i>
+          <span>电脑办公</span>
+        </div>
+        <div class="category-item" data-category="appliance">
+          <i class="fas fa-tv category-icon"></i>
+          <span>家用电器</span>
+        </div>
+        <div class="category-item" data-category="clothing">
+          <i class="fas fa-tshirt category-icon"></i>
+          <span>服饰鞋包</span>
+        </div>
+        <div class="category-item" data-category="beauty">
+          <i class="fas fa-spa category-icon"></i>
+          <span>美妆个护</span>
+        </div>
+        <div class="category-item" data-category="food">
+          <i class="fas fa-utensils category-icon"></i>
+          <span>食品生鲜</span>
+        </div>
+        <div class="category-item" data-category="home">
+          <i class="fas fa-couch category-icon"></i>
+          <span>家居家装</span>
+        </div>
+        <div class="category-item" data-category="sports">
+          <i class="fas fa-running category-icon"></i>
+          <span>运动户外</span>
+        </div>
+        <div class="category-item" data-category="mother">
+          <i class="fas fa-baby category-icon"></i>
+          <span>母婴玩具</span>
+        </div>
+        <div class="category-item" data-category="book">
+          <i class="fas fa-book category-icon"></i>
+          <span>图书文创</span>
+        </div>
+        <div class="category-item" data-category="auto">
+          <i class="fas fa-car category-icon"></i>
+          <span>汽车用品</span>
+        </div>
+        <div class="category-item" data-category="pet">
+          <i class="fas fa-paw category-icon"></i>
+          <span>宠物生活</span>
+        </div>
+      </div>
+
+      <!-- 右侧二级分类 -->
+      <div class="category-right">
+        <div class="subcategory-header">手机数码</div>
+        <div class="subcategory-grid" id="subcategoryGrid">
+          <!-- 手机通讯 -->
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd)">
+              <i class="fas fa-mobile-alt" style="color: #1890FF"></i>
+            </div>
+            <span class="subcategory-name">手机</span>
+          </div>
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #fef3c7, #fde68a)">
+              <i class="fas fa-tablet-alt" style="color: #FAAD14"></i>
+            </div>
+            <span class="subcategory-name">平板电脑</span>
+          </div>
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #fee2e2, #fecaca)">
+              <i class="fas fa-headphones-alt" style="color: #FF4D4F"></i>
+            </div>
+            <span class="subcategory-name">耳机音箱</span>
+          </div>
+          <!-- 配件 -->
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0)">
+              <i class="fas fa-charging-station" style="color: #52C41A"></i>
+            </div>
+            <span class="subcategory-name">充电器</span>
+          </div>
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #f3e8ff, #e9d5ff)">
+              <i class="fas fa-battery-full" style="color: #a855f7"></i>
+            </div>
+            <span class="subcategory-name">充电宝</span>
+          </div>
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #fce7f3, #fbcfe8)">
+              <i class="fas fa-shield-alt" style="color: #ec4899"></i>
+            </div>
+            <span class="subcategory-name">手机壳膜</span>
+          </div>
+          <!-- 其他 -->
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe)">
+              <i class="fas fa-camera" style="color: #6366f1"></i>
+            </div>
+            <span class="subcategory-name">相机摄影</span>
+          </div>
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #fef9c3, #fef08a)">
+              <i class="fas fa-sd-card" style="color: #eab308"></i>
+            </div>
+            <span class="subcategory-name">存储设备</span>
+          </div>
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, #cffafe, #a5f3fc)">
+              <i class="fas fa-plug" style="color: #06b6d4"></i>
+            </div>
+            <span class="subcategory-name">数据线</span>
+          </div>
+        </div>
+
+        <!-- 推荐商品 -->
+        <div class="recommend-section">
+          <div class="recommend-header">
+            <div class="line"></div>
+            <span>热门推荐</span>
+          </div>
+          <div class="recommend-grid" id="recommendGrid">
+            <div class="recommend-item">
+              <div class="img" style="background: linear-gradient(135deg, #f3f4f6, #e5e7eb)">
+                <i class="fas fa-mobile-alt" style="color: #9ca3af"></i>
+              </div>
+              <div class="info">
+                <div class="name">iPhone 15 Pro Max</div>
+                <div class="price">¥8999</div>
+              </div>
+            </div>
+            <div class="recommend-item">
+              <div class="img" style="background: linear-gradient(135deg, #eff6ff, #dbeafe)">
+                <i class="fas fa-headphones-alt" style="color: #93c5fd"></i>
+              </div>
+              <div class="info">
+                <div class="name">AirPods Pro 2</div>
+                <div class="price">¥1899</div>
+              </div>
+            </div>
+            <div class="recommend-item">
+              <div class="img" style="background: linear-gradient(135deg, #faf5ff, #f3e8ff)">
+                <i class="fas fa-battery-full" style="color: #d8b4fe"></i>
+              </div>
+              <div class="info">
+                <div class="name">磁吸充电宝 10000mAh</div>
+                <div class="price">¥199</div>
+              </div>
+            </div>
+            <div class="recommend-item">
+              <div class="img" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7)">
+                <i class="fas fa-shield-alt" style="color: #86efac"></i>
+              </div>
+              <div class="info">
+                <div class="name">防摔手机壳 磁吸支架</div>
+                <div class="price">¥59</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+      <div class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>首页</span>
+      </div>
+      <div class="nav-item active">
+        <i class="fas fa-th-large"></i>
+        <span>分类</span>
+      </div>
+      <div class="nav-item has-badge">
+        <i class="fas fa-shopping-cart"></i>
+        <span>购物车</span>
+        <span class="badge">3</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </nav>
+  </div>
+
+  <script>
+    // 分类数据
+    const categoryData = {
+      phone: {
+        name: '手机数码',
+        subcategories: [
+          { icon: 'fa-mobile-alt', name: '手机', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-tablet-alt', name: '平板电脑', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-headphones-alt', name: '耳机音箱', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-charging-station', name: '充电器', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-battery-full', name: '充电宝', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-shield-alt', name: '手机壳膜', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-camera', name: '相机摄影', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-sd-card', name: '存储设备', color: '#eab308', bg: ['#fef9c3', '#fef08a'] },
+          { icon: 'fa-plug', name: '数据线', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] }
+        ],
+        recommends: [
+          { icon: 'fa-mobile-alt', name: 'iPhone 15 Pro Max', price: '¥8999', bg: ['#f3f4f6', '#e5e7eb'], color: '#9ca3af' },
+          { icon: 'fa-headphones-alt', name: 'AirPods Pro 2', price: '¥1899', bg: ['#eff6ff', '#dbeafe'], color: '#93c5fd' },
+          { icon: 'fa-battery-full', name: '磁吸充电宝 10000mAh', price: '¥199', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-shield-alt', name: '防摔手机壳 磁吸支架', price: '¥59', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      computer: {
+        name: '电脑办公',
+        subcategories: [
+          { icon: 'fa-laptop', name: '笔记本', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-desktop', name: '台式机', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-keyboard', name: '键盘鼠标', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-print', name: '打印机', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-hdd', name: '硬盘存储', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-wifi', name: '网络设备', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-briefcase', name: '办公用品', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-usb', name: '转接配件', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-memory', name: '内存条', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-laptop', name: 'MacBook Air M3', price: '¥9499', bg: ['#f3f4f6', '#e5e7eb'], color: '#9ca3af' },
+          { icon: 'fa-keyboard', name: '机械键盘 RGB', price: '¥399', bg: ['#eff6ff', '#dbeafe'], color: '#93c5fd' },
+          { icon: 'fa-hdd', name: 'SSD固态 1TB', price: '¥599', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-mouse', name: '无线鼠标 静音', price: '¥89', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      appliance: {
+        name: '家用电器',
+        subcategories: [
+          { icon: 'fa-tv', name: '电视', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-snowflake', name: '空调', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-wind', name: '风扇', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-box', name: '冰箱', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-water', name: '洗衣机', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-fire', name: '热水器', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-blender', name: '厨电', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-broom', name: '清洁电器', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-lightbulb', name: '照明', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-tv', name: '小米电视 75寸', price: '¥4999', bg: ['#f3f4f6', '#e5e7eb'], color: '#9ca3af' },
+          { icon: 'fa-snowflake', name: '格力空调 1.5匹', price: '¥3299', bg: ['#cffafe', '#a5f3fc'], color: '#67e8f9' },
+          { icon: 'fa-box', name: '海尔冰箱 对开门', price: '¥5999', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-broom', name: '扫地机器人', price: '¥2999', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      clothing: {
+        name: '服饰鞋包',
+        subcategories: [
+          { icon: 'fa-tshirt', name: '男装', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-female', name: '女装', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-child', name: '童装', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-shoe-prints', name: '运动鞋', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-socks', name: '休闲鞋', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-shopping-bag', name: '箱包', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-glasses', name: '配饰', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-hat-cowboy', name: '帽子', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-ring', name: '珠宝', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-tshirt', name: '纯棉T恤 休闲款', price: '¥89', bg: ['#f3f4f6', '#e5e7eb'], color: '#9ca3af' },
+          { icon: 'fa-shoe-prints', name: '跑步鞋 气垫', price: '¥399', bg: ['#eff6ff', '#dbeafe'], color: '#93c5fd' },
+          { icon: 'fa-shopping-bag', name: '双肩包 大容量', price: '¥199', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-glasses', name: '太阳镜 防紫外线', price: '¥129', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      beauty: {
+        name: '美妆个护',
+        subcategories: [
+          { icon: 'fa-spa', name: '护肤品', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-paint-brush', name: '彩妆', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-pump-soap', name: '清洁', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-cut', name: '理发器', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-tooth', name: '口腔护理', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-wind', name: '吹风机', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-magic', name: '美容仪', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-eye', name: '眼部护理', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-hand-sparkles', name: '手部护理', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-spa', name: '精华液 抗皱', price: '¥299', bg: ['#fce7f3', '#fbcfe8'], color: '#f9a8d4' },
+          { icon: 'fa-paint-brush', name: '口红套装', price: '¥199', bg: ['#fee2e2', '#fecaca'], color: '#fca5a5' },
+          { icon: 'fa-wind', name: '高速吹风机', price: '¥399', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-magic', name: '射频美容仪', price: '¥1299', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      food: {
+        name: '食品生鲜',
+        subcategories: [
+          { icon: 'fa-apple-alt', name: '水果', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-drumstick-bite', name: '肉类', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-fish', name: '海鲜', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-leaf', name: '蔬菜', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-egg', name: '蛋奶', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-cookie', name: '零食', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-wine-bottle', name: '酒水', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-coffee', name: '饮料', color: '#eab308', bg: ['#fef9c3', '#fef08a'] },
+          { icon: 'fa-wheat-awn', name: '粮油', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] }
+        ],
+        recommends: [
+          { icon: 'fa-apple-alt', name: '智利车厘子 2斤', price: '¥89', bg: ['#fee2e2', '#fecaca'], color: '#fca5a5' },
+          { icon: 'fa-fish', name: '挪威三文鱼', price: '¥168', bg: ['#cffafe', '#a5f3fc'], color: '#67e8f9' },
+          { icon: 'fa-cookie', name: '网红零食大礼包', price: '¥59', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-wine-bottle', name: '进口红酒礼盒', price: '¥299', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      home: {
+        name: '家居家装',
+        subcategories: [
+          { icon: 'fa-couch', name: '家具', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-bed', name: '床品', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-mug-hot', name: '厨具', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-bath', name: '卫浴', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-lightbulb', name: '灯具', color: '#eab308', bg: ['#fef9c3', '#fef08a'] },
+          { icon: 'fa-paint-roller', name: '装修', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-door-open', name: '门窗', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-faucet', name: '五金', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-seedling', name: '绿植', color: '#22c55e', bg: ['#dcfce7', '#bbf7d0'] }
+        ],
+        recommends: [
+          { icon: 'fa-couch', name: '北欧沙发 三人位', price: '¥2999', bg: ['#f3f4f6', '#e5e7eb'], color: '#9ca3af' },
+          { icon: 'fa-bed', name: '全棉四件套', price: '¥299', bg: ['#fce7f3', '#fbcfe8'], color: '#f9a8d4' },
+          { icon: 'fa-lightbulb', name: '智能吸顶灯', price: '¥399', bg: ['#fef9c3', '#fef08a'], color: '#fde047' },
+          { icon: 'fa-mug-hot', name: '陶瓷餐具套装', price: '¥199', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      sports: {
+        name: '运动户外',
+        subcategories: [
+          { icon: 'fa-running', name: '跑步装备', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-basketball-ball', name: '球类运动', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-dumbbell', name: '健身器材', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-bicycle', name: '骑行装备', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-swimming-pool', name: '游泳', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-mountain', name: '户外装备', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-campground', name: '露营', color: '#22c55e', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-fishing-rod', name: '钓鱼', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-skiing', name: '滑雪', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] }
+        ],
+        recommends: [
+          { icon: 'fa-running', name: '专业跑鞋 透气', price: '¥599', bg: ['#fee2e2', '#fecaca'], color: '#fca5a5' },
+          { icon: 'fa-dumbbell', name: '家用哑铃套装', price: '¥299', bg: ['#e0e7ff', '#c7d2fe'], color: '#a5b4fc' },
+          { icon: 'fa-campground', name: '自动帐篷 双人', price: '¥399', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-bicycle', name: '山地车 26寸', price: '¥1299', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      mother: {
+        name: '母婴玩具',
+        subcategories: [
+          { icon: 'fa-baby', name: '奶粉', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-baby-carriage', name: '婴儿车', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-gamepad', name: '玩具', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-tshirt', name: '童装', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-utensils', name: '喂养用品', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-bed', name: '婴儿床', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-pump-soap', name: '洗护用品', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-book-open', name: '早教书籍', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-baby-wearing', name: '孕产用品', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-baby', name: '进口奶粉 3段', price: '¥328', bg: ['#fef3c7', '#fde68a'], color: '#fcd34d' },
+          { icon: 'fa-gamepad', name: '乐高积木套装', price: '¥299', bg: ['#fee2e2', '#fecaca'], color: '#fca5a5' },
+          { icon: 'fa-baby-carriage', name: '轻便婴儿车', price: '¥899', bg: ['#fce7f3', '#fbcfe8'], color: '#f9a8d4' },
+          { icon: 'fa-book-open', name: '早教点读笔', price: '¥199', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      book: {
+        name: '图书文创',
+        subcategories: [
+          { icon: 'fa-book', name: '文学小说', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-graduation-cap', name: '教育考试', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-brain', name: '心理励志', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-laptop-code', name: '科技编程', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-palette', name: '艺术设计', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-child', name: '童书绘本', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-briefcase', name: '经济管理', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-pen', name: '文具用品', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-gift', name: '礼品套装', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-book', name: '三体 完整版', price: '¥89', bg: ['#e0e7ff', '#c7d2fe'], color: '#a5b4fc' },
+          { icon: 'fa-graduation-cap', name: '考研英语词汇', price: '¥49', bg: ['#e0f2fe', '#bae6fd'], color: '#7dd3fc' },
+          { icon: 'fa-pen', name: '钢笔礼盒装', price: '¥199', bg: ['#fee2e2', '#fecaca'], color: '#fca5a5' },
+          { icon: 'fa-child', name: '儿童绘本套装', price: '¥129', bg: ['#fef3c7', '#fde68a'], color: '#fcd34d' }
+        ]
+      },
+      auto: {
+        name: '汽车用品',
+        subcategories: [
+          { icon: 'fa-car', name: '车载电器', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-car-seat', name: '座垫脚垫', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-spray-can', name: '美容养护', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-tools', name: '维修工具', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-shield-alt', name: '安全用品', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-wifi', name: '电子导航', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-music', name: '音响改装', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-thermometer-half', name: '车载香薰', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-sun', name: '防晒用品', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-car', name: '车载吸尘器 无线', price: '¥199', bg: ['#f3f4f6', '#e5e7eb'], color: '#9ca3af' },
+          { icon: 'fa-car-seat', name: '四季通用座垫', price: '¥299', bg: ['#e0e7ff', '#c7d2fe'], color: '#a5b4fc' },
+          { icon: 'fa-shield-alt', name: '行车记录仪 4K', price: '¥399', bg: ['#fee2e2', '#fecaca'], color: '#fca5a5' },
+          { icon: 'fa-thermometer-half', name: '车载香薰 祛味', price: '¥59', bg: ['#f0fdf4', '#dcfce7'], color: '#86efac' }
+        ]
+      },
+      pet: {
+        name: '宠物生活',
+        subcategories: [
+          { icon: 'fa-paw', name: '宠物食品', color: '#FAAD14', bg: ['#fef3c7', '#fde68a'] },
+          { icon: 'fa-dog', name: '狗狗用品', color: '#6366f1', bg: ['#e0e7ff', '#c7d2fe'] },
+          { icon: 'fa-cat', name: '猫咪用品', color: '#ec4899', bg: ['#fce7f3', '#fbcfe8'] },
+          { icon: 'fa-home', name: '窝床笼舍', color: '#a855f7', bg: ['#f3e8ff', '#e9d5ff'] },
+          { icon: 'fa-shower', name: '洗护用品', color: '#06b6d4', bg: ['#cffafe', '#a5f3fc'] },
+          { icon: 'fa-medkit', name: '医疗保健', color: '#FF4D4F', bg: ['#fee2e2', '#fecaca'] },
+          { icon: 'fa-bone', name: '玩具零食', color: '#52C41A', bg: ['#dcfce7', '#bbf7d0'] },
+          { icon: 'fa-tshirt', name: '服饰装饰', color: '#1890FF', bg: ['#e0f2fe', '#bae6fd'] },
+          { icon: 'fa-car', name: '出行装备', color: '#eab308', bg: ['#fef9c3', '#fef08a'] }
+        ],
+        recommends: [
+          { icon: 'fa-paw', name: '进口猫粮 5kg', price: '¥299', bg: ['#fef3c7', '#fde68a'], color: '#fcd34d' },
+          { icon: 'fa-home', name: '猫窝 猫爬架', price: '¥199', bg: ['#faf5ff', '#f3e8ff'], color: '#d8b4fe' },
+          { icon: 'fa-bone', name: '磨牙棒 大型犬', price: '¥49', bg: ['#fee2e2', '#fecaca'], color: '#fca5a5' },
+          { icon: 'fa-shower', name: '宠物沐浴露', price: '¥59', bg: ['#cffafe', '#a5f3fc'], color: '#67e8f9' }
+        ]
+      }
+    };
+
+    // 切换分类
+    document.querySelectorAll('.category-item').forEach(item => {
+      item.addEventListener('click', function() {
+        // 更新左侧选中状态
+        document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+
+        // 更新右侧内容
+        const category = this.dataset.category;
+        const data = categoryData[category];
+        
+        // 更新标题
+        document.querySelector('.subcategory-header').textContent = data.name;
+
+        // 更新二级分类网格
+        const grid = document.getElementById('subcategoryGrid');
+        grid.innerHTML = data.subcategories.map(sub => `
+          <div class="subcategory-item">
+            <div class="subcategory-icon" style="background: linear-gradient(135deg, ${sub.bg[0]}, ${sub.bg[1]})">
+              <i class="fas ${sub.icon}" style="color: ${sub.color}"></i>
+            </div>
+            <span class="subcategory-name">${sub.name}</span>
+          </div>
+        `).join('');
+
+        // 更新推荐商品
+        const recommendGrid = document.getElementById('recommendGrid');
+        recommendGrid.innerHTML = data.recommends.map(rec => `
+          <div class="recommend-item">
+            <div class="img" style="background: linear-gradient(135deg, ${rec.bg[0]}, ${rec.bg[1]})">
+              <i class="fas ${rec.icon}" style="color: ${rec.color}"></i>
+            </div>
+            <div class="info">
+              <div class="name">${rec.name}</div>
+              <div class="price">${rec.price}</div>
+            </div>
+          </div>
+        `).join('');
+      });
+    });
+
+    // 底部导航点击
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

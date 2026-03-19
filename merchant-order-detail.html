@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 订单详情</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #52C41A;
+    }
+    .menu-item.active {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .menu-item i { width: 18px; text-align: center; }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 页面标题 */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #666;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .back-btn:hover {
+      background: #f5f5f5;
+      color: #52C41A;
+    }
+    .page-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    /* 卡片样式 */
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title i {
+      color: #52C41A;
+    }
+    
+    /* 时间线样式 */
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: #e8e8e8;
+    }
+    .timeline-item {
+      position: relative;
+      padding-bottom: 24px;
+    }
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: -32px;
+      top: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+    .timeline-dot.active {
+      background: #52C41A;
+    }
+    .timeline-dot.active i {
+      color: white;
+      font-size: 12px;
+    }
+    .timeline-dot.pending i {
+      color: #bfbfbf;
+      font-size: 12px;
+    }
+    .timeline-content {
+      padding-left: 8px;
+    }
+    .timeline-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .timeline-title.pending {
+      color: #999;
+    }
+    .timeline-time {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    /* 信息行样式 */
+    .info-row {
+      display: flex;
+      margin-bottom: 12px;
+    }
+    .info-row:last-child {
+      margin-bottom: 0;
+    }
+    .info-label {
+      width: 80px;
+      font-size: 13px;
+      color: #999;
+      flex-shrink: 0;
+    }
+    .info-value {
+      font-size: 13px;
+      color: #333;
+    }
+    
+    /* 商品表格 */
+    .goods-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .goods-table th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .goods-table td {
+      padding: 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .goods-table tr:last-child td {
+      border-bottom: none;
+    }
+    .goods-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .goods-img {
+      width: 60px;
+      height: 60px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ccc;
+    }
+    .goods-name {
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .goods-spec {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    /* 标签样式 */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .tag-exchange {
+      background: #fff7e6;
+      color: #FAAD14;
+    }
+    .tag-normal {
+      background: #f5f5f5;
+      color: #666;
+    }
+    .tag-pending {
+      background: #fff1f0;
+      color: #FF4D4F;
+    }
+    .tag-shipped {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .tag-completed {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    
+    /* 操作按钮 */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #52C41A;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #3fad17;
+    }
+    .btn-default {
+      background: #f5f5f5;
+      color: #666;
+    }
+    .btn-default:hover {
+      background: #e8e8e8;
+    }
+    .btn-outline {
+      background: white;
+      border: 1px solid #52C41A;
+      color: #52C41A;
+    }
+    .btn-outline:hover {
+      background: #f6ffed;
+    }
+    
+    /* 网格布局 */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    /* 状态徽章 */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .status-badge.pending {
+      background: #fff1f0;
+      color: #FF4D4F;
+    }
+    .status-badge.shipped {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .status-badge.completed {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    
+    /* 订单信息区块 */
+    .order-meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 16px 20px;
+      background: #fafafa;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .meta-label {
+      font-size: 12px;
+      color: #999;
+    }
+    .meta-value {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    /* 收货地址样式 */
+    .address-info {
+      line-height: 1.8;
+    }
+    .address-name {
+      font-weight: 500;
+      color: #333;
+    }
+    .address-phone {
+      color: #666;
+      margin-left: 12px;
+    }
+    .address-detail {
+      color: #666;
+      margin-top: 4px;
+    }
+    
+    /* 总计金额 */
+    .order-total {
+      text-align: right;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .total-row:last-child {
+      margin-bottom: 0;
+    }
+    .total-label {
+      color: #666;
+      font-size: 13px;
+    }
+    .total-value {
+      color: #333;
+      font-size: 13px;
+    }
+    .total-final {
+      font-size: 18px;
+      font-weight: 600;
+      color: #FF4D4F;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#52C41A,#22c55e);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-store" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利商家端</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#f6ffed;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#52C41A;font-weight:500">店</span>
+        </div>
+        <span style="font-size:13px;color:#333">店铺员工</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <a href="merchant-home.html" class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>工作台</span>
+    </a>
+    <a href="merchant-order.html" class="menu-item active">
+      <i class="fas fa-box"></i>
+      <span>订单管理</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-undo"></i>
+      <span>售后管理</span>
+    </a>
+    <a href="merchant-logistics.html" class="menu-item">
+      <i class="fas fa-truck"></i>
+      <span>物流查询</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-headset"></i>
+      <span>客服对话</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换记录</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>数据统计</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-comment-dots"></i>
+      <span>消息中心</span>
+    </a>
+    <a href="merchant-setting.html" class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>店铺设置</span>
+    </a>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面头部 -->
+    <div class="page-header">
+      <a href="merchant-order.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i>
+        <span>返回</span>
+      </a>
+      <h1 class="page-title">订单详情</h1>
+      <span class="status-badge pending">
+        <i class="fas fa-clock"></i>
+        <span>待发货</span>
+      </span>
+    </div>
+
+    <!-- 订单基本信息 -->
+    <div class="order-meta">
+      <div class="meta-item">
+        <span class="meta-label">订单号</span>
+        <span class="meta-value">20260319001</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">下单时间</span>
+        <span class="meta-value">2026-03-19 10:05:32</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">订单类型</span>
+        <span class="tag tag-exchange">兑换订单</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">支付方式</span>
+        <span class="meta-value">积分兑换</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- 左侧：订单状态时间线 -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-clock"></i>
+          <span>订单状态</span>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot active">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">订单已创建</div>
+              <div class="timeline-time">2026-03-19 10:05:32</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot active">
+              <i class="fas fa-check"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">支付成功</div>
+              <div class="timeline-time">2026-03-19 10:05:35</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot pending">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title pending">待发货</div>
+              <div class="timeline-time">等待商家发货</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot pending">
+              <i class="fas fa-truck"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title pending">已发货</div>
+              <div class="timeline-time">等待物流更新</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot pending">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title pending">已完成</div>
+              <div class="timeline-time">等待签收确认</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：收货信息 -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>收货信息</span>
+        </div>
+        <div class="address-info">
+          <div>
+            <span class="address-name">张三</span>
+            <span class="address-phone">138****1234</span>
+          </div>
+          <div class="address-detail">
+            广东省深圳市南山区科技园南区深圳湾科技生态园10栋B座1801室
+          </div>
+        </div>
+        
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0">
+          <div class="info-row">
+            <span class="info-label">备注</span>
+            <span class="info-value">请尽量工作日送货，提前电话联系</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商品列表 -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-shopping-bag"></i>
+        <span>商品信息</span>
+      </div>
+      <table class="goods-table">
+        <thead>
+          <tr>
+            <th style="width:300px">商品</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>小计</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="goods-info">
+                <div class="goods-img">
+                  <i class="fas fa-image"></i>
+                </div>
+                <div>
+                  <div class="goods-name">iPhone手机壳</div>
+                  <div class="goods-spec">型号：iPhone 15 Pro Max / 颜色：深空黑</div>
+                </div>
+              </div>
+            </td>
+            <td>¥39.00</td>
+            <td>1</td>
+            <td style="font-weight:500">¥39.00</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="goods-info">
+                <div class="goods-img">
+                  <i class="fas fa-image"></i>
+                </div>
+                <div>
+                  <div class="goods-name">钢化膜套装</div>
+                  <div class="goods-spec">规格：全屏覆盖 / 数量：3片装</div>
+                </div>
+              </div>
+            </td>
+            <td>¥19.00</td>
+            <td>2</td>
+            <td style="font-weight:500">¥38.00</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- 订单总计 -->
+      <div class="order-total">
+        <div class="total-row">
+          <span class="total-label">商品总额</span>
+          <span class="total-value">¥77.00</span>
+        </div>
+        <div class="total-row">
+          <span class="total-label">运费</span>
+          <span class="total-value">¥0.00</span>
+        </div>
+        <div class="total-row">
+          <span class="total-label">积分抵扣</span>
+          <span class="total-value">-¥77.00</span>
+        </div>
+        <div class="total-row" style="margin-top:12px;padding-top:12px;border-top:1px solid #e8e8e8">
+          <span class="total-label">实付金额</span>
+          <span class="total-final">¥0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 订单操作 -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-cog"></i>
+        <span>订单操作</span>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-primary">
+          <i class="fas fa-truck"></i>
+          <span>发货</span>
+        </button>
+        <button class="btn btn-outline">
+          <i class="fas fa-print"></i>
+          <span>打印面单</span>
+        </button>
+        <button class="btn btn-default">
+          <i class="fas fa-phone"></i>
+          <span>联系客户</span>
+        </button>
+      </div>
+      
+      <!-- 操作记录 -->
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0">
+        <div style="font-size:14px;font-weight:500;color:#333;margin-bottom:12px">操作记录</div>
+        <div style="font-size:13px;color:#666;line-height:1.8">
+          <div>2026-03-19 10:05:35 - 系统自动确认支付成功</div>
+          <div>2026-03-19 10:05:32 - 用户提交订单成功</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

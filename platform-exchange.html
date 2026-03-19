@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 兑换中心</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 数据卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    
+    /* 筛选栏 */
+    .filter-bar {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-label {
+      font-size: 13px;
+      color: #666;
+    }
+    .filter-input {
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .filter-input:focus {
+      border-color: #1890FF;
+    }
+    .filter-select {
+      height: 32px;
+      padding: 0 28px 0 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 10px center;
+      cursor: pointer;
+      appearance: none;
+    }
+    .filter-select:focus {
+      border-color: #1890FF;
+    }
+    .filter-btn {
+      height: 32px;
+      padding: 0 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn.primary {
+      background: #1890FF;
+      color: white;
+    }
+    .filter-btn.primary:hover {
+      background: #40a9ff;
+    }
+    .filter-btn.default {
+      background: white;
+      border: 1px solid #d9d9d9;
+      color: #666;
+    }
+    .filter-btn.default:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    
+    /* 表格容器 */
+    .table-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 14px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-tag.success {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    .status-tag.warning {
+      background: #fffbe6;
+      color: #FAAD14;
+      border: 1px solid #fff1b8;
+    }
+    .status-tag.processing {
+      background: #e6f7ff;
+      color: #1890FF;
+      border: 1px solid #91d5ff;
+    }
+    .status-tag.error {
+      background: #fff2f0;
+      color: #FF4D4F;
+      border: 1px solid #ffccc7;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 16px 20px;
+      border-top: 1px solid #f0f0f0;
+      gap: 8px;
+    }
+    .pagination-info {
+      font-size: 13px;
+      color: #666;
+      margin-right: 16px;
+    }
+    .pagination-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      background: white;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pagination-btn:hover:not(:disabled) {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .pagination-btn.active {
+      background: #1890FF;
+      border-color: #1890FF;
+      color: white;
+    }
+    .pagination-btn:disabled {
+      color: #d9d9d9;
+      cursor: not-allowed;
+    }
+    .pagination-ellipsis {
+      width: 32px;
+      text-align: center;
+      color: #999;
+    }
+    
+    /* 商品信息 */
+    .product-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .product-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      background: #f5f5f5;
+      object-fit: cover;
+    }
+    .product-name {
+      font-size: 13px;
+      color: #333;
+      font-weight: 500;
+    }
+    .product-sku {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    
+    /* 用户信息 */
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e6f7ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #1890FF;
+    }
+    
+    /* 积分数值 */
+    .points-value {
+      color: #FF4D4F;
+      font-weight: 600;
+    }
+    
+    /* 操作按钮 */
+    .action-btn {
+      padding: 4px 12px;
+      border: none;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      color: #1890FF;
+    }
+    .action-btn:hover {
+      background: #e6f7ff;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面标题 -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:20px;font-weight:600;color:#333">兑换中心</h1>
+      <div style="font-size:13px;color:#999;margin-top:4px">管理所有积分兑换订单</div>
+    </div>
+
+    <!-- 兑换统计 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+      <div class="stat-card">
+        <div class="stat-label">今日兑换订单</div>
+        <div class="stat-value" style="color:#1890FF">156</div>
+        <div style="font-size:12px;color:#52C41A;margin-top:4px"><i class="fas fa-arrow-up"></i> 12.5% 较昨日</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">今日消耗积分</div>
+        <div class="stat-value" style="color:#FF4D4F">28,500</div>
+        <div style="font-size:12px;color:#52C41A;margin-top:4px"><i class="fas fa-arrow-up"></i> 8.3% 较昨日</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">待发货</div>
+        <div class="stat-value" style="color:#FAAD14">32</div>
+        <div style="font-size:12px;color:#999;margin-top:4px">需要及时处理</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">已完成订单</div>
+        <div class="stat-value" style="color:#52C41A">1,256</div>
+        <div style="font-size:12px;color:#52C41A;margin-top:4px">本月累计</div>
+      </div>
+    </div>
+
+    <!-- 筛选栏 -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label class="filter-label">商品名称</label>
+        <input type="text" class="filter-input" placeholder="请输入商品名称" style="width:180px">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">订单状态</label>
+        <select class="filter-select" style="width:120px">
+          <option value="">全部状态</option>
+          <option value="pending">待发货</option>
+          <option value="shipped">已发货</option>
+          <option value="completed">已完成</option>
+          <option value="cancelled">已取消</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">时间范围</label>
+        <input type="date" class="filter-input" style="width:140px">
+        <span style="color:#999;font-size:13px">至</span>
+        <input type="date" class="filter-input" style="width:140px">
+      </div>
+      <div class="filter-group" style="margin-left:auto">
+        <button class="filter-btn primary"><i class="fas fa-search" style="margin-right:6px"></i>查询</button>
+        <button class="filter-btn default"><i class="fas fa-redo" style="margin-right:6px"></i>重置</button>
+        <button class="filter-btn default"><i class="fas fa-download" style="margin-right:6px"></i>导出</button>
+      </div>
+    </div>
+
+    <!-- 表格 -->
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:180px">订单号</th>
+            <th style="width:220px">商品信息</th>
+            <th style="width:100px">积分</th>
+            <th style="width:140px">用户</th>
+            <th style="width:100px">状态</th>
+            <th style="width:160px">兑换时间</th>
+            <th style="width:80px">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900001</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-headphones" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">蓝牙耳机Pro版</div>
+                  <div class="product-sku">SKU: BT-001</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">2,800</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">张</div>
+                <div>
+                  <div style="font-size:13px;color:#333">张三</div>
+                  <div style="font-size:12px;color:#999">ID: 10001</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag processing">待发货</span></td>
+            <td>2026-03-19 10:28:35</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900002</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#f093fb,#f5576c);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-mobile-alt" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">iPhone手机壳</div>
+                  <div class="product-sku">SKU: CS-015</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">580</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">李</div>
+                <div>
+                  <div style="font-size:13px;color:#333">李四</div>
+                  <div style="font-size:12px;color:#999">ID: 10002</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag success">已完成</span></td>
+            <td>2026-03-19 09:15:22</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900003</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#4facfe,#00f2fe);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-charging-station" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">无线充电器</div>
+                  <div class="product-sku">SKU: WC-008</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">1,500</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">王</div>
+                <div>
+                  <div style="font-size:13px;color:#333">王五</div>
+                  <div style="font-size:12px;color:#999">ID: 10003</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag success">已完成</span></td>
+            <td>2026-03-19 08:42:18</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900004</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#fa709a,#fee140);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-umbrella-beach" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">便携遮阳伞</div>
+                  <div class="product-sku">SKU: UB-022</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">320</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">赵</div>
+                <div>
+                  <div style="font-size:13px;color:#333">赵六</div>
+                  <div style="font-size:12px;color:#999">ID: 10004</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag warning">已发货</span></td>
+            <td>2026-03-18 16:30:45</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900005</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#a8edea,#fed6e3);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-mug-hot" style="color:#666;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">保温杯500ml</div>
+                  <div class="product-sku">SKU: CP-009</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">680</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">孙</div>
+                <div>
+                  <div style="font-size:13px;color:#333">孙七</div>
+                  <div style="font-size:12px;color:#999">ID: 10005</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag processing">待发货</span></td>
+            <td>2026-03-18 14:22:10</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900006</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#ff9a9e,#fecfef);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-tshirt" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">定制T恤</div>
+                  <div class="product-sku">SKU: TS-003</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">1,200</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">周</div>
+                <div>
+                  <div style="font-size:13px;color:#333">周八</div>
+                  <div style="font-size:12px;color:#999">ID: 10006</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag error">已取消</span></td>
+            <td>2026-03-18 11:05:33</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900007</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-keyboard" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">机械键盘</div>
+                  <div class="product-sku">SKU: KB-012</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">3,500</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">吴</div>
+                <div>
+                  <div style="font-size:13px;color:#333">吴九</div>
+                  <div style="font-size:12px;color:#999">ID: 10007</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag success">已完成</span></td>
+            <td>2026-03-17 17:48:56</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900008</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#ffecd2,#fcb69f);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-book" style="color:#666;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">精美笔记本</div>
+                  <div class="product-sku">SKU: NB-007</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">450</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">郑</div>
+                <div>
+                  <div style="font-size:13px;color:#333">郑十</div>
+                  <div style="font-size:12px;color:#999">ID: 10008</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag warning">已发货</span></td>
+            <td>2026-03-17 15:30:12</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900009</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#a1c4fd,#c2e9fb);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-mouse" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">无线鼠标</div>
+                  <div class="product-sku">SKU: MS-004</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">880</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">钱</div>
+                <div>
+                  <div style="font-size:13px;color:#333">钱十一</div>
+                  <div style="font-size:12px;color:#999">ID: 10009</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag success">已完成</span></td>
+            <td>2026-03-17 10:15:44</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;color:#666">DH2026031900010</td>
+            <td>
+              <div class="product-info">
+                <div style="width:48px;height:48px;background:linear-gradient(135deg,#f5af19,#f12711);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                  <i class="fas fa-backpack" style="color:white;font-size:18px"></i>
+                </div>
+                <div>
+                  <div class="product-name">商务背包</div>
+                  <div class="product-sku">SKU: BP-011</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="points-value">2,200</span></td>
+            <td>
+              <div class="user-info">
+                <div class="user-avatar">陈</div>
+                <div>
+                  <div style="font-size:13px;color:#333">陈十二</div>
+                  <div style="font-size:12px;color:#999">ID: 10010</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-tag processing">待发货</span></td>
+            <td>2026-03-16 18:22:30</td>
+            <td><button class="action-btn">详情</button></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- 分页 -->
+      <div class="pagination">
+        <span class="pagination-info">共 256 条记录</span>
+        <button class="pagination-btn" disabled><i class="fas fa-angle-left"></i></button>
+        <button class="pagination-btn active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <span class="pagination-ellipsis">...</span>
+        <button class="pagination-btn">26</button>
+        <button class="pagination-btn"><i class="fas fa-angle-right"></i></button>
+        <div style="display:flex;align-items:center;gap:8px;margin-left:16px">
+          <span style="font-size:13px;color:#666">跳至</span>
+          <input type="number" class="filter-input" style="width:50px;text-align:center" value="1">
+          <span style="font-size:13px;color:#666">页</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

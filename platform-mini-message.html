@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利系统 - 消息中心</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    /* 小程序框架 */
+    .mini-app {
+      width: 390px;
+      height: 844px;
+      background: #f5f7fa;
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 状态栏 */
+    .status-bar {
+      height: 44px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .status-bar .time { font-weight: 600; }
+    .status-bar .icons { display: flex; gap: 4px; align-items: center; }
+    
+    /* 顶部标题栏 */
+    .header {
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+      padding: 16px 20px 20px;
+      color: white;
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .back-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .header-action {
+      font-size: 12px;
+      color: rgba(255,255,255,0.9);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* 分类标签 */
+    .tabs-container {
+      background: white;
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .tab.active {
+      background: #1890FF;
+      color: white;
+    }
+    .tab:not(.active) {
+      background: #f5f5f5;
+      color: #666;
+    }
+    .tab .badge {
+      position: absolute;
+      top: 4px;
+      right: 12px;
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+    .tab.active .badge {
+      background: white;
+      color: #FF4D4F;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 100px;
+    }
+    
+    /* 消息分组 */
+    .message-group {
+      margin-bottom: 16px;
+    }
+    .group-header {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 10px;
+      padding-left: 4px;
+    }
+    
+    /* 消息卡片 */
+    .message-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .message-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .message-card.unread {
+      border-left: 3px solid #1890FF;
+    }
+    .message-card.unread::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 8px;
+      height: 8px;
+      background: #FF4D4F;
+      border-radius: 50%;
+    }
+    
+    .message-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .message-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .message-icon.system { background: #e6f7ff; color: #1890FF; }
+    .message-icon.audit { background: #fff7e6; color: #FA8C16; }
+    .message-icon.warning { background: #fff2f0; color: #FF4D4F; }
+    .message-icon.success { background: #f6ffed; color: #52C41A; }
+    
+    .message-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .message-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .message-title .tag {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+    .message-title .tag.system { background: #e6f7ff; color: #1890FF; }
+    .message-title .tag.audit { background: #fff7e6; color: #FA8C16; }
+    
+    .message-time {
+      font-size: 11px;
+      color: #999;
+    }
+    
+    .message-body {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+    
+    .message-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f5f5f5;
+    }
+    .message-meta {
+      font-size: 11px;
+      color: #999;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .message-action {
+      font-size: 12px;
+      color: #1890FF;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .empty-state i {
+      font-size: 48px;
+      color: #d9d9d9;
+      margin-bottom: 16px;
+    }
+    .empty-state p {
+      font-size: 14px;
+      color: #999;
+    }
+    
+    /* 底部导航 */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 83px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      padding-bottom: 20px;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .nav-item i {
+      font-size: 20px;
+      color: #999;
+    }
+    .nav-item span {
+      font-size: 10px;
+      color: #999;
+    }
+    .nav-item.active i { color: #1890FF; }
+    .nav-item.active span { color: #1890FF; font-weight: 500; }
+    .nav-item .nav-badge {
+      position: absolute;
+      top: 8px;
+      right: 50%;
+      transform: translateX(14px);
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+    
+    /* 底部安全区 */
+    .safe-area {
+      height: 34px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .home-indicator {
+      width: 134px;
+      height: 5px;
+      background: #333;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="mini-app">
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <span class="time">14:35</span>
+      <div class="icons">
+        <i class="fas fa-signal" style="font-size:12px"></i>
+        <i class="fas fa-wifi" style="font-size:12px"></i>
+        <i class="fas fa-battery-full" style="font-size:14px"></i>
+      </div>
+    </div>
+    
+    <!-- 顶部标题栏 -->
+    <div class="header">
+      <div class="header-content">
+        <div class="header-left">
+          <div class="back-btn">
+            <i class="fas fa-chevron-left"></i>
+          </div>
+          <h1>消息中心</h1>
+        </div>
+        <div class="header-actions">
+          <div class="header-action">
+            <i class="fas fa-check-double"></i>
+            全部已读
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 分类标签 -->
+    <div class="tabs-container">
+      <div class="tabs">
+        <div class="tab active">
+          全部
+          <span class="badge">12</span>
+        </div>
+        <div class="tab">
+          系统通知
+          <span class="badge">5</span>
+        </div>
+        <div class="tab">
+          审核通知
+          <span class="badge">7</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 今天 -->
+      <div class="message-group">
+        <div class="group-header">今天</div>
+        
+        <!-- 审核通知 - 未读 -->
+        <div class="message-card unread">
+          <div class="message-header">
+            <div class="message-icon audit">
+              <i class="fas fa-store"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                商家入驻审核
+                <span class="tag audit">待审核</span>
+              </div>
+              <div class="message-time">10分钟前</div>
+            </div>
+          </div>
+          <div class="message-body">
+            新商家「美味鲜超市」申请入驻平台，请尽快审核处理。店铺主营：生鲜蔬果，地址：杭州市西湖区文三路XXX号。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-user"></i> 张三</span>
+              <span><i class="fas fa-clock"></i> 截止 18:00</span>
+            </div>
+            <div class="message-action">
+              立即处理 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 系统通知 - 未读 -->
+        <div class="message-card unread">
+          <div class="message-header">
+            <div class="message-icon warning">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                系统预警通知
+                <span class="tag system">系统</span>
+              </div>
+              <div class="message-time">30分钟前</div>
+            </div>
+          </div>
+          <div class="message-body">
+            服务器CPU使用率达到85%，建议及时检查或扩容。当前峰值时段流量较大，可能影响用户体验。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-server"></i> 运维监控</span>
+            </div>
+            <div class="message-action">
+              查看详情 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 审核通知 - 未读 -->
+        <div class="message-card unread">
+          <div class="message-header">
+            <div class="message-icon audit">
+              <i class="fas fa-box"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                商品上架审核
+                <span class="tag audit">待审核</span>
+              </div>
+              <div class="message-time">1小时前</div>
+            </div>
+          </div>
+          <div class="message-body">
+            商家「幸福水果店」提交新品上架申请：新疆阿克苏冰糖心苹果，规格5斤装，售价¥39.9。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-store"></i> 幸福水果店</span>
+            </div>
+            <div class="message-action">
+              去审核 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 昨天 -->
+      <div class="message-group">
+        <div class="group-header">昨天</div>
+        
+        <!-- 审核通知 - 已读 -->
+        <div class="message-card">
+          <div class="message-header">
+            <div class="message-icon success">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                审核通过通知
+                <span class="tag audit">审核</span>
+              </div>
+              <div class="message-time">昨天 16:30</div>
+            </div>
+          </div>
+          <div class="message-body">
+            商家「品质生活馆」入驻审核已通过，店铺已正式上线运营。请跟进后续入驻培训事宜。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-user-check"></i> 李四审核</span>
+            </div>
+            <div class="message-action">
+              查看详情 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 系统通知 - 已读 -->
+        <div class="message-card">
+          <div class="message-header">
+            <div class="message-icon system">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                系统公告
+                <span class="tag system">系统</span>
+              </div>
+              <div class="message-time">昨天 10:00</div>
+            </div>
+          </div>
+          <div class="message-body">
+            平台将于本周六凌晨2:00-4:00进行系统升级维护，届时部分功能可能暂时无法使用，请提前做好相关安排。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-calendar"></i> 2024-01-15</span>
+            </div>
+            <div class="message-action">
+              查看详情 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 审核通知 - 已读 -->
+        <div class="message-card">
+          <div class="message-header">
+            <div class="message-icon audit">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                提现审核完成
+                <span class="tag audit">审核</span>
+              </div>
+              <div class="message-time">昨天 09:15</div>
+            </div>
+          </div>
+          <div class="message-body">
+            商家「鲜果优选」提现申请¥12,580.00已审核通过，款项将于1-3个工作日内到账。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-yen-sign"></i> ¥12,580.00</span>
+            </div>
+            <div class="message-action">
+              查看详情 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 更早 -->
+      <div class="message-group">
+        <div class="group-header">更早</div>
+        
+        <!-- 系统通知 - 已读 -->
+        <div class="message-card">
+          <div class="message-header">
+            <div class="message-icon system">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                安全提醒
+                <span class="tag system">系统</span>
+              </div>
+              <div class="message-time">01月12日</div>
+            </div>
+          </div>
+          <div class="message-body">
+            检测到异常登录行为，账号于异地登录成功。如非本人操作，请及时修改密码并检查账户安全。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-map-marker-alt"></i> 上海市</span>
+            </div>
+            <div class="message-action">
+              查看详情 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 审核通知 - 已读 -->
+        <div class="message-card">
+          <div class="message-header">
+            <div class="message-icon success">
+              <i class="fas fa-undo"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                退款审核完成
+                <span class="tag audit">审核</span>
+              </div>
+              <div class="message-time">01月11日</div>
+            </div>
+          </div>
+          <div class="message-body">
+            订单#20240111001的退款申请已审核通过，退款金额¥89.00已原路退回用户账户。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-hashtag"></i> 订单号 20240111001</span>
+            </div>
+            <div class="message-action">
+              查看详情 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 系统通知 - 已读 -->
+        <div class="message-card">
+          <div class="message-header">
+            <div class="message-icon system">
+              <i class="fas fa-gift"></i>
+            </div>
+            <div class="message-info">
+              <div class="message-title">
+                活动通知
+                <span class="tag system">系统</span>
+              </div>
+              <div class="message-time">01月10日</div>
+            </div>
+          </div>
+          <div class="message-body">
+            新年促销活动已上线，活动期间平台将提供流量扶持，请各商家积极备货参与。
+          </div>
+          <div class="message-footer">
+            <div class="message-meta">
+              <span><i class="fas fa-calendar-alt"></i> 活动期 01.10-02.10</span>
+            </div>
+            <div class="message-action">
+              查看详情 <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>首页</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-chart-bar"></i>
+        <span>数据</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>待办</span>
+      </div>
+      <div class="nav-item active">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </div>
+    
+    <!-- 安全区 -->
+    <div class="safe-area">
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 店铺设置</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #52C41A;
+    }
+    .menu-item.active {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .menu-item i { width: 18px; text-align: center; }
+    
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .setting-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      margin-bottom: 20px;
+    }
+    
+    .card-header {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-header i {
+      color: #52C41A;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .form-label .required {
+      color: #FF4D4F;
+      margin-left: 2px;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #333;
+      transition: all 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #52C41A;
+      box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.1);
+    }
+    .form-input::placeholder {
+      color: #bfbfbf;
+    }
+    
+    textarea.form-input {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    
+    .logo-upload {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .logo-preview {
+      width: 80px;
+      height: 80px;
+      border: 2px dashed #d9d9d9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fafafa;
+      flex-shrink: 0;
+    }
+    .logo-preview:hover {
+      border-color: #52C41A;
+      background: #f6ffed;
+    }
+    .logo-preview i {
+      font-size: 24px;
+      color: #bfbfbf;
+    }
+    .logo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .logo-tips {
+      font-size: 12px;
+      color: #999;
+      line-height: 1.6;
+    }
+    .logo-tips p {
+      margin-bottom: 4px;
+    }
+    
+    .time-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .time-row:last-child {
+      margin-bottom: 0;
+    }
+    
+    .time-input {
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #333;
+      width: 140px;
+    }
+    .time-input:focus {
+      outline: none;
+      border-color: #52C41A;
+    }
+    
+    .time-separator {
+      color: #999;
+      font-size: 14px;
+    }
+    
+    .day-select {
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #333;
+      min-width: 120px;
+      cursor: pointer;
+    }
+    .day-select:focus {
+      outline: none;
+      border-color: #52C41A;
+    }
+    
+    .add-time-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px dashed #52C41A;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: all 0.2s;
+    }
+    .add-time-btn:hover {
+      background: #52C41A;
+      color: white;
+      border-style: solid;
+    }
+    
+    .save-bar {
+      position: fixed;
+      bottom: 0;
+      left: 210px;
+      right: 0;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      z-index: 50;
+    }
+    
+    .btn {
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-primary {
+      background: #52C41A;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #3db010;
+    }
+    .btn-default {
+      background: #f5f5f5;
+      color: #666;
+      border: 1px solid #d9d9d9;
+    }
+    .btn-default:hover {
+      border-color: #52C41A;
+      color: #52C41A;
+    }
+    
+    .status-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toggle-switch {
+      width: 44px;
+      height: 22px;
+      background: #bfbfbf;
+      border-radius: 11px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toggle-switch.active {
+      background: #52C41A;
+    }
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: all 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .toggle-switch.active::after {
+      left: 24px;
+    }
+    .toggle-label {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .contact-item i {
+      width: 16px;
+      color: #999;
+      text-align: center;
+    }
+    
+    .help-text {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    /* 给底部留出空间 */
+    .main-content {
+      padding-bottom: 80px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#52C41A,#22c55e);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-store" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利商家端</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#f6ffed;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#52C41A;font-weight:500">店</span>
+        </div>
+        <span style="font-size:13px;color:#333">店铺员工</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <a href="merchant-home.html" class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>工作台</span>
+    </a>
+    <a href="merchant-order.html" class="menu-item">
+      <i class="fas fa-box"></i>
+      <span>订单管理</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-undo"></i>
+      <span>售后管理</span>
+    </a>
+    <a href="merchant-logistics.html" class="menu-item">
+      <i class="fas fa-truck"></i>
+      <span>物流查询</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-headset"></i>
+      <span>客服对话</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换记录</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>数据统计</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-comment-dots"></i>
+      <span>消息中心</span>
+    </a>
+    <a href="merchant-setting.html" class="menu-item active">
+      <i class="fas fa-cog"></i>
+      <span>店铺设置</span>
+    </a>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <h1 class="page-title">店铺设置</h1>
+    
+    <!-- 店铺基本信息 -->
+    <div class="setting-card">
+      <div class="card-header">
+        <i class="fas fa-store"></i>
+        店铺基本信息
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">店铺名称 <span class="required">*</span></label>
+        <input type="text" class="form-input" placeholder="请输入店铺名称" value="臻伟福利旗舰店">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">店铺Logo</label>
+        <div class="logo-upload">
+          <div class="logo-preview">
+            <i class="fas fa-plus"></i>
+          </div>
+          <div class="logo-tips">
+            <p>• 支持格式：JPG、PNG</p>
+            <p>• 建议尺寸：200x200像素</p>
+            <p>• 文件大小不超过2MB</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">店铺简介</label>
+        <textarea class="form-input" placeholder="请输入店铺简介，让用户更好地了解您的店铺">臻伟福利旗舰店，专注于为用户提供优质福利商品，积分兑换好礼，让每一次消费都更有价值。</textarea>
+      </div>
+    </div>
+    
+    <!-- 联系方式 -->
+    <div class="setting-card">
+      <div class="card-header">
+        <i class="fas fa-phone-alt"></i>
+        联系方式
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">客服电话 <span class="required">*</span></label>
+          <input type="tel" class="form-input" placeholder="请输入客服电话" value="400-888-9999">
+        </div>
+        <div class="form-group">
+          <label class="form-label">客服邮箱</label>
+          <input type="email" class="form-input" placeholder="请输入客服邮箱" value="service@zhenwei.com">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">客服微信</label>
+          <input type="text" class="form-input" placeholder="请输入客服微信号" value="zhenwei_service">
+        </div>
+        <div class="form-group">
+          <label class="form-label">客服QQ</label>
+          <input type="text" class="form-input" placeholder="请输入客服QQ号">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">店铺地址</label>
+        <input type="text" class="form-input" placeholder="请输入店铺详细地址" value="广东省深圳市南山区科技园南区">
+      </div>
+    </div>
+    
+    <!-- 营业时间 -->
+    <div class="setting-card">
+      <div class="card-header">
+        <i class="fas fa-clock"></i>
+        营业时间
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">营业状态</label>
+        <div class="status-toggle">
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+          <span class="toggle-label">营业中</span>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">营业时间设置</label>
+        <div id="time-list">
+          <div class="time-row">
+            <select class="day-select">
+              <option value="all">每天</option>
+              <option value="weekday">工作日</option>
+              <option value="weekend">周末</option>
+              <option value="mon">周一</option>
+              <option value="tue">周二</option>
+              <option value="wed">周三</option>
+              <option value="thu">周四</option>
+              <option value="fri">周五</option>
+              <option value="sat">周六</option>
+              <option value="sun">周日</option>
+            </select>
+            <input type="time" class="time-input" value="09:00">
+            <span class="time-separator">至</span>
+            <input type="time" class="time-input" value="18:00">
+          </div>
+        </div>
+        <button class="add-time-btn" onclick="addTimeRow()">
+          <i class="fas fa-plus"></i>
+          添加时间段
+        </button>
+        <p class="help-text">可设置多个营业时间段，支持按星期设置不同的营业时间</p>
+      </div>
+    </div>
+    
+    <!-- 其他设置 -->
+    <div class="setting-card">
+      <div class="card-header">
+        <i class="fas fa-sliders-h"></i>
+        其他设置
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">起送金额</label>
+          <input type="number" class="form-input" placeholder="请输入起送金额" value="0">
+          <p class="help-text">设置为0表示无起送金额限制</p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">配送费</label>
+          <input type="number" class="form-input" placeholder="请输入配送费" value="0">
+          <p class="help-text">设置为0表示免配送费</p>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">店铺公告</label>
+        <textarea class="form-input" placeholder="请输入店铺公告，展示在店铺首页">欢迎光临臻伟福利旗舰店！积分兑换好礼，更多优惠活动敬请关注。</textarea>
+      </div>
+    </div>
+  </main>
+
+  <!-- 底部保存栏 -->
+  <div class="save-bar">
+    <button class="btn btn-default">重置</button>
+    <button class="btn btn-primary">
+      <i class="fas fa-save" style="margin-right:6px"></i>保存设置
+    </button>
+  </div>
+
+  <script>
+    // 菜单切换
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // 添加时间段
+    function addTimeRow() {
+      const timeList = document.getElementById('time-list');
+      const newRow = document.createElement('div');
+      newRow.className = 'time-row';
+      newRow.innerHTML = `
+        <select class="day-select">
+          <option value="all">每天</option>
+          <option value="weekday">工作日</option>
+          <option value="weekend">周末</option>
+          <option value="mon">周一</option>
+          <option value="tue">周二</option>
+          <option value="wed">周三</option>
+          <option value="thu">周四</option>
+          <option value="fri">周五</option>
+          <option value="sat">周六</option>
+          <option value="sun">周日</option>
+        </select>
+        <input type="time" class="time-input" value="09:00">
+        <span class="time-separator">至</span>
+        <input type="time" class="time-input" value="18:00">
+        <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#999;cursor:pointer;padding:4px 8px;">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      timeList.appendChild(newRow);
+    }
+    
+    // Logo上传预览
+    document.querySelector('.logo-preview').addEventListener('click', function() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const preview = document.querySelector('.logo-preview');
+            preview.innerHTML = `<img src="${e.target.result}" alt="Logo">`;
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      input.click();
+    });
+  </script>
+</body>
+</html>

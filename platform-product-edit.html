@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 商品编辑</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 卡片 */
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    /* 表单 */
+    .form-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .form-label {
+      width: 100px;
+      flex-shrink: 0;
+      font-size: 14px;
+      color: #333;
+      padding-top: 8px;
+    }
+    .form-label.required::before {
+      content: '*';
+      color: #FF4D4F;
+      margin-right: 4px;
+    }
+    .form-input {
+      flex: 1;
+      max-width: 400px;
+    }
+    .form-input input,
+    .form-input select,
+    .form-input textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    .form-input input:focus,
+    .form-input select:focus,
+    .form-input textarea:focus {
+      outline: none;
+      border-color: #1890FF;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+    }
+    .form-input textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .form-hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    
+    /* 图片上传 */
+    .image-upload-area {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .image-box {
+      width: 100px;
+      height: 100px;
+      border: 1px dashed #d9d9d9;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .image-box:hover {
+      border-color: #1890FF;
+    }
+    .image-box.primary {
+      border-color: #1890FF;
+      border-style: solid;
+    }
+    .image-box.primary::after {
+      content: '主图';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #1890FF;
+      color: white;
+      font-size: 10px;
+      text-align: center;
+      padding: 2px 0;
+    }
+    .image-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .image-box .placeholder {
+      text-align: center;
+      color: #999;
+    }
+    .image-box .placeholder i {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .image-box .placeholder span {
+      font-size: 12px;
+      display: block;
+    }
+    .image-box .delete-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 10px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .image-box:hover .delete-btn {
+      opacity: 1;
+    }
+    
+    /* 详情编辑器 */
+    .detail-editor {
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .editor-toolbar {
+      background: #fafafa;
+      padding: 8px 12px;
+      border-bottom: 1px solid #d9d9d9;
+      display: flex;
+      gap: 8px;
+    }
+    .editor-toolbar button {
+      background: none;
+      border: 1px solid #d9d9d9;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #666;
+      transition: all 0.2s;
+    }
+    .editor-toolbar button:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .editor-content {
+      min-height: 300px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #333;
+    }
+    .editor-content[contenteditable]:focus {
+      outline: none;
+    }
+    
+    /* 规格设置 */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .spec-table th {
+      background: #fafafa;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 13px;
+      color: #666;
+      border: 1px solid #f0f0f0;
+    }
+    .spec-table td {
+      padding: 10px 12px;
+      border: 1px solid #f0f0f0;
+      font-size: 13px;
+    }
+    .spec-table input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .spec-table input:focus {
+      outline: none;
+      border-color: #1890FF;
+    }
+    .spec-color-preview {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    
+    /* 状态开关 */
+    .status-switch {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .switch-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .switch-item input {
+      display: none;
+    }
+    .switch-track {
+      width: 44px;
+      height: 22px;
+      background: #d9d9d9;
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .switch-track::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+    }
+    .switch-item input:checked + .switch-track {
+      background: #1890FF;
+    }
+    .switch-item input:checked + .switch-track::after {
+      transform: translateX(22px);
+    }
+    .switch-label {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    /* 按钮 */
+    .btn {
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    .btn-default {
+      background: white;
+      border: 1px solid #d9d9d9;
+      color: #666;
+    }
+    .btn-default:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    .btn-success {
+      background: #52C41A;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #73d13d;
+    }
+    
+    /* 操作栏 */
+    .action-bar {
+      position: sticky;
+      bottom: 0;
+      background: white;
+      padding: 16px 24px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-left: -210px;
+      margin-right: -24px;
+      padding-right: 24px;
+    }
+    
+    /* 标签 */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .tag-success {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    .tag-warning {
+      background: #fffbe6;
+      color: #FAAD14;
+      border: 1px solid #ffe58f;
+    }
+    .tag-default {
+      background: #f5f5f5;
+      color: #666;
+      border: 1px solid #d9d9d9;
+    }
+    
+    /* 分类选择 */
+    .category-select {
+      display: flex;
+      gap: 8px;
+    }
+    .category-select select {
+      min-width: 120px;
+    }
+    
+    /* 规格标签 */
+    .spec-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .spec-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #1890FF;
+    }
+    .spec-tag .close {
+      cursor: pointer;
+      opacity: 0.6;
+    }
+    .spec-tag .close:hover {
+      opacity: 1;
+    }
+    .add-spec-btn {
+      padding: 4px 10px;
+      background: white;
+      border: 1px dashed #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+    }
+    .add-spec-btn:hover {
+      border-color: #1890FF;
+      color: #1890FF;
+    }
+    
+    /* 价格输入组 */
+    .price-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .price-input-group input {
+      width: 120px;
+    }
+    .price-input-group span {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    /* 面包屑 */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 16px;
+    }
+    .breadcrumb a {
+      color: #1890FF;
+      text-decoration: none;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 面包屑 -->
+    <div class="breadcrumb">
+      <a href="#">商品管理</a>
+      <i class="fas fa-chevron-right" style="font-size:10px"></i>
+      <a href="#">商品列表</a>
+      <i class="fas fa-chevron-right" style="font-size:10px"></i>
+      <span>编辑商品</span>
+    </div>
+
+    <!-- 页面标题 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h1 style="font-size:20px;font-weight:600;color:#333">编辑商品</h1>
+      <span class="tag tag-success"><i class="fas fa-check"></i> 已上架</span>
+    </div>
+
+    <!-- 商品基本信息 -->
+    <div class="card">
+      <div class="card-title">基本信息</div>
+      
+      <div class="form-row">
+        <label class="form-label required">商品名称</label>
+        <div class="form-input">
+          <input type="text" placeholder="请输入商品名称，最多50字" value="苹果 iPhone 15 Pro 手机壳 透明防摔保护壳">
+          <div class="form-hint">建议20字以内，突出商品核心卖点</div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label required">商品分类</label>
+        <div class="form-input">
+          <div class="category-select">
+            <select>
+              <option>数码产品</option>
+              <option>生活用品</option>
+              <option>食品饮料</option>
+              <option>家用电器</option>
+            </select>
+            <select>
+              <option>手机配件</option>
+              <option>电脑配件</option>
+              <option>相机配件</option>
+            </select>
+            <select>
+              <option>手机壳</option>
+              <option>手机膜</option>
+              <option>充电器</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">商品品牌</label>
+        <div class="form-input">
+          <select>
+            <option value="">请选择品牌</option>
+            <option selected>Apple</option>
+            <option>Samsung</option>
+            <option>Huawei</option>
+            <option>Xiaomi</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">商品规格</label>
+        <div class="form-input">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="font-size:13px;color:#666;margin-bottom:8px">颜色</div>
+              <div class="spec-tags">
+                <span class="spec-tag">透明 <i class="fas fa-times close"></i></span>
+                <span class="spec-tag">黑色 <i class="fas fa-times close"></i></span>
+                <span class="spec-tag">白色 <i class="fas fa-times close"></i></span>
+                <button class="add-spec-btn"><i class="fas fa-plus"></i> 添加颜色</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13px;color:#666;margin-bottom:8px">型号</div>
+              <div class="spec-tags">
+                <span class="spec-tag">iPhone 15 Pro <i class="fas fa-times close"></i></span>
+                <span class="spec-tag">iPhone 15 Pro Max <i class="fas fa-times close"></i></span>
+                <button class="add-spec-btn"><i class="fas fa-plus"></i> 添加型号</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商品图片 -->
+    <div class="card">
+      <div class="card-title">
+        商品图片
+        <span style="font-size:12px;color:#999;font-weight:400;margin-left:8px">最多上传9张，第一张为主图</span>
+      </div>
+      
+      <div class="image-upload-area">
+        <div class="image-box primary">
+          <img src="https://via.placeholder.com/100x100/e6f7ff/1890FF?text=主图" alt="主图">
+          <span class="delete-btn"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="image-box">
+          <img src="https://via.placeholder.com/100x100/f5f5f5/999?text=图2" alt="图片">
+          <span class="delete-btn"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="image-box">
+          <img src="https://via.placeholder.com/100x100/f5f5f5/999?text=图3" alt="图片">
+          <span class="delete-btn"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="image-box">
+          <img src="https://via.placeholder.com/100x100/f5f5f5/999?text=图4" alt="图片">
+          <span class="delete-btn"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="image-box">
+          <div class="placeholder">
+            <i class="fas fa-plus"></i>
+            <span>上传图片</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-hint" style="margin-top:12px">
+        <i class="fas fa-info-circle"></i> 支持 JPG、PNG 格式，单张不超过 5MB，建议尺寸 800x800 像素
+      </div>
+    </div>
+
+    <!-- 商品详情 -->
+    <div class="card">
+      <div class="card-title">商品详情</div>
+      
+      <div class="detail-editor">
+        <div class="editor-toolbar">
+          <button><i class="fas fa-bold"></i></button>
+          <button><i class="fas fa-italic"></i></button>
+          <button><i class="fas fa-underline"></i></button>
+          <button style="width:1px;padding:0;background:#d9d9d9;border:none;margin:0 4px"></button>
+          <button><i class="fas fa-align-left"></i></button>
+          <button><i class="fas fa-align-center"></i></button>
+          <button><i class="fas fa-align-right"></i></button>
+          <button style="width:1px;padding:0;background:#d9d9d9;border:none;margin:0 4px"></button>
+          <button><i class="fas fa-list-ul"></i></button>
+          <button><i class="fas fa-list-ol"></i></button>
+          <button style="width:1px;padding:0;background:#d9d9d9;border:none;margin:0 4px"></button>
+          <button><i class="fas fa-image"></i></button>
+          <button><i class="fas fa-link"></i></button>
+          <button><i class="fas fa-table"></i></button>
+        </div>
+        <div class="editor-content" contenteditable="true">
+          <p style="margin-bottom:12px"><strong>【产品特点】</strong></p>
+          <p style="margin-bottom:8px">1. 高透防摔材质，有效保护手机</p>
+          <p style="margin-bottom:8px">2. 精准开孔，不影响按键手感</p>
+          <p style="margin-bottom:8px">3. 轻薄设计，不增加额外厚度</p>
+          <p style="margin-bottom:8px">4. 防指纹涂层，持久洁净</p>
+          <p style="margin-bottom:16px;margin-top:12px"><strong>【适用机型】</strong></p>
+          <p style="margin-bottom:8px">iPhone 15 Pro / iPhone 15 Pro Max</p>
+          <p style="margin-bottom:16px;margin-top:12px"><strong>【包装清单】</strong></p>
+          <p>手机保护壳 x 1</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 价格库存 -->
+    <div class="card">
+      <div class="card-title">价格库存</div>
+      
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th style="width:25%">规格组合</th>
+            <th style="width:20%">成本价</th>
+            <th style="width:20%">销售价</th>
+            <th style="width:15%">库存</th>
+            <th style="width:15%">SKU编码</th>
+            <th style="width:5%">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="spec-color-preview" style="background:transparent;border:1px solid #d9d9d9"></span>
+                <span>透明 / iPhone 15 Pro</span>
+              </div>
+            </td>
+            <td><input type="number" value="15.00"></td>
+            <td><input type="number" value="39.90"></td>
+            <td><input type="number" value="500"></td>
+            <td><input type="text" value="SKU001"></td>
+            <td style="text-align:center"><i class="fas fa-trash" style="color:#FF4D4F;cursor:pointer"></i></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="spec-color-preview" style="background:transparent;border:1px solid #d9d9d9"></span>
+                <span>透明 / iPhone 15 Pro Max</span>
+              </div>
+            </td>
+            <td><input type="number" value="15.00"></td>
+            <td><input type="number" value="39.90"></td>
+            <td><input type="number" value="350"></td>
+            <td><input type="text" value="SKU002"></td>
+            <td style="text-align:center"><i class="fas fa-trash" style="color:#FF4D4F;cursor:pointer"></i></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="spec-color-preview" style="background:#333"></span>
+                <span>黑色 / iPhone 15 Pro</span>
+              </div>
+            </td>
+            <td><input type="number" value="15.00"></td>
+            <td><input type="number" value="39.90"></td>
+            <td><input type="number" value="280"></td>
+            <td><input type="text" value="SKU003"></td>
+            <td style="text-align:center"><i class="fas fa-trash" style="color:#FF4D4F;cursor:pointer"></i></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="spec-color-preview" style="background:#333"></span>
+                <span>黑色 / iPhone 15 Pro Max</span>
+              </div>
+            </td>
+            <td><input type="number" value="15.00"></td>
+            <td><input type="number" value="39.90"></td>
+            <td><input type="number" value="200"></td>
+            <td><input type="text" value="SKU004"></td>
+            <td style="text-align:center"><i class="fas fa-trash" style="color:#FF4D4F;cursor:pointer"></i></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="spec-color-preview" style="background:#fff;border:1px solid #d9d9d9"></span>
+                <span>白色 / iPhone 15 Pro</span>
+              </div>
+            </td>
+            <td><input type="number" value="15.00"></td>
+            <td><input type="number" value="39.90"></td>
+            <td><input type="number" value="150"></td>
+            <td><input type="text" value="SKU005"></td>
+            <td style="text-align:center"><i class="fas fa-trash" style="color:#FF4D4F;cursor:pointer"></i></td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="spec-color-preview" style="background:#fff;border:1px solid #d9d9d9"></span>
+                <span>白色 / iPhone 15 Pro Max</span>
+              </div>
+            </td>
+            <td><input type="number" value="15.00"></td>
+            <td><input type="number" value="39.90"></td>
+            <td><input type="number" value="120"></td>
+            <td><input type="text" value="SKU006"></td>
+            <td style="text-align:center"><i class="fas fa-trash" style="color:#FF4D4F;cursor:pointer"></i></td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <div style="margin-top:16px;padding:12px;background:#fafafa;border-radius:4px;font-size:13px;color:#666">
+        <i class="fas fa-calculator" style="margin-right:8px"></i>
+        总库存：<span style="color:#1890FF;font-weight:600">1,600</span> 件
+        <span style="margin-left:24px">总价值：<span style="color:#1890FF;font-weight:600">¥63,840.00</span></span>
+      </div>
+    </div>
+
+    <!-- 上下架设置 -->
+    <div class="card">
+      <div class="card-title">上架设置</div>
+      
+      <div class="form-row">
+        <label class="form-label">商品状态</label>
+        <div class="form-input">
+          <div class="status-switch">
+            <label class="switch-item">
+              <input type="radio" name="status" checked>
+              <span class="switch-track"></span>
+              <span class="switch-label">立即上架</span>
+            </label>
+            <label class="switch-item">
+              <input type="radio" name="status">
+              <span class="switch-track"></span>
+              <span class="switch-label">放入仓库</span>
+            </label>
+            <label class="switch-item">
+              <input type="radio" name="status">
+              <span class="switch-track"></span>
+              <span class="switch-label">定时上架</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">定时上架时间</label>
+        <div class="form-input">
+          <input type="datetime-local" disabled style="background:#f5f5f5">
+          <div class="form-hint">选择定时上架后可设置具体时间</div>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <label class="form-label">商品排序</label>
+        <div class="form-input">
+          <input type="number" value="100" style="width:120px">
+          <div class="form-hint">数字越大排名越靠前，默认100</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="action-bar">
+      <button class="btn btn-default"><i class="fas fa-arrow-left"></i> 返回列表</button>
+      <button class="btn btn-default"><i class="fas fa-save"></i> 保存草稿</button>
+      <button class="btn btn-default"><i class="fas fa-eye"></i> 预览</button>
+      <button class="btn btn-primary"><i class="fas fa-save"></i> 保存</button>
+      <button class="btn btn-success"><i class="fas fa-paper-plane"></i> 提交审核</button>
+    </div>
+  </main>
+</body>
+</html>

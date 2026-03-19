@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>消息中心 - 臻伟福利商家端</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { 
+      height: 100%; 
+      background: #f5f5f5; 
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+    }
+    
+    /* 整体布局 */
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: #001529;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .sidebar-logo {
+      height: 56px;
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .sidebar-logo i {
+      color: white;
+      font-size: 22px;
+    }
+    
+    .sidebar-logo span {
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .sidebar-menu {
+      flex: 1;
+      padding: 8px 0;
+      overflow-y: auto;
+    }
+    
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 24px;
+      color: rgba(255,255,255,0.65);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
+    
+    .menu-item:hover {
+      color: white;
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .menu-item.active {
+      color: white;
+      background: #52C41A;
+    }
+    
+    .menu-item i {
+      font-size: 16px;
+      width: 16px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    /* 顶部栏 */
+    .top-bar {
+      height: 56px;
+      background: white;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .breadcrumb {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .breadcrumb span {
+      color: #333;
+      font-weight: 500;
+    }
+    
+    .top-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 14px;
+    }
+    
+    .user-name {
+      font-size: 14px;
+      color: #333;
+    }
+    
+    /* 内容区 */
+    .content-area {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: #f5f5f5;
+    }
+    
+    /* 页面标题 */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid #d9d9d9;
+      background: white;
+      color: #666;
+      transition: all 0.2s;
+    }
+    
+    .btn:hover {
+      color: #52C41A;
+      border-color: #52C41A;
+    }
+    
+    .btn-primary {
+      background: #52C41A;
+      border-color: #52C41A;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #45a617;
+      border-color: #45a617;
+      color: white;
+    }
+    
+    /* 消息分类标签 */
+    .message-tabs {
+      display: flex;
+      gap: 0;
+      background: white;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    
+    .tab-item {
+      padding: 10px 24px;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      position: relative;
+    }
+    
+    .tab-item:hover {
+      color: #52C41A;
+    }
+    
+    .tab-item.active {
+      background: #52C41A;
+      color: white;
+    }
+    
+    .tab-badge {
+      position: absolute;
+      top: 2px;
+      right: 8px;
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+    
+    .tab-item.active .tab-badge {
+      background: white;
+      color: #52C41A;
+    }
+    
+    /* 消息列表 */
+    .message-list {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    
+    .message-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 16px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    
+    .message-item:last-child {
+      border-bottom: none;
+    }
+    
+    .message-item:hover {
+      background: #fafafa;
+    }
+    
+    .message-item.unread {
+      background: #f6ffed;
+    }
+    
+    .message-item.unread:hover {
+      background: #e6f7e0;
+    }
+    
+    .message-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-right: 16px;
+    }
+    
+    .message-icon.system {
+      background: linear-gradient(135deg, #e6f7ff, #bae7ff);
+      color: #1890FF;
+    }
+    
+    .message-icon.order {
+      background: linear-gradient(135deg, #f6ffed, #d9f7be);
+      color: #52C41A;
+    }
+    
+    .message-icon.activity {
+      background: linear-gradient(135deg, #fff7e6, #ffe7ba);
+      color: #FA8C16;
+    }
+    
+    .message-content {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .message-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    
+    .message-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      background: #FF4D4F;
+      border-radius: 50%;
+    }
+    
+    .message-time {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .message-summary {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .message-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: 16px;
+      flex-shrink: 0;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .message-item:hover .message-actions {
+      opacity: 1;
+    }
+    
+    .action-btn {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      background: white;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:hover {
+      color: #52C41A;
+      border-color: #52C41A;
+    }
+    
+    .action-btn.danger:hover {
+      color: #FF4D4F;
+      border-color: #FF4D4F;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .empty-state i {
+      font-size: 48px;
+      color: #d9d9d9;
+      margin-bottom: 16px;
+    }
+    
+    .empty-state p {
+      font-size: 14px;
+      color: #999;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 20px;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+    
+    .page-btn:hover {
+      color: #52C41A;
+      border-color: #52C41A;
+    }
+    
+    .page-btn.active {
+      background: #52C41A;
+      border-color: #52C41A;
+      color: white;
+    }
+    
+    .page-btn.disabled {
+      color: #d9d9d9;
+      cursor: not-allowed;
+    }
+    
+    /* 选中操作栏 */
+    .selection-bar {
+      display: none;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      background: #f6ffed;
+      border-bottom: 1px solid #b7eb8f;
+    }
+    
+    .selection-bar.show {
+      display: flex;
+    }
+    
+    .selection-info {
+      font-size: 14px;
+      color: #52C41A;
+    }
+    
+    .selection-actions {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <i class="fas fa-store"></i>
+        <span>臻伟福利</span>
+      </div>
+      <nav class="sidebar-menu">
+        <div class="menu-item">
+          <i class="fas fa-home"></i>
+          <span>工作台</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-box"></i>
+          <span>订单管理</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-undo-alt"></i>
+          <span>售后管理</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-truck"></i>
+          <span>物流查询</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-comments"></i>
+          <span>客服对话</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-gift"></i>
+          <span>兑换记录</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-chart-line"></i>
+          <span>数据统计</span>
+        </div>
+        <div class="menu-item active">
+          <i class="fas fa-bell"></i>
+          <span>消息中心</span>
+        </div>
+        <div class="menu-item">
+          <i class="fas fa-cog"></i>
+          <span>店铺设置</span>
+        </div>
+      </nav>
+    </aside>
+    
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- 顶部栏 -->
+      <header class="top-bar">
+        <div class="top-bar-left">
+          <div class="breadcrumb">
+            首页 / <span>消息中心</span>
+          </div>
+        </div>
+        <div class="top-bar-right">
+          <div class="user-info">
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="user-name">商家管理员</span>
+            <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
+          </div>
+        </div>
+      </header>
+      
+      <!-- 内容区 -->
+      <div class="content-area">
+        <!-- 页面标题 -->
+        <div class="page-header">
+          <h1 class="page-title">消息中心</h1>
+          <div class="header-actions">
+            <button class="btn" id="markAllRead">
+              <i class="fas fa-check-double" style="margin-right: 6px;"></i>全部标记已读
+            </button>
+          </div>
+        </div>
+        
+        <!-- 消息分类标签 -->
+        <div class="message-tabs">
+          <div class="tab-item active" data-tab="all">
+            全部消息
+            <span class="tab-badge">12</span>
+          </div>
+          <div class="tab-item" data-tab="system">
+            <i class="fas fa-cog" style="margin-right: 6px;"></i>系统通知
+            <span class="tab-badge">3</span>
+          </div>
+          <div class="tab-item" data-tab="order">
+            <i class="fas fa-shopping-bag" style="margin-right: 6px;"></i>订单消息
+            <span class="tab-badge">8</span>
+          </div>
+          <div class="tab-item" data-tab="activity">
+            <i class="fas fa-bullhorn" style="margin-right: 6px;"></i>活动公告
+            <span class="tab-badge">1</span>
+          </div>
+        </div>
+        
+        <!-- 选中操作栏 -->
+        <div class="selection-bar" id="selectionBar">
+          <span class="selection-info">已选择 <strong id="selectedCount">0</strong> 条消息</span>
+          <div class="selection-actions">
+            <button class="btn" id="batchMarkRead">标记已读</button>
+            <button class="btn" id="batchDelete">删除</button>
+            <button class="btn" id="cancelSelection">取消选择</button>
+          </div>
+        </div>
+        
+        <!-- 消息列表 -->
+        <div class="message-list" id="messageList">
+          <!-- 系统通知 -->
+          <div class="message-item unread" data-type="system" data-id="1">
+            <div class="message-icon system">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">
+                  系统维护通知
+                  <span class="unread-dot"></span>
+                </div>
+                <span class="message-time">2026-03-19 15:30</span>
+              </div>
+              <div class="message-summary">系统将于2026年3月20日凌晨2:00-4:00进行例行维护升级，届时系统将暂停服务，请提前做好相关安排。</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn">标记已读</button>
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <!-- 订单消息 -->
+          <div class="message-item unread" data-type="order" data-id="2">
+            <div class="message-icon order">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">
+                  新订单通知
+                  <span class="unread-dot"></span>
+                </div>
+                <span class="message-time">2026-03-19 14:22</span>
+              </div>
+              <div class="message-summary">您收到一个新订单，订单号：20260319003，商品：蓝牙耳机 x1，收件人：王**，请及时处理发货。</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn">标记已读</button>
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <div class="message-item unread" data-type="order" data-id="3">
+            <div class="message-icon order">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">
+                  订单支付成功
+                  <span class="unread-dot"></span>
+                </div>
+                <span class="message-time">2026-03-19 12:15</span>
+              </div>
+              <div class="message-summary">订单20260319002已支付成功，金额：¥128.00，请尽快安排发货。</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn">标记已读</button>
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <!-- 活动公告 -->
+          <div class="message-item unread" data-type="activity" data-id="4">
+            <div class="message-icon activity">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">
+                  春季促销活动报名通知
+                  <span class="unread-dot"></span>
+                </div>
+                <span class="message-time">2026-03-19 10:00</span>
+              </div>
+              <div class="message-summary">平台将于3月25日-31日举办春季促销活动，现已开放商家报名，活动期间平台将提供流量扶持和补贴优惠，点击查看详情并报名参与。</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn">标记已读</button>
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <!-- 已读消息 -->
+          <div class="message-item" data-type="order" data-id="5">
+            <div class="message-icon order">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">订单发货成功</div>
+                <span class="message-time">2026-03-18 16:45</span>
+              </div>
+              <div class="message-summary">订单20260318001已成功发货，物流公司：顺丰快递，运单号：SF1234567890</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <div class="message-item" data-type="system" data-id="6">
+            <div class="message-icon system">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">账户安全提醒</div>
+                <span class="message-time">2026-03-18 09:30</span>
+              </div>
+              <div class="message-summary">您的账户于2026年3月18日09:25在新设备登录，如非本人操作，请及时修改密码并联系客服。</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <div class="message-item" data-type="order" data-id="7">
+            <div class="message-icon order">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">售后申请通知</div>
+                <span class="message-time">2026-03-17 20:12</span>
+              </div>
+              <div class="message-summary">订单20260315002申请售后服务，售后类型：退货退款，原因：商品与描述不符，请及时处理。</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <div class="message-item" data-type="order" data-id="8">
+            <div class="message-icon order">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">订单确认收货</div>
+                <span class="message-time">2026-03-17 14:30</span>
+              </div>
+              <div class="message-summary">订单20260312001买家已确认收货，订单完成。感谢您对平台的信任与支持！</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <div class="message-item" data-type="system" data-id="9">
+            <div class="message-icon system">
+              <i class="fas fa-cog"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">新功能上线通知</div>
+                <span class="message-time">2026-03-16 10:00</span>
+              </div>
+              <div class="message-summary">商家端新增数据看板功能，支持自定义统计维度和数据导出，帮助您更好地了解经营状况。</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+          
+          <div class="message-item" data-type="order" data-id="10">
+            <div class="message-icon order">
+              <i class="fas fa-shopping-bag"></i>
+            </div>
+            <div class="message-content">
+              <div class="message-header">
+                <div class="message-title">订单评价提醒</div>
+                <span class="message-time">2026-03-15 18:22</span>
+              </div>
+              <div class="message-summary">订单20260310003买家已评价，评分：5星，评价内容：商品质量很好，物流很快，下次还会再来！</div>
+            </div>
+            <div class="message-actions">
+              <button class="action-btn danger">删除</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 分页 -->
+        <div class="pagination">
+          <button class="page-btn disabled"><i class="fas fa-chevron-left"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    // 标签切换
+    document.querySelectorAll('.tab-item').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const type = this.dataset.tab;
+        filterMessages(type);
+      });
+    });
+    
+    // 筛选消息
+    function filterMessages(type) {
+      const items = document.querySelectorAll('.message-item');
+      items.forEach(item => {
+        if (type === 'all' || item.dataset.type === type) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+    
+    // 标记已读
+    document.querySelectorAll('.action-btn:not(.danger)').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const item = this.closest('.message-item');
+        item.classList.remove('unread');
+        const dot = item.querySelector('.unread-dot');
+        if (dot) dot.remove();
+        this.remove();
+        updateBadges();
+      });
+    });
+    
+    // 删除消息
+    document.querySelectorAll('.action-btn.danger').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const item = this.closest('.message-item');
+        item.style.transition = 'all 0.3s';
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(20px)';
+        setTimeout(() => {
+          item.remove();
+          updateBadges();
+        }, 300);
+      });
+    });
+    
+    // 全部标记已读
+    document.getElementById('markAllRead').addEventListener('click', function() {
+      document.querySelectorAll('.message-item.unread').forEach(item => {
+        item.classList.remove('unread');
+        const dot = item.querySelector('.unread-dot');
+        if (dot) dot.remove();
+        const markReadBtn = item.querySelector('.action-btn:not(.danger)');
+        if (markReadBtn) markReadBtn.remove();
+      });
+      updateBadges();
+    });
+    
+    // 更新角标
+    function updateBadges() {
+      const tabs = document.querySelectorAll('.tab-item');
+      const types = ['all', 'system', 'order', 'activity'];
+      
+      types.forEach((type, index) => {
+        let count = 0;
+        if (type === 'all') {
+          count = document.querySelectorAll('.message-item.unread').length;
+        } else {
+          count = document.querySelectorAll(`.message-item.unread[data-type="${type}"]`).length;
+        }
+        
+        const badge = tabs[index].querySelector('.tab-badge');
+        if (badge) {
+          if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'flex';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+      });
+    }
+    
+    // 菜单项点击
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // 分页点击
+    document.querySelectorAll('.page-btn:not(.disabled)').forEach(btn => {
+      btn.addEventListener('click', function() {
+        if (this.textContent.trim() && !isNaN(this.textContent.trim())) {
+          document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 订单管理</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #e5e5e5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    /* 顶部Tab样式 */
+    .tab-header {
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+      padding-top: 44px;
+    }
+    
+    .tab-title {
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .tab-nav {
+      display: flex;
+      background: white;
+      border-radius: 16px 16px 0 0;
+      margin-top: 8px;
+    }
+    
+    .tab-item {
+      flex: 1;
+      text-align: center;
+      padding: 14px 0;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+    
+    .tab-item.active {
+      color: #52C41A;
+      font-weight: 600;
+    }
+    
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 3px;
+      background: #52C41A;
+      border-radius: 2px;
+    }
+    
+    .tab-badge {
+      display: inline-block;
+      background: #FF4D4F;
+      color: white;
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 10px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    
+    /* 订单列表 */
+    .order-list {
+      padding: 12px 16px;
+    }
+    
+    .order-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .order-card:active {
+      transform: scale(0.99);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .order-no {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .order-status {
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    
+    .status-pending {
+      background: #FFF7E6;
+      color: #FA8C16;
+    }
+    
+    .status-shipped {
+      background: #E6F7FF;
+      color: #1890FF;
+    }
+    
+    .status-completed {
+      background: #F0FDF4;
+      color: #52C41A;
+    }
+    
+    .order-time {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .order-goods {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    
+    .goods-image {
+      width: 60px;
+      height: 60px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .goods-image i {
+      color: #ccc;
+      font-size: 24px;
+    }
+    
+    .goods-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .goods-name {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 6px;
+    }
+    
+    .goods-spec {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 4px;
+    }
+    
+    .goods-price {
+      font-size: 14px;
+      color: #FF4D4F;
+      font-weight: 600;
+    }
+    
+    .order-recipient {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #fafafa;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .recipient-icon {
+      width: 28px;
+      height: 28px;
+      background: #52C41A;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .recipient-icon i {
+      color: white;
+      font-size: 12px;
+    }
+    
+    .recipient-info {
+      flex: 1;
+      font-size: 13px;
+      color: #333;
+    }
+    
+    .recipient-phone {
+      color: #999;
+      margin-left: 8px;
+    }
+    
+    /* 操作按钮 */
+    .order-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    
+    .action-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    
+    .action-btn:active {
+      transform: scale(0.95);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #52C41A, #22c55e);
+      color: white;
+      box-shadow: 0 2px 8px rgba(82, 196, 26, 0.3);
+    }
+    
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #666;
+    }
+    
+    .btn-outline {
+      background: white;
+      color: #52C41A;
+      border: 1px solid #52C41A;
+    }
+    
+    /* 底部导航 */
+    .bottom-nav {
+      width: 390px;
+      margin: 0 auto;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      cursor: pointer;
+      padding: 6px 32px;
+    }
+    
+    .nav-item.active {
+      color: #52C41A;
+    }
+    
+    .nav-item i {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+    
+    .nav-item span {
+      font-size: 11px;
+    }
+    
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    
+    .empty-icon {
+      width: 80px;
+      height: 80px;
+      background: #f5f5f5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+    
+    .empty-icon i {
+      font-size: 32px;
+      color: #ccc;
+    }
+    
+    .empty-text {
+      font-size: 14px;
+      color: #999;
+    }
+    
+    /* 搜索栏 */
+    .search-bar {
+      padding: 12px 16px;
+      background: white;
+    }
+    
+    .search-input {
+      width: 100%;
+      height: 36px;
+      background: #f5f5f5;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 8px;
+    }
+    
+    .search-input i {
+      color: #ccc;
+      font-size: 14px;
+    }
+    
+    .search-input input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      outline: none;
+    }
+    
+    .search-input input::placeholder {
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#52C41A,#22c55e)"></div>
+      
+      <!-- 顶部标题 -->
+      <div class="tab-header">
+        <div class="tab-title">
+          <i class="fas fa-clipboard-list"></i>
+          订单管理
+        </div>
+        
+        <!-- Tab导航 -->
+        <div class="tab-nav">
+          <div class="tab-item active" data-tab="all">
+            全部
+          </div>
+          <div class="tab-item" data-tab="pending">
+            待发货<span class="tab-badge">8</span>
+          </div>
+          <div class="tab-item" data-tab="shipped">
+            已发货<span class="tab-badge">3</span>
+          </div>
+          <div class="tab-item" data-tab="completed">
+            已完成
+          </div>
+        </div>
+      </div>
+      
+      <!-- 搜索栏 -->
+      <div class="search-bar">
+        <div class="search-input">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="搜索订单号/收件人/商品">
+        </div>
+      </div>
+      
+      <!-- 订单列表 -->
+      <div class="order-list">
+        <!-- 订单卡片1 - 待发货 -->
+        <div class="order-card">
+          <div class="order-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="order-no">20260319001</span>
+              <span class="order-status status-pending">待发货</span>
+            </div>
+            <span class="order-time">刚刚</span>
+          </div>
+          
+          <div class="order-goods">
+            <div class="goods-image">
+              <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="goods-info">
+              <div class="goods-name">iPhone手机壳 透明防摔</div>
+              <div class="goods-spec">透明 / iPhone 15 Pro Max</div>
+              <div class="goods-price">¥68.00</div>
+            </div>
+          </div>
+          
+          <div class="order-recipient">
+            <div class="recipient-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="recipient-info">
+              张先生<span class="recipient-phone">138****1234</span>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <div class="action-btn btn-secondary">
+              <i class="fas fa-phone"></i>联系客户
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-eye"></i>查看详情
+            </div>
+            <div class="action-btn btn-primary">
+              <i class="fas fa-truck"></i>发货
+            </div>
+          </div>
+        </div>
+        
+        <!-- 订单卡片2 - 待发货 -->
+        <div class="order-card">
+          <div class="order-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="order-no">20260319002</span>
+              <span class="order-status status-pending">待发货</span>
+            </div>
+            <span class="order-time">10分钟前</span>
+          </div>
+          
+          <div class="order-goods">
+            <div class="goods-image">
+              <i class="fas fa-bolt"></i>
+            </div>
+            <div class="goods-info">
+              <div class="goods-name">无线充电器 快充版</div>
+              <div class="goods-spec">黑色 / 15W</div>
+              <div class="goods-price">¥156.00</div>
+            </div>
+          </div>
+          
+          <div class="order-recipient">
+            <div class="recipient-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="recipient-info">
+              李女士<span class="recipient-phone">139****5678</span>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <div class="action-btn btn-secondary">
+              <i class="fas fa-phone"></i>联系客户
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-eye"></i>查看详情
+            </div>
+            <div class="action-btn btn-primary">
+              <i class="fas fa-truck"></i>发货
+            </div>
+          </div>
+        </div>
+        
+        <!-- 订单卡片3 - 已发货 -->
+        <div class="order-card">
+          <div class="order-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="order-no">20260318015</span>
+              <span class="order-status status-shipped">已发货</span>
+            </div>
+            <span class="order-time">2小时前</span>
+          </div>
+          
+          <div class="order-goods">
+            <div class="goods-image">
+              <i class="fas fa-headphones"></i>
+            </div>
+            <div class="goods-info">
+              <div class="goods-name">蓝牙耳机 Pro 降噪版</div>
+              <div class="goods-spec">星空黑 / 标准版</div>
+              <div class="goods-price">¥299.00</div>
+            </div>
+          </div>
+          
+          <div class="order-recipient">
+            <div class="recipient-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="recipient-info">
+              王先生<span class="recipient-phone">137****9012</span>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <div class="action-btn btn-secondary">
+              <i class="fas fa-phone"></i>联系客户
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-eye"></i>查看详情
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-truck"></i>物流跟踪
+            </div>
+          </div>
+        </div>
+        
+        <!-- 订单卡片4 - 已完成 -->
+        <div class="order-card">
+          <div class="order-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="order-no">20260318008</span>
+              <span class="order-status status-completed">已完成</span>
+            </div>
+            <span class="order-time">昨天 14:30</span>
+          </div>
+          
+          <div class="order-goods">
+            <div class="goods-image">
+              <i class="fas fa-keyboard"></i>
+            </div>
+            <div class="goods-info">
+              <div class="goods-name">机械键盘 RGB背光</div>
+              <div class="goods-spec">青轴 / 87键</div>
+              <div class="goods-price">¥459.00</div>
+            </div>
+          </div>
+          
+          <div class="order-recipient">
+            <div class="recipient-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="recipient-info">
+              赵女士<span class="recipient-phone">135****3456</span>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <div class="action-btn btn-secondary">
+              <i class="fas fa-phone"></i>联系客户
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-eye"></i>查看详情
+            </div>
+          </div>
+        </div>
+        
+        <!-- 订单卡片5 - 已完成 -->
+        <div class="order-card">
+          <div class="order-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="order-no">20260318005</span>
+              <span class="order-status status-completed">已完成</span>
+            </div>
+            <span class="order-time">昨天 10:15</span>
+          </div>
+          
+          <div class="order-goods">
+            <div class="goods-image">
+              <i class="fas fa-mouse"></i>
+            </div>
+            <div class="goods-info">
+              <div class="goods-name">无线鼠标 静音款</div>
+              <div class="goods-spec">白色 / 蓝牙双模</div>
+              <div class="goods-price">¥128.00</div>
+            </div>
+          </div>
+          
+          <div class="order-recipient">
+            <div class="recipient-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="recipient-info">
+              孙先生<span class="recipient-phone">136****7890</span>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <div class="action-btn btn-secondary">
+              <i class="fas fa-phone"></i>联系客户
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-eye"></i>查看详情
+            </div>
+          </div>
+        </div>
+        
+        <!-- 订单卡片6 - 已发货 -->
+        <div class="order-card">
+          <div class="order-header">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="order-no">20260317022</span>
+              <span class="order-status status-shipped">已发货</span>
+            </div>
+            <span class="order-time">前天 16:45</span>
+          </div>
+          
+          <div class="order-goods">
+            <div class="goods-image">
+              <i class="fas fa-tablet-alt"></i>
+            </div>
+            <div class="goods-info">
+              <div class="goods-name">iPad支架 可折叠</div>
+              <div class="goods-spec">银色 / 通用款</div>
+              <div class="goods-price">¥89.00</div>
+            </div>
+          </div>
+          
+          <div class="order-recipient">
+            <div class="recipient-icon">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="recipient-info">
+              周女士<span class="recipient-phone">158****2468</span>
+            </div>
+          </div>
+          
+          <div class="order-actions">
+            <div class="action-btn btn-secondary">
+              <i class="fas fa-phone"></i>联系客户
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-eye"></i>查看详情
+            </div>
+            <div class="action-btn btn-outline">
+              <i class="fas fa-truck"></i>物流跟踪
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>工作台</span>
+      </div>
+      <div class="nav-item active">
+        <i class="fas fa-clipboard-list"></i>
+        <span>订单</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Tab切换交互
+    document.querySelectorAll('.tab-item').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    // 按钮点击效果
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const text = this.textContent.trim();
+        if (text.includes('发货')) {
+          alert('发货功能开发中...');
+        } else if (text.includes('查看详情')) {
+          alert('查看订单详情');
+        } else if (text.includes('联系客户')) {
+          alert('拨打客户电话');
+        } else if (text.includes('物流跟踪')) {
+          alert('查看物流信息');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

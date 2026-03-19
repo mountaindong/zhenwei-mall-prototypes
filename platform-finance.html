@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 财务管理</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    .menu-group {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .menu-group-title {
+      padding: 8px 24px;
+      font-size: 12px;
+      color: #999;
+      font-weight: 500;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 数据卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 8px;
+    }
+    
+    /* 图表容器 */
+    .chart-container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    
+    /* 状态标签 */
+    .status-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-pending {
+      background: #fffbe6;
+      color: #FAAD14;
+    }
+    .status-success {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .status-processing {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .status-rejected {
+      background: #fff2f0;
+      color: #FF4D4F;
+    }
+    
+    /* Tab切换 */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #f0f0f0;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 12px 24px;
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .tab:hover {
+      color: #1890FF;
+    }
+    .tab.active {
+      color: #1890FF;
+      border-bottom-color: #1890FF;
+      font-weight: 500;
+    }
+    
+    /* 按钮 */
+    .btn {
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      outline: none;
+    }
+    .btn-primary {
+      background: #1890FF;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #40a9ff;
+    }
+    .btn-success {
+      background: #52C41A;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #73d13d;
+    }
+    .btn-danger {
+      background: #FF4D4F;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #ff7875;
+    }
+    .btn-default {
+      background: white;
+      color: #333;
+      border: 1px solid #d9d9d9;
+    }
+    .btn-default:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+    }
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+    }
+    .page-btn:hover {
+      color: #1890FF;
+      border-color: #1890FF;
+    }
+    .page-btn.active {
+      background: #1890FF;
+      color: white;
+      border-color: #1890FF;
+    }
+    .page-btn:disabled {
+      color: #d9d9d9;
+      border-color: #d9d9d9;
+      cursor: not-allowed;
+    }
+    .page-info {
+      font-size: 13px;
+      color: #666;
+      margin-right: 8px;
+    }
+    
+    /* 搜索筛选 */
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-item label {
+      font-size: 13px;
+      color: #666;
+      white-space: nowrap;
+    }
+    .filter-item input,
+    .filter-item select {
+      padding: 6px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .filter-item input:focus,
+    .filter-item select:focus {
+      border-color: #1890FF;
+      box-shadow: 0 0 0 2px rgba(24,144,255,0.1);
+    }
+    
+    /* 操作按钮组 */
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    
+    /* 统计卡片带图标 */
+    .stat-card-icon {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .stat-icon-wrapper {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    
+    /* 隐藏内容 */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <div class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item active">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面标题 -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:20px;font-weight:600;color:#333">财务管理</h1>
+      <div style="font-size:13px;color:#999;margin-top:4px">管理平台结算与提现业务</div>
+    </div>
+
+    <!-- 数据概览 -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <div>
+            <div class="stat-label">待结算金额</div>
+            <div class="stat-value" style="color:#FAAD14">¥256,800</div>
+            <div style="font-size:12px;color:#999;margin-top:4px">12笔待处理</div>
+          </div>
+          <div class="stat-icon-wrapper" style="background:#fffbe6">
+            <i class="fas fa-clock" style="color:#FAAD14"></i>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <div>
+            <div class="stat-label">已结算金额</div>
+            <div class="stat-value" style="color:#52C41A">¥1,568,900</div>
+            <div style="font-size:12px;color:#999;margin-top:4px">本月累计</div>
+          </div>
+          <div class="stat-icon-wrapper" style="background:#f6ffed">
+            <i class="fas fa-check-circle" style="color:#52C41A"></i>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-icon">
+          <div>
+            <div class="stat-label">待审核提现</div>
+            <div class="stat-value" style="color:#FF4D4F">¥89,500</div>
+            <div style="font-size:12px;color:#999;margin-top:4px">5笔待审核</div>
+          </div>
+          <div class="stat-icon-wrapper" style="background:#fff2f0">
+            <i class="fas fa-exclamation-circle" style="color:#FF4D4F"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab内容区 -->
+    <div class="chart-container">
+      <!-- Tab导航 -->
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('settlement')">结算管理</div>
+        <div class="tab" onclick="switchTab('withdrawal')">提现审核</div>
+      </div>
+
+      <!-- 结算管理 Tab -->
+      <div id="settlement-tab" class="tab-content active">
+        <!-- 搜索筛选 -->
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label>商家名称</label>
+            <input type="text" placeholder="请输入商家名称" style="width:180px">
+          </div>
+          <div class="filter-item">
+            <label>结算状态</label>
+            <select style="width:120px">
+              <option>全部状态</option>
+              <option>待结算</option>
+              <option>结算中</option>
+              <option>已结算</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>结算周期</label>
+            <input type="date" style="width:140px">
+            <span style="color:#d9d9d9">-</span>
+            <input type="date" style="width:140px">
+          </div>
+          <button class="btn btn-primary">
+            <i class="fas fa-search" style="margin-right:4px"></i>查询
+          </button>
+          <button class="btn btn-default">重置</button>
+        </div>
+
+        <!-- 结算列表 -->
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>结算单号</th>
+              <th>商家名称</th>
+              <th>结算周期</th>
+              <th>结算金额</th>
+              <th>订单数量</th>
+              <th>状态</th>
+              <th>创建时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:#1890FF">JS20260319001</td>
+              <td>华为官方旗舰店</td>
+              <td>2026-03-01 ~ 2026-03-15</td>
+              <td style="font-weight:600;color:#333">¥128,500.00</td>
+              <td>156</td>
+              <td><span class="status-tag status-pending">待结算</span></td>
+              <td>2026-03-16 10:30</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-primary" style="font-size:12px">确认结算</button>
+                  <button class="btn btn-default" style="font-size:12px">详情</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">JS20260318002</td>
+              <td>小米科技专营店</td>
+              <td>2026-03-01 ~ 2026-03-15</td>
+              <td style="font-weight:600;color:#333">¥86,200.00</td>
+              <td>98</td>
+              <td><span class="status-tag status-processing">结算中</span></td>
+              <td>2026-03-16 09:15</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-default" style="font-size:12px">详情</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">JS20260317003</td>
+              <td>OPPO官方旗舰店</td>
+              <td>2026-02-16 ~ 2026-02-28</td>
+              <td style="font-weight:600;color:#333">¥65,800.00</td>
+              <td>72</td>
+              <td><span class="status-tag status-success">已结算</span></td>
+              <td>2026-03-15 16:20</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-default" style="font-size:12px">详情</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">JS20260316004</td>
+              <td>vivo授权专卖店</td>
+              <td>2026-02-16 ~ 2026-02-28</td>
+              <td style="font-weight:600;color:#333">¥45,300.00</td>
+              <td>58</td>
+              <td><span class="status-tag status-success">已结算</span></td>
+              <td>2026-03-14 11:45</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-default" style="font-size:12px">详情</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">JS20260315005</td>
+              <td>苹果授权经销商</td>
+              <td>2026-02-16 ~ 2026-02-28</td>
+              <td style="font-weight:600;color:#333">¥256,800.00</td>
+              <td>245</td>
+              <td><span class="status-tag status-success">已结算</span></td>
+              <td>2026-03-13 14:30</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-default" style="font-size:12px">详情</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <span class="page-info">共 86 条记录</span>
+          <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">5</button>
+          <span style="color:#d9d9d9">...</span>
+          <button class="page-btn">9</button>
+          <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+          <div class="filter-item" style="margin-left:12px">
+            <label>每页</label>
+            <select style="width:70px">
+              <option>10条</option>
+              <option>20条</option>
+              <option>50条</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 提现审核 Tab -->
+      <div id="withdrawal-tab" class="tab-content">
+        <!-- 搜索筛选 -->
+        <div class="filter-bar">
+          <div class="filter-item">
+            <label>申请人</label>
+            <input type="text" placeholder="请输入申请人姓名" style="width:150px">
+          </div>
+          <div class="filter-item">
+            <label>商家名称</label>
+            <input type="text" placeholder="请输入商家名称" style="width:180px">
+          </div>
+          <div class="filter-item">
+            <label>审核状态</label>
+            <select style="width:120px">
+              <option>全部状态</option>
+              <option>待审核</option>
+              <option>已通过</option>
+              <option>已拒绝</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>申请时间</label>
+            <input type="date" style="width:140px">
+            <span style="color:#d9d9d9">-</span>
+            <input type="date" style="width:140px">
+          </div>
+          <button class="btn btn-primary">
+            <i class="fas fa-search" style="margin-right:4px"></i>查询
+          </button>
+          <button class="btn btn-default">重置</button>
+        </div>
+
+        <!-- 提现列表 -->
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>申请单号</th>
+              <th>申请人</th>
+              <th>所属商家</th>
+              <th>提现金额</th>
+              <th>银行账户</th>
+              <th>状态</th>
+              <th>申请时间</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color:#1890FF">TX20260319001</td>
+              <td>张三</td>
+              <td>华为官方旗舰店</td>
+              <td style="font-weight:600;color:#333">¥35,000.00</td>
+              <td>尾号8899 (工商银行)</td>
+              <td><span class="status-tag status-pending">待审核</span></td>
+              <td>2026-03-19 09:30</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-success" style="font-size:12px">通过</button>
+                  <button class="btn btn-danger" style="font-size:12px">拒绝</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">TX20260318002</td>
+              <td>李四</td>
+              <td>小米科技专营店</td>
+              <td style="font-weight:600;color:#333">¥28,500.00</td>
+              <td>尾号6677 (建设银行)</td>
+              <td><span class="status-tag status-pending">待审核</span></td>
+              <td>2026-03-18 16:45</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-success" style="font-size:12px">通过</button>
+                  <button class="btn btn-danger" style="font-size:12px">拒绝</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">TX20260318003</td>
+              <td>王五</td>
+              <td>OPPO官方旗舰店</td>
+              <td style="font-weight:600;color:#333">¥15,000.00</td>
+              <td>尾号5544 (招商银行)</td>
+              <td><span class="status-tag status-pending">待审核</span></td>
+              <td>2026-03-18 14:20</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-success" style="font-size:12px">通过</button>
+                  <button class="btn btn-danger" style="font-size:12px">拒绝</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">TX20260317004</td>
+              <td>赵六</td>
+              <td>vivo授权专卖店</td>
+              <td style="font-weight:600;color:#333">¥11,000.00</td>
+              <td>尾号3322 (农业银行)</td>
+              <td><span class="status-tag status-success">已通过</span></td>
+              <td>2026-03-17 11:30</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-default" style="font-size:12px">详情</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="color:#1890FF">TX20260316005</td>
+              <td>钱七</td>
+              <td>苹果授权经销商</td>
+              <td style="font-weight:600;color:#333">¥50,000.00</td>
+              <td>尾号9988 (中国银行)</td>
+              <td><span class="status-tag status-rejected">已拒绝</span></td>
+              <td>2026-03-16 15:00</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-default" style="font-size:12px">详情</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <span class="page-info">共 52 条记录</span>
+          <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">5</button>
+          <button class="page-btn">6</button>
+          <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+          <div class="filter-item" style="margin-left:12px">
+            <label>每页</label>
+            <select style="width:70px">
+              <option>10条</option>
+              <option>20条</option>
+              <option>50条</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function switchTab(tabName) {
+      // 移除所有tab的active状态
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // 激活当前tab
+      event.target.classList.add('active');
+      document.getElementById(tabName + '-tab').classList.add('active');
+    }
+  </script>
+</body>
+</html>

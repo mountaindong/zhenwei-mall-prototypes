@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>臻伟福利 - 商家端小程序个人中心</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #e5e5e5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif; }
+    
+    .phone-frame {
+      width: 390px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #f5f5f5;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+    }
+    
+    .bottom-nav {
+      width: 390px;
+      margin: 0 auto;
+      height: 56px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      cursor: pointer;
+      padding: 6px 32px;
+    }
+    .nav-item.active { color: #52C41A; }
+    .nav-item i { font-size: 20px; margin-bottom: 2px; }
+    .nav-item span { font-size: 11px; }
+    
+    /* 卡片交互 */
+    .menu-item {
+      transition: transform 0.2s, background 0.2s;
+    }
+    .menu-item:active {
+      transform: scale(0.98);
+      background: #f5f5f5;
+    }
+    
+    .stat-card {
+      transition: transform 0.2s;
+    }
+    .stat-card:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="scroll-area">
+      <!-- 状态栏 -->
+      <div style="height:44px;background:linear-gradient(135deg,#52C41A,#22c55e)"></div>
+      
+      <!-- 顶部：店铺信息头部 -->
+      <div style="background:linear-gradient(135deg,#52C41A,#22c55e);padding:16px 16px 60px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <!-- 店铺头像 -->
+          <div style="width:64px;height:64px;background:white;border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
+            <i class="fas fa-store" style="color:#52C41A;font-size:28px"></i>
+          </div>
+          <div style="flex:1">
+            <div style="color:white;font-size:20px;font-weight:600">臻伟福利旗舰店</div>
+            <div style="color:rgba(255,255,255,0.85);font-size:13px;margin-top:4px">营业中 · 正常接单</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+              <span style="background:rgba(255,255,255,0.2);color:white;font-size:11px;padding:2px 8px;border-radius:10px">金牌商家</span>
+              <span style="background:rgba(255,255,255,0.2);color:white;font-size:11px;padding:2px 8px;border-radius:10px">已认证</span>
+            </div>
+          </div>
+          <!-- 二维码入口 -->
+          <div style="width:40px;height:40px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer">
+            <i class="fas fa-qrcode" style="color:white;font-size:18px"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 数据概览卡片 -->
+      <div style="margin:-44px 16px 16px">
+        <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,0.08)">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+            <i class="fas fa-chart-line" style="color:#52C41A;font-size:14px"></i>
+            <span style="font-size:14px;color:#666">数据概览</span>
+            <span style="font-size:11px;color:#999;margin-left:auto">今日数据</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+            <!-- 卖出数量 -->
+            <div class="stat-card" style="text-align:center;padding:16px 12px;background:linear-gradient(135deg,#F0FDF4,#dcfce7);border-radius:12px;cursor:pointer">
+              <div style="font-size:36px;font-weight:700;color:#52C41A">128</div>
+              <div style="font-size:13px;color:#666;margin-top:8px">卖出数量</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px">
+                <i class="fas fa-arrow-up" style="color:#52C41A;font-size:10px"></i>
+                <span style="font-size:11px;color:#52C41A">+23%</span>
+              </div>
+            </div>
+            <!-- 发货数量 -->
+            <div class="stat-card" style="text-align:center;padding:16px 12px;background:linear-gradient(135deg,#EFF6FF,#dbeafe);border-radius:12px;cursor:pointer">
+              <div style="font-size:36px;font-weight:700;color:#1890FF">86</div>
+              <div style="font-size:13px;color:#666;margin-top:8px">发货数量</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-top:6px">
+                <i class="fas fa-arrow-up" style="color:#1890FF;font-size:10px"></i>
+                <span style="font-size:11px;color:#1890FF">+15%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 功能菜单 -->
+      <div style="padding:0 16px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#52C41A;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">常用功能</span>
+        </div>
+        <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+          <!-- 订单管理 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer;border-bottom:1px solid #f5f5f5">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#52C41A,#22c55e);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px;box-shadow:0 2px 8px rgba(82,196,26,0.25)">
+              <i class="fas fa-clipboard-list" style="color:white;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">订单管理</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">查看和处理订单</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="background:#FFF7E6;color:#FA8C16;font-size:11px;padding:2px 8px;border-radius:10px">8待处理</span>
+              <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+            </div>
+          </div>
+          
+          <!-- 消息 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer;border-bottom:1px solid #f5f5f5">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#FAAD14,#fbbf24);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px;box-shadow:0 2px 8px rgba(250,173,20,0.25)">
+              <i class="fas fa-comment-dots" style="color:white;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">消息</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">系统通知、客户消息</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="background:#FF4D4F;color:white;font-size:11px;padding:2px 8px;border-radius:10px;min-width:20px;text-align:center">5</span>
+              <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+            </div>
+          </div>
+          
+          <!-- 设置 -->
+          <div class="menu-item" style="display:flex;align-items:center;padding:16px;cursor:pointer">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#8C8C8C,#a6a6a6);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-right:14px;box-shadow:0 2px 8px rgba(140,140,140,0.25)">
+              <i class="fas fa-cog" style="color:white;font-size:18px"></i>
+            </div>
+            <div style="flex:1">
+              <div style="font-size:15px;color:#333;font-weight:500">设置</div>
+              <div style="font-size:12px;color:#999;margin-top:2px">店铺设置、账户管理</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color:#ccc;font-size:12px"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 更多服务 -->
+      <div style="padding:0 16px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#52C41A;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">更多服务</span>
+        </div>
+        <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+            <!-- 数据统计 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#F0FDF4;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-chart-pie" style="color:#52C41A;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">数据统计</span>
+            </div>
+            <!-- 商品管理 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#FFF7E6;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-box" style="color:#FA8C16;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">商品管理</span>
+            </div>
+            <!-- 资金账户 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#EFF6FF;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-wallet" style="color:#1890FF;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">资金账户</span>
+            </div>
+            <!-- 帮助中心 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer">
+              <div style="width:44px;height:44px;background:#FFF1F0;border-radius:12px;display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-question-circle" style="color:#FF4D4F;font-size:18px"></i>
+              </div>
+              <span style="font-size:12px;color:#666">帮助中心</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 店铺信息 -->
+      <div style="padding:0 16px 16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:3px;height:16px;background:#52C41A;border-radius:2px"></div>
+          <span style="font-weight:600;color:#333;font-size:15px">店铺信息</span>
+        </div>
+        <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+            <div style="padding:12px;background:#fafafa;border-radius:8px">
+              <div style="font-size:12px;color:#999;margin-bottom:4px">店铺类型</div>
+              <div style="font-size:14px;color:#333">旗舰店</div>
+            </div>
+            <div style="padding:12px;background:#fafafa;border-radius:8px">
+              <div style="font-size:12px;color:#999;margin-bottom:4px">主营类目</div>
+              <div style="font-size:14px;color:#333">数码配件</div>
+            </div>
+            <div style="padding:12px;background:#fafafa;border-radius:8px">
+              <div style="font-size:12px;color:#999;margin-bottom:4px">入驻时间</div>
+              <div style="font-size:14px;color:#333">2024-06-15</div>
+            </div>
+            <div style="padding:12px;background:#fafafa;border-radius:8px">
+              <div style="font-size:12px;color:#999;margin-bottom:4px">联系客服</div>
+              <div style="font-size:14px;color:#52C41A">在线客服</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+      <div class="nav-item">
+        <i class="fas fa-home"></i>
+        <span>工作台</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>订单</span>
+      </div>
+      <div class="nav-item active">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </nav>
+  </div>
+</body>
+</html>

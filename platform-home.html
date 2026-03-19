@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 平台端首页原型</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    /* 顶部导航 */
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    /* 侧边栏 - 加大间距 */
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #1890FF;
+    }
+    .menu-item.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .menu-item i {
+      width: 18px;
+      text-align: center;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+    
+    /* 数据卡片 */
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+    }
+    .stat-trend {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    .stat-trend.up { color: #52C41A; }
+    .stat-trend.down { color: #FF4D4F; }
+    
+    /* 图表区域 */
+    .chart-container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    
+    /* 表格 */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #fafafa;
+      font-weight: 500;
+      color: #666;
+      font-size: 13px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #333;
+    }
+    .data-table tr:hover {
+      background: #fafafa;
+    }
+    
+    /* 待办标签 */
+    .todo-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .todo-tag:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+    
+    /* 模拟图表条 */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      height: 160px;
+      padding: 20px 0;
+    }
+    .bar {
+      flex: 1;
+      background: linear-gradient(to top, #1890FF, #40a9ff);
+      border-radius: 4px 4px 0 0;
+      position: relative;
+    }
+    .bar-label {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#1890FF,#40a9ff);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-crown" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利系统</span>
+      </div>
+      <span style="color:#d9d9d9">|</span>
+      <span style="font-size:14px;color:#666">平台管理后台</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#e6f7ff;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#1890FF;font-weight:500">管</span>
+        </div>
+        <span style="font-size:13px;color:#333">管理员</span>
+        <i class="fas fa-chevron-down" style="font-size:10px;color:#999"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 - 加大间距 -->
+  <aside class="sidebar">
+    <div class="menu-item active">
+      <i class="fas fa-home"></i>
+      <span>首页</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shopping-bag"></i>
+      <span>商品管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换中心</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-users"></i>
+      <span>账号管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>运营数据</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-store"></i>
+      <span>商家管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-user-tie"></i>
+      <span>销售管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-envelope"></i>
+      <span>消息管理</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>系统设置</span>
+    </div>
+    <div class="menu-item">
+      <i class="fas fa-shield-alt"></i>
+      <span>权限管理</span>
+    </div>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面标题 -->
+    <div style="margin-bottom:20px">
+      <h1 style="font-size:20px;font-weight:600;color:#333">数据看板</h1>
+      <div style="font-size:13px;color:#999;margin-top:4px">更新时间: 2026-03-19 10:28:00</div>
+    </div>
+
+    <!-- 今日实时数据 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999;margin-bottom:8px">今日交易额</div>
+        <div class="stat-value">¥128,560</div>
+        <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 12.5% 较昨日同期</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999;margin-bottom:8px">今日订单数</div>
+        <div class="stat-value">1,256</div>
+        <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 8.3% 较昨日同期</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999;margin-bottom:8px">新增用户</div>
+        <div class="stat-value">328</div>
+        <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 15.2% 较昨日同期</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:13px;color:#999;margin-bottom:8px">活跃用户</div>
+        <div class="stat-value">2,156</div>
+        <div class="stat-trend up"><i class="fas fa-arrow-up"></i> 6.8% 较昨日同期</div>
+      </div>
+    </div>
+
+    <!-- 图表行 -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
+      <!-- 交易趋势 -->
+      <div class="chart-container">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <h3 style="font-size:15px;font-weight:600;color:#333">交易趋势（近7天）</h3>
+          <div style="display:flex;gap:8px">
+            <span style="font-size:12px;color:#1890FF;background:#e6f7ff;padding:4px 12px;border-radius:4px;cursor:pointer">7天</span>
+            <span style="font-size:12px;color:#666;background:#f5f5f5;padding:4px 12px;border-radius:4px;cursor:pointer">30天</span>
+          </div>
+        </div>
+        <div class="bar-chart">
+          <div class="bar" style="height:60%"><span class="bar-label">一</span></div>
+          <div class="bar" style="height:80%"><span class="bar-label">二</span></div>
+          <div class="bar" style="height:50%"><span class="bar-label">三</span></div>
+          <div class="bar" style="height:90%"><span class="bar-label">四</span></div>
+          <div class="bar" style="height:70%"><span class="bar-label">五</span></div>
+          <div class="bar" style="height:100%"><span class="bar-label">六</span></div>
+          <div class="bar" style="height:85%"><span class="bar-label">日</span></div>
+        </div>
+      </div>
+
+      <!-- 热销商品 -->
+      <div class="chart-container">
+        <h3 style="font-size:15px;font-weight:600;color:#333;margin-bottom:16px">热销商品TOP5</h3>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:20px;height:20px;background:#FF4D4F;border-radius:4px;color:white;font-size:12px;display:flex;align-items:center;justify-content:center">1</span>
+            <div style="flex:1">
+              <div style="font-size:13px;color:#333">iPhone手机壳</div>
+              <div style="font-size:12px;color:#1890FF;font-weight:500">¥89,200</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:20px;height:20px;background:#FAAD14;border-radius:4px;color:white;font-size:12px;display:flex;align-items:center;justify-content:center">2</span>
+            <div style="flex:1">
+              <div style="font-size:13px;color:#333">无线充电器</div>
+              <div style="font-size:12px;color:#1890FF;font-weight:500">¥67,500</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:20px;height:20px;background:#1890FF;border-radius:4px;color:white;font-size:12px;display:flex;align-items:center;justify-content:center">3</span>
+            <div style="flex:1">
+              <div style="font-size:13px;color:#333">蓝牙耳机</div>
+              <div style="font-size:12px;color:#1890FF;font-weight:500">¥45,800</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:20px;height:20px;background:#52C41A;border-radius:4px;color:white;font-size:12px;display:flex;align-items:center;justify-content:center">4</span>
+            <div style="flex:1">
+              <div style="font-size:13px;color:#333">数据线套装</div>
+              <div style="font-size:12px;color:#1890FF;font-weight:500">¥38,200</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="width:20px;height:20px;background:#999;border-radius:4px;color:white;font-size:12px;display:flex;align-items:center;justify-content:center">5</span>
+            <div style="flex:1">
+              <div style="font-size:13px;color:#333">手机支架</div>
+              <div style="font-size:12px;color:#1890FF;font-weight:500">¥29,600</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第二行图表 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <!-- 用户分布 -->
+      <div class="chart-container">
+        <h3 style="font-size:15px;font-weight:600;color:#333;margin-bottom:16px">用户分布</h3>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#666;width:60px">消费者</span>
+            <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
+              <div style="width:85%;height:100%;background:#1890FF"></div>
+            </div>
+            <span style="font-size:13px;color:#333;width:40px;text-align:right">85%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#666;width:60px">销售员</span>
+            <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
+              <div style="width:12%;height:100%;background:#52C41A"></div>
+            </div>
+            <span style="font-size:13px;color:#333;width:40px;text-align:right">12%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#666;width:60px">商家</span>
+            <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
+              <div style="width:3%;height:100%;background:#FAAD14"></div>
+            </div>
+            <span style="font-size:13px;color:#333;width:40px;text-align:right">3%</span>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0">
+          <span style="font-size:13px;color:#666">总用户: </span>
+          <span style="font-size:18px;font-weight:600;color:#1890FF">15,680</span>
+        </div>
+      </div>
+
+      <!-- 商家状态 -->
+      <div class="chart-container">
+        <h3 style="font-size:15px;font-weight:600;color:#333;margin-bottom:16px">商家状态</h3>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#666;width:60px">在线</span>
+            <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
+              <div style="width:51%;height:100%;background:#52C41A"></div>
+            </div>
+            <span style="font-size:13px;color:#333;width:40px;text-align:right">45</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#666;width:60px">离线</span>
+            <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
+              <div style="width:43%;height:100%;background:#999"></div>
+            </div>
+            <span style="font-size:13px;color:#333;width:40px;text-align:right">38</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:13px;color:#666;width:60px">待审核</span>
+            <div style="flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden">
+              <div style="width:6%;height:100%;background:#FF4D4F"></div>
+            </div>
+            <span style="font-size:13px;color:#333;width:40px;text-align:right">5</span>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid #f0f0f0">
+          <span style="font-size:13px;color:#666">商家总数: </span>
+          <span style="font-size:18px;font-weight:600;color:#52C41A">88</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 待处理事项 -->
+    <div class="chart-container" style="margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:600;color:#333;margin-bottom:16px">待处理事项</h3>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+        <div class="todo-tag" style="background:#fff2f0;border:1px solid #ffccc7">
+          <i class="fas fa-store" style="color:#FF4D4F"></i>
+          <span style="font-size:13px;color:#333">商家入驻审核</span>
+          <span style="background:#FF4D4F;color:white;font-size:11px;padding:2px 8px;border-radius:10px">3</span>
+        </div>
+        <div class="todo-tag" style="background:#fffbe6;border:1px solid #fff1b8">
+          <i class="fas fa-money-bill-wave" style="color:#FAAD14"></i>
+          <span style="font-size:13px;color:#333">提现申请</span>
+          <span style="background:#FAAD14;color:white;font-size:11px;padding:2px 8px;border-radius:10px">5</span>
+        </div>
+        <div class="todo-tag" style="background:#fff7e6;border:1px solid #ffd591">
+          <i class="fas fa-exclamation-triangle" style="color:#FA8C16"></i>
+          <span style="font-size:13px;color:#333">商品投诉</span>
+          <span style="background:#FA8C16;color:white;font-size:11px;padding:2px 8px;border-radius:10px">2</span>
+        </div>
+        <div class="todo-tag" style="background:#e6f7ff;border:1px solid #91d5ff">
+          <i class="fas fa-boxes" style="color:#1890FF"></i>
+          <span style="font-size:13px;color:#333">库存预警</span>
+          <span style="background:#1890FF;color:white;font-size:11px;padding:2px 8px;border-radius:10px">3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最新订单 -->
+    <div class="chart-container">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h3 style="font-size:15px;font-weight:600;color:#333">最新订单</h3>
+        <span style="font-size:13px;color:#1890FF;cursor:pointer">查看全部 <i class="fas fa-arrow-right" style="font-size:10px"></i></span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>订单号</th>
+            <th>商品</th>
+            <th>金额</th>
+            <th>用户</th>
+            <th>状态</th>
+            <th>时间</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:#1890FF;cursor:pointer">20260319001</td>
+            <td>手机壳 x1</td>
+            <td style="font-weight:500">¥99</td>
+            <td>张**</td>
+            <td><span style="background:#fff7e6;color:#FA8C16;padding:2px 8px;border-radius:4px;font-size:12px">待发货</span></td>
+            <td style="color:#999">10:05</td>
+          </tr>
+          <tr>
+            <td style="color:#1890FF;cursor:pointer">20260319002</td>
+            <td>充电器 x2</td>
+            <td style="font-weight:500">¥158</td>
+            <td>李**</td>
+            <td><span style="background:#e6f7ff;color:#1890FF;padding:2px 8px;border-radius:4px;font-size:12px">已发货</span></td>
+            <td style="color:#999">09:58</td>
+          </tr>
+          <tr>
+            <td style="color:#1890FF;cursor:pointer">20260319003</td>
+            <td>耳机 x1</td>
+            <td style="font-weight:500">¥299</td>
+            <td>王**</td>
+            <td><span style="background:#f6ffed;color:#52C41A;padding:2px 8px;border-radius:4px;font-size:12px">已完成</span></td>
+            <td style="color:#999">09:45</td>
+          </tr>
+          <tr>
+            <td style="color:#1890FF;cursor:pointer">20260319004</td>
+            <td>数据线 x3</td>
+            <td style="font-weight:500">¥57</td>
+            <td>赵**</td>
+            <td><span style="background:#f6ffed;color:#52C41A;padding:2px 8px;border-radius:4px;font-size:12px">已完成</span></td>
+            <td style="color:#999">09:32</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // 菜单点击
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

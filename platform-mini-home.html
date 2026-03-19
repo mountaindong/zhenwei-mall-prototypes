@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利系统 - 平台端小程序首页</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    /* 小程序框架 */
+    .mini-app {
+      width: 390px;
+      height: 844px;
+      background: #f5f7fa;
+      border-radius: 40px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* 状态栏 */
+    .status-bar {
+      height: 44px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .status-bar .time { font-weight: 600; }
+    .status-bar .icons { display: flex; gap: 4px; align-items: center; }
+    
+    /* 顶部标题栏 */
+    .header {
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+      padding: 16px 20px 24px;
+      color: white;
+    }
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .header-title .logo {
+      width: 36px;
+      height: 36px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-title h1 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .header-subtitle {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+    
+    /* 主内容区 */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 16px 100px;
+      margin-top: -8px;
+    }
+    
+    /* 核心数据卡片组 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .stat-card.highlight {
+      background: linear-gradient(135deg, #1890FF, #40a9ff);
+      color: white;
+    }
+    .stat-card.highlight .stat-label { color: rgba(255,255,255,0.85); }
+    .stat-card.highlight .stat-value { color: white; }
+    .stat-card.highlight .stat-trend { color: rgba(255,255,255,0.9); }
+    .stat-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    .stat-trend {
+      font-size: 11px;
+      color: #52C41A;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .stat-trend.down { color: #FF4D4F; }
+    
+    /* 待办提醒 */
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title .more {
+      font-size: 12px;
+      color: #1890FF;
+      font-weight: 400;
+    }
+    
+    .todo-section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .todo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #fafafa;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .todo-item:hover {
+      background: #f0f0f0;
+    }
+    .todo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .todo-icon.red { background: #fff2f0; color: #FF4D4F; }
+    .todo-icon.orange { background: #fff7e6; color: #FA8C16; }
+    .todo-icon.yellow { background: #fffbe6; color: #FAAD14; }
+    .todo-content {
+      flex: 1;
+    }
+    .todo-title {
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+    .todo-desc {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+    .todo-badge {
+      background: #FF4D4F;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .todo-arrow {
+      color: #ccc;
+      font-size: 12px;
+    }
+    
+    /* 趋势简图 */
+    .trend-section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .trend-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .trend-tabs {
+      display: flex;
+      gap: 8px;
+    }
+    .trend-tab {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .trend-tab.active {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .trend-tab:not(.active) {
+      color: #999;
+    }
+    
+    /* 柱状图 */
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 120px;
+      padding: 10px 0;
+    }
+    .bar-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .bar {
+      width: 100%;
+      background: linear-gradient(to top, #1890FF, #69c0ff);
+      border-radius: 4px 4px 0 0;
+      transition: all 0.3s;
+    }
+    .bar:hover {
+      background: linear-gradient(to top, #40a9ff, #91d5ff);
+    }
+    .bar-label {
+      font-size: 10px;
+      color: #999;
+    }
+    .bar-value {
+      font-size: 9px;
+      color: #1890FF;
+      font-weight: 500;
+    }
+    
+    /* 底部导航 */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 83px;
+      background: white;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      padding-bottom: 20px;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-item i {
+      font-size: 20px;
+      color: #999;
+    }
+    .nav-item span {
+      font-size: 10px;
+      color: #999;
+    }
+    .nav-item.active i { color: #1890FF; }
+    .nav-item.active span { color: #1890FF; font-weight: 500; }
+    
+    /* 快捷入口 */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .quick-action {
+      background: white;
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .quick-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .quick-action i {
+      font-size: 20px;
+      color: #1890FF;
+      margin-bottom: 6px;
+    }
+    .quick-action span {
+      display: block;
+      font-size: 11px;
+      color: #666;
+    }
+    
+    /* 底部安全区 */
+    .safe-area {
+      height: 34px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .home-indicator {
+      width: 134px;
+      height: 5px;
+      background: #333;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="mini-app">
+    <!-- 状态栏 -->
+    <div class="status-bar">
+      <span class="time">11:08</span>
+      <div class="icons">
+        <i class="fas fa-signal" style="font-size:12px"></i>
+        <i class="fas fa-wifi" style="font-size:12px"></i>
+        <i class="fas fa-battery-full" style="font-size:14px"></i>
+      </div>
+    </div>
+    
+    <!-- 顶部标题栏 -->
+    <div class="header">
+      <div class="header-title">
+        <div class="logo">
+          <i class="fas fa-crown" style="font-size:18px"></i>
+        </div>
+        <div>
+          <h1>臻伟福利系统</h1>
+          <div class="header-subtitle">平台管理端 · 今日概览</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 主内容 -->
+    <div class="main-content">
+      <!-- 核心数据卡片 -->
+      <div class="stats-grid">
+        <div class="stat-card highlight">
+          <div class="stat-label">
+            <i class="fas fa-chart-line"></i>
+            今日交易额
+          </div>
+          <div class="stat-value">¥128.5K</div>
+          <div class="stat-trend">
+            <i class="fas fa-arrow-up"></i> 12.5%
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <i class="fas fa-shopping-cart"></i>
+            今日订单数
+          </div>
+          <div class="stat-value">1,256</div>
+          <div class="stat-trend">
+            <i class="fas fa-arrow-up"></i> 8.3%
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <i class="fas fa-user-plus"></i>
+            新增用户
+          </div>
+          <div class="stat-value">328</div>
+          <div class="stat-trend">
+            <i class="fas fa-arrow-up"></i> 15.2%
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <i class="fas fa-users"></i>
+            活跃用户
+          </div>
+          <div class="stat-value">2,156</div>
+          <div class="stat-trend">
+            <i class="fas fa-arrow-up"></i> 6.8%
+          </div>
+        </div>
+      </div>
+      
+      <!-- 待办提醒 -->
+      <div class="section-title">
+        <span><i class="fas fa-bell" style="color:#FAAD14;margin-right:6px"></i>待办提醒</span>
+        <span class="more">查看全部 <i class="fas fa-chevron-right"></i></span>
+      </div>
+      <div class="todo-section">
+        <div class="todo-list">
+          <div class="todo-item">
+            <div class="todo-icon red">
+              <i class="fas fa-store"></i>
+            </div>
+            <div class="todo-content">
+              <div class="todo-title">商家入驻审核</div>
+              <div class="todo-desc">有新商家申请入驻，等待审核</div>
+            </div>
+            <div class="todo-badge">3</div>
+            <i class="fas fa-chevron-right todo-arrow"></i>
+          </div>
+          <div class="todo-item">
+            <div class="todo-icon yellow">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div class="todo-content">
+              <div class="todo-title">提现审核</div>
+              <div class="todo-desc">商家提现申请待处理</div>
+            </div>
+            <div class="todo-badge">5</div>
+            <i class="fas fa-chevron-right todo-arrow"></i>
+          </div>
+          <div class="todo-item">
+            <div class="todo-icon orange">
+              <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="todo-content">
+              <div class="todo-title">投诉处理</div>
+              <div class="todo-desc">用户投诉需要跟进处理</div>
+            </div>
+            <div class="todo-badge" style="background:#FA8C16">2</div>
+            <i class="fas fa-chevron-right todo-arrow"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 趋势简图 -->
+      <div class="section-title">
+        <span><i class="fas fa-chart-bar" style="color:#1890FF;margin-right:6px"></i>交易趋势</span>
+      </div>
+      <div class="trend-section">
+        <div class="trend-header">
+          <span style="font-size:12px;color:#666">近7天交易趋势</span>
+          <div class="trend-tabs">
+            <span class="trend-tab active">交易额</span>
+            <span class="trend-tab">订单数</span>
+          </div>
+        </div>
+        <div class="bar-chart">
+          <div class="bar-item">
+            <div class="bar-value">8.2万</div>
+            <div class="bar" style="height:60%"></div>
+            <div class="bar-label">周一</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-value">10.5万</div>
+            <div class="bar" style="height:80%"></div>
+            <div class="bar-label">周二</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-value">6.8万</div>
+            <div class="bar" style="height:50%"></div>
+            <div class="bar-label">周三</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-value">12.1万</div>
+            <div class="bar" style="height:90%"></div>
+            <div class="bar-label">周四</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-value">9.3万</div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar-label">周五</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-value">13.8万</div>
+            <div class="bar" style="height:100%"></div>
+            <div class="bar-label">周六</div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-value">11.2万</div>
+            <div class="bar" style="height:85%"></div>
+            <div class="bar-label">周日</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 快捷入口 -->
+      <div class="section-title">
+        <span><i class="fas fa-th-large" style="color:#1890FF;margin-right:6px"></i>快捷入口</span>
+      </div>
+      <div class="quick-actions">
+        <div class="quick-action">
+          <i class="fas fa-store"></i>
+          <span>商家管理</span>
+        </div>
+        <div class="quick-action">
+          <i class="fas fa-box"></i>
+          <span>商品审核</span>
+        </div>
+        <div class="quick-action">
+          <i class="fas fa-chart-pie"></i>
+          <span>数据报表</span>
+        </div>
+        <div class="quick-action">
+          <i class="fas fa-cog"></i>
+          <span>系统设置</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <i class="fas fa-home"></i>
+        <span>首页</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-chart-bar"></i>
+        <span>数据</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-clipboard-list"></i>
+        <span>待办</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>我的</span>
+      </div>
+    </div>
+    
+    <!-- 安全区 -->
+    <div class="safe-area">
+      <div class="home-indicator"></div>
+    </div>
+  </div>
+</body>
+</html>

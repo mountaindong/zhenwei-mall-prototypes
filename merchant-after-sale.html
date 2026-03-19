@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>臻伟福利 - 商家端售后管理</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+    }
+    
+    .top-nav {
+      background: white;
+      height: 56px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .sidebar {
+      width: 210px;
+      background: white;
+      height: calc(100vh - 56px);
+      position: fixed;
+      left: 0;
+      top: 56px;
+      border-right: 1px solid #f0f0f0;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+    .menu-item {
+      padding: 14px 24px;
+      margin: 4px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .menu-item:hover {
+      background: #f5f5f5;
+      color: #52C41A;
+    }
+    .menu-item.active {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .menu-item i { width: 18px; text-align: center; }
+    
+    .main-content {
+      margin-left: 210px;
+      padding: 24px;
+      min-height: calc(100vh - 56px);
+    }
+
+    .page-header {
+      margin-bottom: 20px;
+    }
+    .page-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-title i { color: #52C41A; }
+
+    /* 统计卡片 */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 2px solid transparent;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .stat-card.active {
+      border-color: #52C41A;
+    }
+    .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    .stat-icon.pending {
+      background: #fff7e6;
+      color: #FAAD14;
+    }
+    .stat-icon.processing {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .stat-icon.completed {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .stat-info {
+      flex: 1;
+    }
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 600;
+      color: #333;
+    }
+    .stat-value.warning { color: #FAAD14; }
+    .stat-value.info { color: #1890FF; }
+    .stat-value.success { color: #52C41A; }
+
+    /* 筛选区域 */
+    .filter-section {
+      background: white;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .filter-label {
+      font-size: 14px;
+      color: #666;
+      white-space: nowrap;
+    }
+    .filter-select,
+    .filter-input {
+      padding: 8px 12px;
+      border: 1px solid #e8e8e8;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #333;
+      background: white;
+      transition: all 0.2s;
+    }
+    .filter-select:focus,
+    .filter-input:focus {
+      outline: none;
+      border-color: #52C41A;
+    }
+    .filter-select {
+      min-width: 120px;
+      cursor: pointer;
+    }
+    .filter-input {
+      min-width: 200px;
+    }
+    .filter-btn {
+      background: #52C41A;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-btn:hover {
+      background: #40a914;
+    }
+    .filter-btn.reset {
+      background: white;
+      border: 1px solid #d9d9d9;
+      color: #666;
+    }
+    .filter-btn.reset:hover {
+      border-color: #52C41A;
+      color: #52C41A;
+    }
+
+    /* 表格区域 */
+    .table-section {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      overflow: hidden;
+    }
+    .table-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .table-title i { color: #52C41A; }
+    .table-count {
+      font-size: 13px;
+      color: #999;
+    }
+    .table-count span { color: #52C41A; font-weight: 500; }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      background: #fafafa;
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 500;
+      color: #666;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table td {
+      padding: 16px;
+      font-size: 14px;
+      color: #333;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .data-table tr:hover td {
+      background: #fafafa;
+    }
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .order-no {
+      color: #52C41A;
+      font-weight: 500;
+    }
+    .type-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .type-tag.refund {
+      background: #fff1f0;
+      color: #ff4d4f;
+    }
+    .type-tag.return {
+      background: #fff7e6;
+      color: #fa8c16;
+    }
+    .reason-text {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .amount {
+      font-weight: 600;
+      color: #ff4d4f;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-badge.pending {
+      background: #fff7e6;
+      color: #FAAD14;
+    }
+    .status-badge.processing {
+      background: #e6f7ff;
+      color: #1890FF;
+    }
+    .status-badge.completed {
+      background: #f6ffed;
+      color: #52C41A;
+    }
+    .status-badge.rejected {
+      background: #fff1f0;
+      color: #ff4d4f;
+    }
+    
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    .action-btn {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .action-btn.view {
+      background: #f0f0f0;
+      color: #666;
+    }
+    .action-btn.view:hover {
+      background: #e6e6e6;
+      color: #333;
+    }
+    .action-btn.agree {
+      background: #f6ffed;
+      color: #52C41A;
+      border: 1px solid #b7eb8f;
+    }
+    .action-btn.agree:hover {
+      background: #52C41A;
+      color: white;
+    }
+    .action-btn.reject {
+      background: #fff1f0;
+      color: #ff4d4f;
+      border: 1px solid #ffa39e;
+    }
+    .action-btn.reject:hover {
+      background: #ff4d4f;
+      color: white;
+    }
+
+    /* 分页 */
+    .pagination {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .page-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: white;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .page-btn:hover {
+      border-color: #52C41A;
+      color: #52C41A;
+    }
+    .page-btn.active {
+      background: #52C41A;
+      border-color: #52C41A;
+      color: white;
+    }
+    .page-btn:disabled {
+      background: #f5f5f5;
+      border-color: #d9d9d9;
+      color: #bfbfbf;
+      cursor: not-allowed;
+    }
+
+    /* 空状态 */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .empty-state i {
+      font-size: 64px;
+      color: #e8e8e8;
+      margin-bottom: 16px;
+    }
+    .empty-state p {
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <nav class="top-nav">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#52C41A,#22c55e);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <i class="fas fa-store" style="color:white;font-size:14px"></i>
+        </div>
+        <span style="font-size:16px;font-weight:600;color:#333">臻伟福利商家端</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <i class="fas fa-bell" style="color:#666;cursor:pointer"></i>
+      <div style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <div style="width:32px;height:32px;background:#f6ffed;border-radius:50%;display:flex;align-items:center;justify-content:center">
+          <span style="color:#52C41A;font-weight:500">店</span>
+        </div>
+        <span style="font-size:13px;color:#333">店铺员工</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 侧边栏 -->
+  <aside class="sidebar">
+    <a href="merchant-home.html" class="menu-item">
+      <i class="fas fa-home"></i>
+      <span>工作台</span>
+    </a>
+    <a href="merchant-order.html" class="menu-item">
+      <i class="fas fa-box"></i>
+      <span>订单管理</span>
+    </a>
+    <a href="merchant-after-sale.html" class="menu-item active">
+      <i class="fas fa-undo"></i>
+      <span>售后管理</span>
+    </a>
+    <a href="merchant-logistics.html" class="menu-item">
+      <i class="fas fa-truck"></i>
+      <span>物流查询</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-headset"></i>
+      <span>客服对话</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-gift"></i>
+      <span>兑换记录</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-chart-bar"></i>
+      <span>数据统计</span>
+    </a>
+    <a href="#" class="menu-item">
+      <i class="fas fa-comment-dots"></i>
+      <span>消息中心</span>
+    </a>
+    <a href="merchant-setting.html" class="menu-item">
+      <i class="fas fa-cog"></i>
+      <span>店铺设置</span>
+    </a>
+  </aside>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <!-- 页面标题 -->
+    <div class="page-header">
+      <h1 class="page-title">
+        <i class="fas fa-undo"></i>
+        售后管理
+      </h1>
+    </div>
+
+    <!-- 统计卡片 -->
+    <div class="stats-row">
+      <div class="stat-card active" onclick="filterByStatus('pending')">
+        <div class="stat-icon pending">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">待处理</div>
+          <div class="stat-value warning">12</div>
+        </div>
+      </div>
+      <div class="stat-card" onclick="filterByStatus('processing')">
+        <div class="stat-icon processing">
+          <i class="fas fa-spinner"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">处理中</div>
+          <div class="stat-value info">8</div>
+        </div>
+      </div>
+      <div class="stat-card" onclick="filterByStatus('completed')">
+        <div class="stat-icon completed">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-label">已完成</div>
+          <div class="stat-value success">156</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 筛选区域 -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-item">
+          <span class="filter-label">状态：</span>
+          <select class="filter-select" id="statusFilter">
+            <option value="">全部状态</option>
+            <option value="pending">待处理</option>
+            <option value="processing">处理中</option>
+            <option value="completed">已完成</option>
+            <option value="rejected">已拒绝</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">时间：</span>
+          <select class="filter-select" id="timeFilter">
+            <option value="">全部时间</option>
+            <option value="today">今天</option>
+            <option value="week">近7天</option>
+            <option value="month">近30天</option>
+            <option value="custom">自定义</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <span class="filter-label">订单号：</span>
+          <input type="text" class="filter-input" id="orderNoInput" placeholder="请输入订单号">
+        </div>
+        <button class="filter-btn" onclick="applyFilter()">
+          <i class="fas fa-search"></i>
+          查询
+        </button>
+        <button class="filter-btn reset" onclick="resetFilter()">
+          <i class="fas fa-redo"></i>
+          重置
+        </button>
+      </div>
+    </div>
+
+    <!-- 表格区域 -->
+    <div class="table-section">
+      <div class="table-header">
+        <h3 class="table-title">
+          <i class="fas fa-list-alt"></i>
+          售后订单列表
+        </h3>
+        <span class="table-count">共 <span>176</span> 条记录</span>
+      </div>
+      
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>订单号</th>
+            <th>类型</th>
+            <th>原因</th>
+            <th>金额</th>
+            <th>状态</th>
+            <th>申请时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="order-no">20260319001</span></td>
+            <td><span class="type-tag refund">退款</span></td>
+            <td class="reason-text">商品质量问题，与描述不符</td>
+            <td><span class="amount">¥299.00</span></td>
+            <td><span class="status-badge pending">待处理</span></td>
+            <td>2026-03-19 14:23:45</td>
+            <td>
+              <div class="action-btns">
+                <a href="#" class="action-btn view"><i class="fas fa-eye"></i> 详情</a>
+                <button class="action-btn agree" onclick="handleAgree('20260319001')"><i class="fas fa-check"></i> 同意</button>
+                <button class="action-btn reject" onclick="handleReject('20260319001')"><i class="fas fa-times"></i> 拒绝</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="order-no">20260318088</span></td>
+            <td><span class="type-tag return">退货</span></td>
+            <td class="reason-text">尺码不合适，需要换货</td>
+            <td><span class="amount">¥599.00</span></td>
+            <td><span class="status-badge pending">待处理</span></td>
+            <td>2026-03-19 11:15:30</td>
+            <td>
+              <div class="action-btns">
+                <a href="#" class="action-btn view"><i class="fas fa-eye"></i> 详情</a>
+                <button class="action-btn agree" onclick="handleAgree('20260318088')"><i class="fas fa-check"></i> 同意</button>
+                <button class="action-btn reject" onclick="handleReject('20260318088')"><i class="fas fa-times"></i> 拒绝</button>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="order-no">20260318056</span></td>
+            <td><span class="type-tag refund">退款</span></td>
+            <td class="reason-text">拍错商品，重新下单</td>
+            <td><span class="amount">¥128.00</span></td>
+            <td><span class="status-badge processing">处理中</span></td>
+            <td>2026-03-18 16:42:18</td>
+            <td>
+              <div class="action-btns">
+                <a href="#" class="action-btn view"><i class="fas fa-eye"></i> 详情</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="order-no">20260318023</span></td>
+            <td><span class="type-tag return">退货</span></td>
+            <td class="reason-text">商品损坏，申请退货退款</td>
+            <td><span class="amount">¥459.00</span></td>
+            <td><span class="status-badge processing">处理中</span></td>
+            <td>2026-03-18 09:30:52</td>
+            <td>
+              <div class="action-btns">
+                <a href="#" class="action-btn view"><i class="fas fa-eye"></i> 详情</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="order-no">20260317099</span></td>
+            <td><span class="type-tag refund">退款</span></td>
+            <td class="reason-text">商品缺货，无法发货</td>
+            <td><span class="amount">¥88.00</span></td>
+            <td><span class="status-badge completed">已完成</span></td>
+            <td>2026-03-17 15:20:33</td>
+            <td>
+              <div class="action-btns">
+                <a href="#" class="action-btn view"><i class="fas fa-eye"></i> 详情</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="order-no">20260317065</span></td>
+            <td><span class="type-tag return">退货</span></td>
+            <td class="reason-text">商品与预期不符</td>
+            <td><span class="amount">¥368.00</span></td>
+            <td><span class="status-badge completed">已完成</span></td>
+            <td>2026-03-17 10:45:21</td>
+            <td>
+              <div class="action-btns">
+                <a href="#" class="action-btn view"><i class="fas fa-eye"></i> 详情</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="order-no">20260316042</span></td>
+            <td><span class="type-tag refund">退款</span></td>
+            <td class="reason-text">物流太慢，不想要了</td>
+            <td><span class="amount">¥199.00</span></td>
+            <td><span class="status-badge rejected">已拒绝</span></td>
+            <td>2026-03-16 14:30:18</td>
+            <td>
+              <div class="action-btns">
+                <a href="#" class="action-btn view"><i class="fas fa-eye"></i> 详情</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 分页 -->
+      <div class="pagination">
+        <button class="page-btn" disabled><i class="fas fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">...</button>
+        <button class="page-btn">18</button>
+        <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // 点击统计卡片筛选
+    function filterByStatus(status) {
+      document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById('statusFilter').value = status;
+      applyFilter();
+    }
+
+    // 应用筛选
+    function applyFilter() {
+      const status = document.getElementById('statusFilter').value;
+      const time = document.getElementById('timeFilter').value;
+      const orderNo = document.getElementById('orderNoInput').value;
+      console.log('筛选条件：', { status, time, orderNo });
+      // 这里可以添加实际的筛选逻辑
+    }
+
+    // 重置筛选
+    function resetFilter() {
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('timeFilter').value = '';
+      document.getElementById('orderNoInput').value = '';
+      document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
+      document.querySelector('.stat-card').classList.add('active');
+    }
+
+    // 同意售后
+    function handleAgree(orderNo) {
+      if (confirm(`确认同意订单 ${orderNo} 的售后申请吗？`)) {
+        console.log('同意售后：', orderNo);
+        // 这里可以添加实际的同意逻辑
+        alert('操作成功！');
+      }
+    }
+
+    // 拒绝售后
+    function handleReject(orderNo) {
+      const reason = prompt(`请输入拒绝订单 ${orderNo} 的原因：`);
+      if (reason) {
+        console.log('拒绝售后：', orderNo, reason);
+        // 这里可以添加实际的拒绝逻辑
+        alert('操作成功！');
+      }
+    }
+  </script>
+</body>
+</html>
